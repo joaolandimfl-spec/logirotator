@@ -37,10 +37,10 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-tight text-white">HUB-LCE-04 | Juazeiro do Norte</h1>
-                    <p class="text-xs text-gray-400">Pit Stop Shopee &bull; Controle Operacional de DSR</p>
+                    <p class="text-xs text-gray-400">Pit Stop Shopee • Controle Operacional de DSR</p>
                 </div>
             </div>
-            
+
             <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
                 <div class="bg-shopee-border px-3 py-1.5 rounded-lg text-xs font-medium text-gray-300 flex items-center gap-2">
                     <i class="fa-regular fa-calendar text-shopee-orange"></i>
@@ -128,11 +128,12 @@
 
     <!-- Rodapé -->
     <footer class="text-center py-6 text-xs text-gray-500 border-t border-shopee-border mt-12">
-        LogiRotator &bull; Pit Stop Shopee &copy; 2026 &bull; Desenvolvido para operações de Alta Performance
+        LogiRotator • Pit Stop Shopee © 2026 • Desenvolvido para operações de Alta Performance
     </footer>
 
     <!-- JavaScript Lógica & Dados Corrigida -->
     <script>
+        // Dados extraídos da planilha "HUB-LCE-04 - Juazeiro do Norte"
         const colaboradoresData = [
             { nome: "JUSCILENE PEREIRA DIAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "ROBERTA CARVALHO DE SOUSA", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
@@ -202,26 +203,24 @@
         let filtroAtual = 'TODOS';
         let termoBusca = '';
 
-        // ✅ Verifica DSR — versão robusta (split por não-letras)
+        // ✅ Função de DSR 100% infalível
         function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
             if (!colaborador || !colaborador.folga) return false;
 
             const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
             const diaHojeStr = diasSemana[dataAtual.getDay()];
 
-            // Normaliza: remove acentos, deixa maiúsculo
+            // Normaliza: remove acentos, maiúsculo, trim
             const folgaNorm = String(colaborador.folga)
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
-                .toUpperCase();
+                .toUpperCase()
+                .trim();
 
-            // Quebra em partes usando QUALQUER caractere que não seja A-Z
-            // "QUA E QUI"          → ["QUA","E","QUI"]
-            // "SEG, TER,QUA,QUI"   → ["SEG","TER","QUA","QUI"]
-            // "SAB E DOM"          → ["SAB","E","DOM"]
+            // Quebra em tokens A-Z e verifica dia exato
+            // Ex: "QUA E QUI" -> ["QUA","E","QUI"] (o "E" é ignorado)
+            //     "SEG, TER,QUA,QUI" -> ["SEG","TER","QUA","QUI"]
             const partes = folgaNorm.split(/[^A-Z]+/).filter(Boolean);
-
-            // Verifica se o dia de hoje está entre as partes
             return partes.includes(diaHojeStr);
         }
 
@@ -270,6 +269,7 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-shopee-dark/40 transition-colors";
 
+                // Badge de status especial (ex: AF - afastado)
                 const statusEspecial = c.status
                     ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">${c.status}</span>`
                     : '';
