@@ -1,0 +1,32 @@
+LOGIROTATOR + NEON DB + NETLIFY
+
+IMPORTANTE
+- Publique a pasta completa; não somente o index.html.
+- A senha do Neon fica somente na variável DATABASE_URL do Netlify.
+- O HTML mantém o modo de teste sem login.
+- Antes de usar dados reais em produção, implemente autenticação/autorização na API.
+
+1. NEON
+Abra o SQL Editor do Neon e execute todo o arquivo schema.sql.
+Copie a connection string do Neon (preferencialmente pooled connection).
+
+2. NETLIFY
+No painel do site: Site configuration > Environment variables.
+Crie DATABASE_URL com a connection string do Neon e salve.
+
+3. PUBLICAÇÃO
+Extraia o ZIP e publique a pasta completa via GitHub conectado ao Netlify.
+Build command: npm install
+Publish directory: .
+Functions directory: netlify/functions
+Faça um novo deploy depois de salvar DATABASE_URL.
+
+4. TESTE
+Acesse https://SEU-SITE.netlify.app/.netlify/functions/api
+Uma resposta 405 no navegador (GET) é esperada: significa que a função existe e aceita POST.
+Depois abra o LogiRotator; o 404 da função deverá desaparecer.
+
+OBSERVAÇÕES
+- O aviso cdn.tailwindcss.com é de otimização, não causa o 404.
+- schema.sql cria tabelas vazias; não transfere automaticamente os dados do Supabase.
+- Se as tabelas já existirem com estrutura diferente, revise o schema antes de executar.

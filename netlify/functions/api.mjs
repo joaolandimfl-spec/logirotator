@@ -1,0 +1,142 @@
+import pg from "pg";
+
+const { Pool } = pg;
+
+const TABLES = new Set([
+  "colaboradores",
+  "presenca_diaria",
+  "historico_escala",
+  "logirotator_diaristas_diarios",
+  "logirotator_perfis"
+]);
+
+let pool;
+function db() {
+  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada no Netlify.");
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 5,
+      idleTimeoutMillis: 10000,
+      connectionTimeoutMillis: 10000
+    });
+  }
+  return pool;
+}
+function ident(value) {
+  if (typeof value !== "string" || !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
+    throw new Error("Nome de coluna inválido.");
+  }
+  return `"${value}"`;
+}
+function json(statusCode, payload) {
+  return { statusCode, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" }, body: JSON.stringify(payload) };
+}
+function buildWhere(filters = [], values = []) {
+  const clauses = [];
+  for (const f of filters) {
+    const col = ident(f.column);
+    if (f.op === "eq" || f.op === "neq" || f.op === "gte" || f.op === "lte") {
+      values.push(f.value);
+      const op = { eq: "=", neq: "<>", gte: ">=", lte: "<=" }[f.op];
+      clauses.push(`${col} ${op} $${values.length}`);
+    } else if (f.op === "is") {
+      if (f.value === null) clauses.push(`${col} IS NULL`);
+      else if (f.value === true) clauses.push(`${col} IS TRUE`);
+      else if (f.value === false) clauses.push(`${col} IS FALSE`);
+      else throw new Error("Filtro IS não suportado.");
+    } else if (f.op === "not") {
+      if (f.operator === "is" && f.value === null) clauses.push(`${col} IS NOT NULL`);
+      else throw new Error("Filtro NOT não suportado.");
+    } else if (f.op === "in") {
+      const arr = Array.isArray(f.values) ? f.values : [];
+      if (!arr.length) clauses.push("FALSE");
+      else {
+        const marks = arr.map(v => { values.push(v); return `$${values.length}`; });
+        clauses.push(`${col} IN (${marks.join(",")})`);
+      }
+    } else {
+      throw new Error("Operador de filtro não permitido.");
+    }
+  }
+  return clauses.length ? " WHERE " + clauses.join(" AND ") : "";
+}
+export const handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers: { "Access-Control-Allow-Origin": "*" } };
+  if (event.httpMethod !== "POST") return json(405, { error: "Método não permitido." });
+  try {
+    const body = JSON.parse(event.body || "{}");
+    const { table, action = "select", columns = "*", values: inputValues, filters = [], orders = [], limit, range, conflict, returning = false, single = false } = body;
+    if (!TABLES.has(table)) return json(400, { error: "Tabela não autorizada." });
+
+    const client = await db().connect();
+    try {
+      let result;
+      if (action === "select") {
+        const selected = columns === "*" ? "*" : String(columns).split(",").map(x => ident(x.trim())).join(", ");
+        const params = [];
+        let sql = `SELECT ${selected} FROM ${ident(table)}` + buildWhere(filters, params);
+        if (orders.length) {
+          const orderSql = orders.map(o => `${ident(o.column)} ${o.ascending === false ? "DESC" : "ASC"}`).join(", ");
+          sql += ` ORDER BY ${orderSql}`;
+        }
+        if (range && Number.isInteger(range.from) && Number.isInteger(range.to)) {
+          sql += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+          params.push(Math.max(0, range.to - range.from + 1), Math.max(0, range.from));
+        } else if (Number.isInteger(limit) && limit >= 0) {
+          sql += ` LIMIT $${params.length + 1}`;
+          params.push(limit);
+        }
+        result = await client.query(sql, params);
+      } else if (action === "insert" || action === "upsert") {
+        const rows = Array.isArray(inputValues) ? inputValues : [inputValues];
+        if (!rows.length || !rows[0] || typeof rows[0] !== "object") throw new Error("Dados para gravação inválidos.");
+        const cols = [...new Set(rows.flatMap(r => Object.keys(r)))];
+        if (!cols.length) throw new Error("Nenhuma coluna informada.");
+        const params = [];
+        const tuples = rows.map(row => {
+          const marks = cols.map(col => {
+            params.push(row[col] === undefined ? null : row[col]);
+            return `$${params.length}`;
+          });
+          return `(${marks.join(",")})`;
+        });
+        let sql = `INSERT INTO ${ident(table)} (${cols.map(ident).join(",")}) VALUES ${tuples.join(",")}`;
+        if (action === "upsert") {
+          const conflictCols = String(conflict || "").split(",").filter(Boolean);
+          if (!conflictCols.length) throw new Error("Informe a coluna de conflito para upsert.");
+          const updates = cols.filter(c => !conflictCols.includes(c));
+          sql += ` ON CONFLICT (${conflictCols.map(ident).join(",")}) `;
+          sql += updates.length ? `DO UPDATE SET ${updates.map(c => `${ident(c)} = EXCLUDED.${ident(c)}`).join(", ")}` : "DO NOTHING";
+        }
+        sql += " RETURNING *";
+        result = await client.query(sql, params);
+      } else if (action === "update" || action === "delete") {
+        const params = [];
+        const where = buildWhere(filters, params);
+        if (!filters.length) throw new Error("Operação sem filtro bloqueada por segurança.");
+        let sql;
+        if (action === "delete") sql = `DELETE FROM ${ident(table)}${where} RETURNING *`;
+        else {
+          if (!inputValues || typeof inputValues !== "object" || Array.isArray(inputValues)) throw new Error("Dados de atualização inválidos.");
+          const sets = Object.entries(inputValues).map(([col, val]) => {
+            params.push(val);
+            return `${ident(col)} = $${params.length}`;
+          });
+          if (!sets.length) throw new Error("Nenhuma alteração informada.");
+          sql = `UPDATE ${ident(table)} SET ${sets.join(", ")}${where} RETURNING *`;
+        }
+        result = await client.query(sql, params);
+      } else {
+        return json(400, { error: "Operação não permitida." });
+      }
+      return json(200, { data: single ? (result.rows[0] || null) : result.rows, count: result.rowCount });
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error("Neon API:", error);
+    return json(500, { error: error.message || "Erro interno na API Neon." });
+  }
+};
