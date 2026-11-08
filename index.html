@@ -140,7 +140,7 @@
             { nome: "NATANAEL GHEOVANI BORGES DE FREITAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "SERGIO DOS SANTOS SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
             { nome: "PAULO HENRIQUE DOS SANTOS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
-            { nome: "EMANUELE ROCHA BARBOSA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "EMANUELE ROCHA BARBOSA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", status: "AF (15 dias)" },
             { nome: "DENILSON REGINALDO BATISTA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "ADEMIR DOS SANTOS SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "MATEUS VIEIRA NOGUEIRA GAMA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
@@ -163,9 +163,9 @@
             { nome: "EDINALDO GOMES PEREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "JOSE ALEXANDRE ALVES SOBREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "LEONARDO DA SILVA BARBOSA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
-            { nome: "ALUIZIO NERI ROCHA NETO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
-            { nome: "CICERO LUCAS RODRIGUES MOREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
-            { nome: "EVERSON GILLIARD DE QUEROIS PEQUENO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "ALUIZIO NERI ROCHA NETO", escala: "5x2 - 220h - SEX A TER - 00:00 às 09:13", folga: "QUA e QUI", operacao: "AM" },
+            { nome: "CICERO LUCAS RODRIGUES MOREIRA", escala: "5x2 - 220h - SEX A TER - 00:00 às 09:13", folga: "QUA e QUI", operacao: "AM" },
+            { nome: "EVERSON GILLIARD DE QUEROIS PEQUENO", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", operacao: "AM" },
             { nome: "JOSE AIRTON DA SILVA COSMO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
             { nome: "JOHNATHAN INALDO RODRIGUES DE SOUZA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
             { nome: "CICERO GABRIEL SANTOS DE SA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
@@ -191,39 +191,50 @@
             { nome: "JOAO PAULO DE OLIVEIRA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
             { nome: "CLEIDIANA PESSOA FERREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "EDIGLEI LUIZ DE SOUSA FILHO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
-            { nome: "JOAO VICTOR VILARDE ARAUJO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" }
+            { nome: "JOAO VICTOR VILARDE ARAUJO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            // ✅ ADICIONADOS (faltavam no código original)
+            { nome: "JOSE NEILSON ALVES GOMES", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", operacao: "AM" },
+            { nome: "ISRAEL ALENCAR DO VALE", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", operacao: "AM" },
+            { nome: "ADRIAN NUNES LIMA SOARES", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", operacao: "AM" },
+            { nome: "HELOÍSA KELLY DA SILVA NASCIMENTO", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", operacao: "AM" },
+            { nome: "GUILHERME NELO ALVES", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" }
         ];
 
         let filtroAtual = 'TODOS';
         let termoBusca = '';
 
-        // Função matematicamente estrita para checar DSR apenas se a folga bater com o dia atual
+        // ✅ Normaliza texto: remove acentos, deixa maiúsculo e trim
+        function normalizar(str) {
+            return (str || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toUpperCase()
+                .trim();
+        }
+
+        // ✅ Verifica DSR comparando tokens exatos (não substring)
         function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
             const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-            const diaHojeStr = diasSemana[dataAtual.getDay()]; // Retorna estritamente o dia de hoje (ex: DOM, SEG...)
-            
-            const folgaPred = (colaborador.folga || '').trim().toUpperCase();
-            
-            // Se a folga predominante for exatamente igual ao dia de hoje
-            if (folgaPred === diaHojeStr) {
-                return true;
-            }
-            
-            // Se a escala contiver múltiplos dias de folga (ex: "SAB e DOM")
-            if (folgaPred.includes(diaHojeStr)) {
-                const partes = folgaPred.split(/[\s+E&]+/);
-                if (partes.includes(diaHojeStr)) {
-                    return true;
-                }
-            }
-            
-            return false;
+            const diaHojeStr = diasSemana[dataAtual.getDay()];
+
+            const folgaNorm = normalizar(colaborador.folga);
+
+            // Quebra por vírgula, espaço, "+", "/" e pelo " E " isolado
+            // Ex: "SEG, TER,QUA,QUI" -> ["SEG","TER","QUA","QUI"]
+            //     "QUA e QUI"        -> ["QUA","QUI"]
+            //     "SAB e DOM"        -> ["SAB","DOM"]
+            const tokens = folgaNorm
+                .replace(/\bE\b/g, ' ')            // troca " E " isolado por espaço
+                .split(/[\s,+\/]+/)
+                .filter(Boolean);
+
+            return tokens.includes(diaHojeStr);
         }
 
         function renderizarDashboard() {
             const tbody = document.getElementById('tabela-colaboradores');
             const dataHoje = new Date();
-            
+
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('txt-data').innerText = dataHoje.toLocaleDateString('pt-BR', options);
 
@@ -265,12 +276,17 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-shopee-dark/40 transition-colors";
 
+                // Badge de status especial (ex: AF - afastado)
+                const statusEspecial = c.status
+                    ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">${c.status}</span>`
+                    : '';
+
                 const badgeStatus = c.emDsr 
                     ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-500/10 text-shopee-orange border border-shopee-orange/30"><i class="fa-solid fa-mug-hot mr-1.5"></i> DSR Hoje</span>`
                     : `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"><i class="fa-solid fa-circle-check mr-1.5"></i> Trabalhando</span>`;
 
                 tr.innerHTML = `
-                    <td class="py-3 px-4 font-medium text-white">${c.nome}</td>
+                    <td class="py-3 px-4 font-medium text-white">${c.nome}${statusEspecial}</td>
                     <td class="py-3 px-4 text-gray-300 text-xs">${c.escala}</td>
                     <td class="py-3 px-4 text-gray-300 text-xs font-semibold">${c.folga}</td>
                     <td class="py-3 px-4 text-gray-400 text-xs"><span class="bg-shopee-dark px-2 py-1 rounded border border-shopee-border">${c.operacao}</span></td>
@@ -283,7 +299,9 @@
         function filtrarStatus(status) {
             filtroAtual = status;
             document.querySelectorAll('.filtro-btn').forEach(btn => {
-                if (btn.innerText.toUpperCase().includes(status) || (status === 'TODOS' && btn.innerText === 'Todos')) {
+                const texto = btn.innerText.toUpperCase();
+                const ativo = (status === 'TODOS' && texto === 'TODOS') || texto.includes(status);
+                if (ativo) {
                     btn.className = "filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-orange text-white transition-all whitespace-nowrap";
                 } else {
                     btn.className = "filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-dark border border-shopee-border text-gray-300 hover:bg-shopee-border transition-all whitespace-nowrap";
