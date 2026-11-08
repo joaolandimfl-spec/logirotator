@@ -1116,7 +1116,6 @@ if(filtroAtivo==='diaristas'){
 }
 
 if(filtroAtivo==='dsr'){
-  // Avaliação garantida de DSR automático para a listagem
   const listaDsrAuto = colaboradores.filter(function(c){
     const t = obterStatusHoje(c);
     return (isColabEmDSRHoje(c) && t !== 'falta' && t !== 'atestado') || t === 'dsr';
@@ -1238,22 +1237,56 @@ function filtrarColabsAlocar(){
   const t=normalizarTexto(document.getElementById('alocar-busca').value);
   const cont=document.getElementById('alocar-lista');
   const lista=colaboradores
-    .filter(function(c){return obterStatusHoje(c)==='presente' && matchBuscaAvancada(t,c.nome)})
+    .filter(function(c){
+      const emDsr=isColabEmDSRHoje(c);
+      return obterStatusHoje(c)==='presente' && !emDsr && matchBuscaAvancada(t,c.nome);
+    })
     .sort(function(a,b){return a.nome.localeCompare(b.nome)});
   if(lista.length===0){
-    cont.innerHTML='<p class="text-xs text-slate-500 italic p-3">Nenhum colaborador presente disponível para adicionar.</p>';
+    cont.innerHTML='<p class="text-xs text-slate-500 italic p-3">Nenhum colaborador presente e disponível (sem DSR) para adicionar.</p>';
     return;
   }
   cont.innerHTML=lista.map(function(c){
     const sel=c.id===alocarColabSelecionadoId;
     const f=c.historicoDias[diaHoje-1]||'-';
     const ft=(f!=='-'&&!isStatusEspecial(f))?f:'';
-    return '<button type="button" onclick="selecionarColabAlocar(\''+c.id+'\')" class="w-full text-left px-3 py-2.5 border-b border-slate-800/60 last:border-0 flex items-center justify-between gap-2 '+(sel?'bg-amber-500/15 border-l-2 border-l-amber-500':'hover:bg-slate-900/60')+'"><div class="min-w-0"><div class="text-xs font-bold text-slate-200 truncate">'+c.nome+'</div><div class="text-[10px] text-slate-400 truncate">'+c.escala+' · DSR: '+c.dsr+(ft?' · Hoje: '+ft:'')+'</div></div>'+(sel?'<i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400"></i>':'<span class="badge badge-success">Presente</span>')+'</button>';
+    return '<button type="button" onclick="selecionarColabAlocar(\''+c.id+'\')" class="w-full text-left px-3 py-2.5 border-b border-slate-800/60 last:border-0 flex items-center justify-between gap-2 '+(sel?'bg-amber-500/15 border-l-2 border-l-amber-500':'hover:bg-slate-900/60')+'"><div class="min-w-0"><div class="text-xs font-bold text-slate-200 truncate">'+c.nome+'</div><div class="text-[10px] text-slate-400 truncate">'+c.escala+' · DSR: '+c.dsr+(ft?' · Hoje: '+ft:'')+'</div></div>'+(sel?'<i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400"></i>':'<span class="badge badge-success">Disponível</span>')+'</button>';
   }).join('');
   lucide.createIcons();
 }
 function selecionarColabAlocar(id){alocarColabSelecionadoId=id;filtrarColabsAlocar()}
-async function confirmarAlocacao(){const funcao=document.getElementById('alocar-funcao').value;if(!alocarColabSelecionadoId){toast("Selecione um.",'warn');return}const colab=colaboradores.find(function(c){return c.id===alocarColabSelecionadoId});if(!colab)return;const btn=document.querySelector('#modal-alocar button[onclick="confirmarAlocacao()"]');if(btn&&btn.disabled)return;if(btn)btn.disabled=true;try{const st=obterStatusHoje(colab);if(st!=='presente'){toast(colab.nome+' nao pode ser alocado neste status.','warn');return}const hora=await registrarMovimentacaoSetorHoje(colab.id,funcao);await recarregarMovimentosCard(colab);colab.historicoDias[diaHoje-1]=funcao;toast(colab.nome+' alocado em '+funcao+' às '+hora.slice(0,5)+'.','ok');fecharModalAlocar();renderizar()}catch(e){console.error(e);toast("Erro: "+(e.message||e),'erro')}finally{if(btn)btn.disabled=false}}
+
+async function confirmarAlocacao(){
+  const funcao=document.getElementById('alocar-funcao').value;
+  if(!alocarColabSelecionadoId){toast("Selecione um colaborador.",'warn');return}
+  const colab=colaboradores.find(function(c){return c.id===alocarColabSelecionadoId});
+  if(!colab)return;
+
+  // BLOQUEIO DE DSR: Impede alocação se estiver de DSR hoje
+  if(isColabEmDSRHoje(colab)){
+    toast(colab.nome+' está de DSR hoje e não pode ser alocado em setores.', 'warn');
+    return;
+  }
+
+  const btn=document.querySelector('#modal-alocar button[onclick="confirmarAlocacao()"]');
+  if(btn&&btn.disabled)return;
+  if(btn)btn.disabled=true;
+  try{
+    const st=obterStatusHoje(colab);
+    if(st!=='presente'){toast(colab.nome+' nao pode ser alocado neste status.','warn');return}
+    const hora=await registrarMovimentacaoSetorHoje(colab.id,funcao);
+    await recarregarMovimentosCard(colab);
+    colab.historicoDias[diaHoje-1]=funcao;
+    toast(colab.nome+' alocado em '+funcao+' às '+hora.slice(0,5)+'.','ok');
+    fecharModalAlocar();
+    renderizar();
+  }catch(e){
+    console.error(e);
+    toast("Erro: "+(e.message||e),'erro');
+  }finally{
+    if(btn)btn.disabled=false;
+  }
+}
 
 async function salvarColaborador(){const btn=document.querySelector('#modal-add button[onclick="salvarColaborador()"]');if(btn&&btn.disabled)return;if(btn)btn.disabled=true;try{const idEdit=document.getElementById('edit-id').value;const nome=document.getElementById('input-nome-colab').value.trim();const func=document.getElementById('novo-funcao').value;if(!nome){toast("Insira o nome.",'warn');return}if(nome.length<3){toast("Nome curto.",'warn');return}const nn=normalizarTexto(nome);const dup=colaboradores.some(function(c){return normalizarTexto(c.nome)===nn&&c.id!==idEdit});if(dup){toast('Ja existe: '+nome,'warn');return}if(idEdit){const ru=await supabaseClient.from('colaboradores').update({nome:nome}).eq('id',idEdit);if(ru.error){toast("Erro: "+ru.error.message,'erro');return}const c=colaboradores.find(function(x){return x.id===idEdit});if(c&&!isColabEmDSRHoje(c))await atualizarDiaSupabase(idEdit,diaHoje,func);else if(c&&isColabEmDSRHoje(c)&&isStatusEspecial(func))await atualizarDiaSupabase(idEdit,diaHoje,func);toast(nome+' atualizado.','ok')}else{const esc=document.getElementById('select-escala').value;const dsr=document.getElementById('select-dsr').value;const hor=document.getElementById('input-horario').value;const ri=await supabaseClient.from('colaboradores').insert([{nome:nome,escala:esc,dsr:dsr,horario:'00:00 - 07:54'}]).select();if(ri.error){toast("Erro: "+ri.error.message,'erro');return}if(ri.data&&ri.data.length>0){const dh=new Date(anoAtual,mesAtualIndex,diaHoje);const hd=isDiaDSR(dsr,dh);if(!hd||isStatusEspecial(func))await atualizarDiaSupabase(ri.data[0].id,diaHoje,func);toast(nome+' adicionado.','ok')}}fecharModalAdd();await carregarDadosSupabase();renderizar()}catch(e){console.error(e);toast("Erro: "+(e.message||e),'erro')}finally{if(btn)btn.disabled=false}}
 
@@ -1442,4 +1475,22 @@ function fecharPainelOperacao(){const m=document.getElementById("modal-operacao"
 function minutosHoraRastreio(h){if(!h)return null;const m=String(h).match(/(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null;}
 function formatarMinutosRastreio(m){if(!Number.isFinite(m)||m<=0)return '0h00';return Math.floor(m/60)+'h'+String(Math.round(m%60)).padStart(2,'0');}
 function abrirRastreioMensal(){if(papelLogi!=='admin'){toast('Rastreio mensal disponível somente para administrador.','erro');return;}const el=document.getElementById('rastreio-mes');if(el&&!el.value)el.value=String(anoAtual)+'-'+String(mesAtualIndex+1).padStart(2,'0');const m=document.getElementById('modal-rastreio-mensal');m.classList.remove('hidden');m.classList.add('flex');renderizarRastreioMensal();}
-function fecharRastreioMens
+function fecharRastreioMensal(){const m=document.getElementById('modal-rastreio-mensal');m.classList.add('hidden');m.classList.remove('flex');}
+function obterDadosRastreioMensal(){const mes=document.getElementById('rastreio-mes')?.value;if(!mes)return {mes:'',rows:[],porColab:[],setores:{},minutos:0,semHora:0};const [aa,mm]=mes.split('-').map(Number);const inicio=mes+'-01';const fim=mes+'-'+String(new Date(aa,mm,0).getDate()).padStart(2,'0');const hoje=opHojeISO();const agora=opAgora();const rows=historicoMovimentosGlobal.filter(r=>{const d=String(r.data_inicio||r.data||'').slice(0,10);return d>=inicio&&d<=fim&&!!r.hora_inicio;});const porId={};const setores={};let minutosTotal=0,semHora=0;rows.forEach(r=>{const c=colaboradores.find(x=>String(x.id)===String(r.colaborador_id));const nome=c?.nome||'Colaborador não localizado';const setor=r.setor||setorDaFuncao(r.funcao||'')||'Setor não informado';const funcao=r.funcao||setor;let ini=minutosHoraRastreio(r.hora_inicio),f=minutosHoraRastreio(r.hora_fim);if(ini===null){semHora++;return;}if(f===null){if(String(r.data_inicio||'').slice(0,10)===hoje)f=minutosHoraRastreio(agora);else{semHora++;return;}}if(f!==null&&f<ini)f+=1440;const dur=Math.max(0,(f??ini)-ini);minutosTotal+=dur;if(!porId[r.colaborador_id])porId[r.colaborador_id]={id:r.colaborador_id,nome:nome,total:0,setores:{},dias:{},movimentos:0};const x=porId[r.colaborador_id];x.total+=dur;x.setores[setor]=(x.setores[setor]||0)+dur;x.movimentos++;const dia=String(r.data_inicio||r.data||'').slice(0,10);if(!x.dias[dia])x.dias[dia]=[];x.dias[dia].push({setor,funcao,inicio:r.hora_inicio,fim:r.hora_fim||((dia===hoje)?agora:null),minutos:dur});if(!setores[setor])setores[setor]={minutos:0,pessoas:{}};setores[setor].minutos+=dur;setores[setor].pessoas[r.colaborador_id]=true;});return {mes,rows,porColab:Object.values(porId).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')),setores,minutos:minutosTotal,semHora};}
+function renderizarRastreioMensal(){const d=obterDadosRastreioMensal();const resumo=document.getElementById('rastreio-resumo'),cont=document.getElementById('rastreio-conteudo');if(!resumo||!cont)return;const pessoas=d.porColab.length,reg=d.rows.length,qtSetores=Object.keys(d.setores).length;resumo.innerHTML=[['LOGIs rastreados',pessoas],['Movimentações',reg],['Setores utilizados',qtSetores],['Tempo rastreado',formatarMinutosRastreio(d.minutos)]].map(x=>'<div class="bg-slate-950 border border-slate-800 rounded-xl p-3"><div class="text-[9px] uppercase text-slate-400">'+x[0]+'</div><div class="text-xl font-extrabold text-cyan-300 mt-1">'+x[1]+'</div></div>').join('');const termo=normalizarTexto(document.getElementById('rastreio-busca')?.value||'');const setores=Object.entries(d.setores).sort((a,b)=>b[1].minutos-a[1].minutos);let h='<section class="bg-slate-950 border border-slate-800 rounded-xl p-3"><h4 class="text-xs font-bold text-cyan-300 mb-3">Permanência por setor / função</h4>';if(!setores.length)h+='<p class="text-xs text-slate-500">Nenhuma movimentação com horário foi registrada neste mês.</p>';else{const max=Math.max(1,...setores.map(x=>x[1].minutos));setores.forEach(([nome,x])=>{h+='<div class="mb-3"><div class="flex justify-between gap-2 text-xs"><b>'+escaparHtmlLogi(nome)+'</b><span class="text-cyan-300">'+formatarMinutosRastreio(x.minutos)+' · '+Object.keys(x.pessoas).length+' LOGIs</span></div><div class="h-2 bg-slate-800 rounded-full mt-1 overflow-hidden"><div class="h-full bg-cyan-500 rounded-full" style="width:'+Math.round(x.minutos/max*100)+'%"></div></div></div>';});}h+='</section><section><h4 class="text-xs font-bold text-slate-200 mb-2">Rastreio individual</h4>';const lista=d.porColab.filter(x=>!termo||matchBuscaAvancada(termo,x.nome,Object.keys(x.setores).join(' ')));if(!lista.length)h+='<p class="text-xs text-slate-500">Nenhum colaborador encontrado.</p>';lista.forEach(x=>{const ss=Object.entries(x.setores).sort((a,b)=>b[1]-a[1]);h+='<details class="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-2"><summary class="cursor-pointer flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-100">'+escaparHtmlLogi(x.nome)+'</span><span class="text-[10px] text-cyan-300">'+formatarMinutosRastreio(x.total)+' · '+x.movimentos+' movimentações</span></summary><div class="mt-3 grid md:grid-cols-2 gap-3"><div><div class="text-[10px] uppercase text-slate-500 mb-2">Tempo por setor</div>'+ss.map(z=>'<div class="flex justify-between text-[10px] border-b border-slate-800 py-1"><span>'+escaparHtmlLogi(z[0])+'</span><b class="text-cyan-300">'+formatarMinutosRastreio(z[1])+'</b></div>').join('')+'</div><div><div class="text-[10px] uppercase text-slate-500 mb-2">Linha do tempo diária</div>';Object.keys(x.dias).sort().forEach(dia=>{h+='<div class="border-b border-slate-800 py-2"><b class="text-[10px] text-amber-300">'+dia.split('-').reverse().join('/')+'</b>';x.dias[dia].forEach(m=>{h+='<div class="text-[10px] text-slate-300 mt-1">'+escaparHtmlLogi(m.setor)+' / '+escaparHtmlLogi(m.funcao)+' · '+String(m.inicio).slice(0,5)+' → '+(m.fim?String(m.fim).slice(0,5):'Sem saída')+' · '+formatarMinutosRastreio(m.minutos)+'</div>';});h+='</div>';});h+='</div></div></details>';});h+='</section>';if(d.semHora)h+='<p class="text-[10px] text-yellow-300">'+d.semHora+' registro(s) sem horário completo não entraram no cálculo de permanência.</p>';cont.innerHTML=h;}
+function exportarRastreioMensalCSV(){const d=obterDadosRastreioMensal();const linhas=[['Colaborador','Data','Setor','Função','Entrada','Saída','Permanência (minutos)']];d.porColab.forEach(c=>Object.keys(c.dias).sort().forEach(data=>c.dias[data].forEach(m=>linhas.push([c.nome,data,m.setor,m.funcao,String(m.inicio||'').slice(0,5),String(m.fim||'').slice(0,5),m.minutos]))));if(linhas.length===1){toast('Não há movimentações para exportar.','warn');return;}const csv='\ufeff'+linhas.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='rastreio-logirotator-'+d.mes+'.csv';a.click();URL.revokeObjectURL(url);}
+</script>
+
+<div id="modal-rastreio-mensal" class="fixed inset-0 bg-slate-950/95 backdrop-blur-sm z-[95] hidden items-center justify-center p-2 sm:p-4">
+ <div class="w-full max-w-7xl max-h-[94vh] overflow-hidden bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col">
+  <div class="p-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+   <div><h3 class="text-base sm:text-lg font-bold text-cyan-300">Rastreio mensal dos LOGIs</h3><p class="text-[10px] text-slate-400">Setores, funções e tempo de permanência registrados no mês.</p></div>
+   <div class="flex items-center gap-2"><input id="rastreio-mes" type="month" class="input w-auto" onchange="renderizarRastreioMensal()"><button onclick="fecharRastreioMensal()" class="btn btn-ghost btn-icon">✕</button></div>
+  </div>
+  <div id="rastreio-resumo" class="p-4 grid grid-cols-2 md:grid-cols-4 gap-2 border-b border-slate-800"></div>
+  <div class="p-4 overflow-auto flex-1"><div class="flex flex-wrap gap-2 mb-3"><input id="rastreio-busca" class="input max-w-sm" placeholder="Buscar colaborador, setor ou função..." oninput="renderizarRastreioMensal()"><button onclick="exportarRastreioMensalCSV()" class="btn btn-secondary btn-sm">Exportar CSV</button></div><div id="rastreio-conteudo" class="space-y-4"></div></div>
+ </div>
+</div>
+
+<div id="modal-operacao" class="fixed inset-0 bg-slate-950/95 backdrop-blur-sm z-[90] hidden items-center justify-center p-4"><div class="w-full max-w-5xl max-h-[92vh] overflow-auto bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl"><div class="sticky top-0 z-10 bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between"><div><h3 class="text-base font-bold text-amber-400">⏱ Operação / Movimentação</h3><p class="text-[10px] text-slate-500">Entrada 00:00–07:54 · troca automática · saída.</p></div><button onclick="fecharPainelOperacao()" class="btn btn-ghost btn-icon-sm">✕</button></div><div class="p-4 space-y-4"><div class="grid grid-cols-1 lg:grid-cols-3 gap-3"><div class="lg:col-span-2"><label class="text-[10px] uppercase text-slate-400 font-bold">Colaborador</label><select id="op-colaborador" class="select mt-1 w-full"></select></div><div><label class="text-[10px] uppercase text-slate-400 font-bold">Data</label><input id="op-data" type="date" class="input mt-1 w-full"></div></div><div id="op-status" class="rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-slate-400">Selecione um colaborador.</div><div class="flex flex-wrap gap-2"><button id="op-btn-entrada" onclick="registrarEntradaOperacao()" class="btn btn-primary">Registrar Entrada</button><button id="op-btn-troca" onclick="trocarFuncaoOperacao()" class="btn btn-secondary">Trocar Função</button><button id="op-btn-saida" onclick="registrarSaidaOperacao()" class="btn btn-danger">Registrar Saída</button></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-4"><div class="bg-slate-950 border border-slate-800 rounded-xl p-4"><h4 class="text-xs font-bold text-amber-400 mb-3">Função</h4><select id="op-funcao" class="select w-full"></select></div><div class="bg-slate-950 border border-slate-800 rounded-xl p-4"><h4 class="text-xs font-bold text-cyan-400 mb-3">Movimentações do dia</h4><div id="op-historico" class="space-y-2 text-xs"></div></div></div></div></div></div></body>
+</html>
