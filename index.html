@@ -192,7 +192,6 @@
             { nome: "CLEIDIANA PESSOA FERREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "EDIGLEI LUIZ DE SOUSA FILHO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
             { nome: "JOAO VICTOR VILARDE ARAUJO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
-            // ✅ ADICIONADOS (faltavam no código original)
             { nome: "JOSE NEILSON ALVES GOMES", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", operacao: "AM" },
             { nome: "ISRAEL ALENCAR DO VALE", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", operacao: "AM" },
             { nome: "ADRIAN NUNES LIMA SOARES", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", operacao: "AM" },
@@ -203,32 +202,27 @@
         let filtroAtual = 'TODOS';
         let termoBusca = '';
 
-        // ✅ Normaliza texto: remove acentos, deixa maiúsculo e trim
-        function normalizar(str) {
-            return (str || '')
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .toUpperCase()
-                .trim();
-        }
-
-        // ✅ Verifica DSR comparando tokens exatos (não substring)
+        // ✅ Verifica DSR — versão robusta (split por não-letras)
         function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
+            if (!colaborador || !colaborador.folga) return false;
+
             const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
             const diaHojeStr = diasSemana[dataAtual.getDay()];
 
-            const folgaNorm = normalizar(colaborador.folga);
+            // Normaliza: remove acentos, deixa maiúsculo
+            const folgaNorm = String(colaborador.folga)
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toUpperCase();
 
-            // Quebra por vírgula, espaço, "+", "/" e pelo " E " isolado
-            // Ex: "SEG, TER,QUA,QUI" -> ["SEG","TER","QUA","QUI"]
-            //     "QUA e QUI"        -> ["QUA","QUI"]
-            //     "SAB e DOM"        -> ["SAB","DOM"]
-            const tokens = folgaNorm
-                .replace(/\bE\b/g, ' ')            // troca " E " isolado por espaço
-                .split(/[\s,+\/]+/)
-                .filter(Boolean);
+            // Quebra em partes usando QUALQUER caractere que não seja A-Z
+            // "QUA E QUI"          → ["QUA","E","QUI"]
+            // "SEG, TER,QUA,QUI"   → ["SEG","TER","QUA","QUI"]
+            // "SAB E DOM"          → ["SAB","E","DOM"]
+            const partes = folgaNorm.split(/[^A-Z]+/).filter(Boolean);
 
-            return tokens.includes(diaHojeStr);
+            // Verifica se o dia de hoje está entre as partes
+            return partes.includes(diaHojeStr);
         }
 
         function renderizarDashboard() {
@@ -276,7 +270,6 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-shopee-dark/40 transition-colors";
 
-                // Badge de status especial (ex: AF - afastado)
                 const statusEspecial = c.status
                     ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">${c.status}</span>`
                     : '';
