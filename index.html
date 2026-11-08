@@ -197,21 +197,21 @@
         let filtroAtual = 'TODOS';
         let termoBusca = '';
 
-        // Validação estrita e segura do DSR
+        // Função matematicamente estrita para checar DSR apenas se a folga bater com o dia atual
         function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
             const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-            const diaHojeStr = diasSemana[dataAtual.getDay()]; // Ex: 'DOM' hoje
+            const diaHojeStr = diasSemana[dataAtual.getDay()]; // Retorna estritamente o dia de hoje (ex: DOM, SEG...)
             
             const folgaPred = (colaborador.folga || '').trim().toUpperCase();
             
-            // Compara estritamente se a folga bate com o dia atual
+            // Se a folga predominante for exatamente igual ao dia de hoje
             if (folgaPred === diaHojeStr) {
                 return true;
             }
             
-            // Se houver múltiplas folgas (ex: "SAB e DOM")
+            // Se a escala contiver múltiplos dias de folga (ex: "SAB e DOM")
             if (folgaPred.includes(diaHojeStr)) {
-                const partes = folgaPred.split(/[\s+E]+/);
+                const partes = folgaPred.split(/[\s+E&]+/);
                 if (partes.includes(diaHojeStr)) {
                     return true;
                 }
