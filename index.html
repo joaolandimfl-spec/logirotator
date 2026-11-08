@@ -42,7 +42,7 @@
             </div>
             
             <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
-                <div id="data-atual-badge" class="bg-shopee-border px-3 py-1.5 rounded-lg text-xs font-medium text-gray-300 flex items-center gap-2">
+                <div class="bg-shopee-border px-3 py-1.5 rounded-lg text-xs font-medium text-gray-300 flex items-center gap-2">
                     <i class="fa-regular fa-calendar text-shopee-orange"></i>
                     <span id="txt-data">Carregando data...</span>
                 </div>
@@ -197,27 +197,22 @@
         let filtroAtual = 'TODOS';
         let termoBusca = '';
 
-        // Correção definitiva da lógica de verificação de DSR
+        // Validação estrita e segura do DSR
         function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
             const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-            const diaHojeStr = diasSemana[dataAtual.getDay()]; // Identifica o dia atual com exatidão (DOM, SEG, TER...)
+            const diaHojeStr = diasSemana[dataAtual.getDay()]; // Ex: 'DOM' hoje
             
             const folgaPred = (colaborador.folga || '').trim().toUpperCase();
             
-            // Valida se o dia de hoje bate exatamente com a folga ou está contido na regra de folgas duplas (ex: "SAB e DOM")
-            if (folgaPred === diaHojeStr || folgaPred.includes(diaHojeStr)) {
-                // Se for uma folga de 3 letras exata (ex: "TER", "QUA", "QUI")
-                if (folgaPred.length === 3 && folgaPred === diaHojeStr) {
-                    return true;
-                }
-                // Se for escala com folgas múltiplas (ex: "SAB e DOM")
-                if (folgaPred.includes('E') || folgaPred.includes('Y') || folgaPred.length > 3) {
-                    // Divide as folgas por espaço ou 'E' para checar individualmente
-                    const partesFolga = folgaPred.split(/[\s+E]+/);
-                    if (partesFolga.includes(diaHojeStr)) {
-                        return true;
-                    }
-                } else if (folgaPred === diaHojeStr) {
+            // Compara estritamente se a folga bate com o dia atual
+            if (folgaPred === diaHojeStr) {
+                return true;
+            }
+            
+            // Se houver múltiplas folgas (ex: "SAB e DOM")
+            if (folgaPred.includes(diaHojeStr)) {
+                const partes = folgaPred.split(/[\s+E]+/);
+                if (partes.includes(diaHojeStr)) {
                     return true;
                 }
             }
