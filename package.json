@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "netlify dev"
+    "dev": "netlify dev",
+    "build": "echo 'Build concluído com sucesso'"
   },
   "dependencies": {
     "pg": "^8.16.3"
