@@ -59,7 +59,6 @@ body{font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
 body.role-user > .flex.min-h-screen,body.role-user > #sidebar-mobile-overlay,body.role-user > #sidebar-mobile{display:none!important}
 body.role-user #logi-user-view{display:block!important}
 body.role-admin #logi-admin-account{display:flex!important}
-
 </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
@@ -144,7 +143,7 @@ body.role-admin #logi-admin-account{display:flex!important}
 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
 <button onclick="setFiltro('todos')" class="text-left card hover:border-blue-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Total Atual</span><h2 id="kpi-total" class="text-2xl font-extrabold text-slate-100 mt-0.5">0</h2></div><div class="bg-blue-500/10 p-2.5 rounded-lg border border-blue-500/20 text-blue-400"><i data-lucide="users" class="w-5 h-5"></i></div></button>
 <button onclick="setFiltro('presentes')" class="text-left card hover:border-emerald-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Presentes</span><h2 id="kpi-presentes" class="text-2xl font-extrabold text-emerald-400 mt-0.5">0</h2><span id="kpi-presentes-detalhe" class="text-[9px] text-slate-500">&mdash;</span></div><div class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-400"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div></button>
-<button onclick="setFiltro('operacao')" class="text-left card hover:border-emerald-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Em Opera&#231;&#227;o</span><h2 id="kpi-operacao" class="text-2xl font-extrabold text-emerald-400 mt-0.5">0</h2><span id="kpi-operacao-detalhe" class="text-[9px] text-slate-500">Total de presentes hoje</span></div><div class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-400"><i data-lucide="activity" class="w-5 h-5"></i></div></button>
+<button onclick="setFiltro('operacao')" class="text-left card hover:border-emerald-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Em Opera&#231;&#227;o</span><h2 id="kpi-operacao" class="text-2xl font-extrabold text-emerald-400 mt-0.5">0</h2><span id="kpi-operacao-detalhe" class="text-[9px] text-slate-500">0 alocado(s) em setores</span></div><div class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-400"><i data-lucide="activity" class="w-5 h-5"></i></div></button>
 <button onclick="setFiltro('diaristas')" class="text-left card hover:border-cyan-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-cyan-400">Diaristas</span><h2 id="kpi-diaristas" class="text-2xl font-extrabold text-cyan-400 mt-0.5">0</h2></div><div class="bg-cyan-500/10 p-2.5 rounded-lg border border-cyan-500/20 text-cyan-400"><i data-lucide="hard-hat" class="w-5 h-5"></i></div></button>
 <button onclick="setFiltro('dsr')" class="text-left card hover:border-orange-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Em DSR</span><h2 id="kpi-dsr" class="text-2xl font-extrabold text-orange-400 mt-0.5">0</h2></div><div class="bg-orange-500/10 p-2.5 rounded-lg border border-orange-500/20 text-orange-400"><i data-lucide="palmtree" class="w-5 h-5"></i></div></button>
 <button onclick="setFiltro('banco_horas')" class="text-left card hover:border-violet-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Banco de Horas</span><h2 id="kpi-banco-horas" class="text-2xl font-extrabold text-violet-400 mt-0.5">0</h2><span class="text-[9px] text-slate-500">Status BH hoje</span></div><div class="bg-violet-500/10 p-2.5 rounded-lg border border-violet-500/20 text-violet-400"><i data-lucide="clock-3" class="w-5 h-5"></i></div></button>
@@ -457,9 +456,9 @@ function colaboradoresOperacionaisMes(){
 }
 
 function estaEmOperacaoHoje(c){
-  const f=(c.historicoDias&&c.historicoDias[diaHoje-1])||'-';
-  const p=(c.presencaDias&&c.presencaDias[diaHoje-1])||'-';
-  return ["P","S2"].includes(p) && isFuncaoAlocada(f);
+  const f = (c.historicoDias && c.historicoDias[diaHoje - 1]) || '-';
+  const p = (c.presencaDias && c.presencaDias[diaHoje - 1]) || '-';
+  return ["P", "S2"].includes(p) && isFuncaoAlocada(f);
 }
 
 function contarDiasNaFuncaoAtual(h){const f=h[diaHoje-1];if(!f||isStatusEspecial(f))return{funcao:"Nenhuma",dias:0,dataInicio:null,dataFim:null};let c=0;let idx=diaHoje-1;for(let i=diaHoje-1;i>=0;i--){if(h[i]===f&&!isStatusEspecial(h[i])){c++;idx=i}else{break}}return{funcao:f,dias:c,dataInicio:new Date(anoAtual,mesAtualIndex,idx+1),dataFim:new Date(anoAtual,mesAtualIndex,diaHoje)}}
@@ -726,7 +725,10 @@ function atualizarKPIs(){
   const diaristas=hoje.filter(function(x){return x.status==='diarista'}).length;
   const diaristasDia=getDiaristasDia();
   const totalPresentes=presentes+diaristasDia.presentes;
-  const operacao=totalPresentes;
+  
+  // 'Em Operação' conta estritamente quem está alocado em um setor hoje
+  const operacao=colaboradores.filter(function(c){return estaEmOperacaoHoje(c);}).length;
+
   const dsr=hoje.filter(function(x){return x.status==='dsr'}).length;
   const bh=hoje.filter(function(x){return x.status==='banco_horas'}).length;
   const faltas=hoje.filter(function(x){return x.status==='falta'}).length;
@@ -734,7 +736,7 @@ function atualizarKPIs(){
 
   const vals={
     'kpi-total':total,
-    'kpi-presentes':presentes,
+    'kpi-presentes':totalPresentes,
     'kpi-operacao':operacao,
     'kpi-diaristas':diaristas,
     'kpi-dsr':dsr,
@@ -760,7 +762,7 @@ function atualizarKPIs(){
     const el=document.getElementById(id); if(el)el.textContent=vals[id];
   });
   const pd=document.getElementById('kpi-presentes-detalhe'); if(pd)pd.textContent=totalPresentes+' de '+total;
-  const od=document.getElementById('kpi-operacao-detalhe'); if(od)od.textContent='Total de presentes hoje';
+  const od=document.getElementById('kpi-operacao-detalhe'); if(od)od.textContent=operacao+' alocado(s) em setores';
 }
 
 function popularSelectFuncoesPorSetor(def){const sel=document.getElementById('novo-funcao');sel.innerHTML="";let og=document.createElement('optgroup');og.label="Status Especiais";STATUS_ESPECIAIS.forEach(function(s){const o=document.createElement('option');o.value=s.valor;o.textContent=s.label;if(s.valor===def)o.selected=true;og.appendChild(o)});sel.appendChild(og);for(const setor of Object.keys(SETORES_E_FUNCOES)){const ogr=document.createElement('optgroup');ogr.label=setor;SETORES_E_FUNCOES[setor].forEach(function(f){const o=document.createElement('option');o.value=f;o.textContent=f;if(f===def)o.selected=true;ogr.appendChild(o)});sel.appendChild(ogr)}}
@@ -874,7 +876,7 @@ function cardColaborador(c,cor){
 
 function criarBloco(titulo,subtitulo,itens,cor,icon,bt){if(itens.length===0)return null;const bloco=document.createElement('div');const cls={orange:'bg-orange-950/20 border-orange-500/40',yellow:'bg-yellow-950/20 border-yellow-500/40',red:'bg-red-950/20 border-red-500/40',purple:'bg-purple-950/20 border-purple-500/40',slate:'bg-slate-900/60 border-slate-700'}[cor]||'bg-slate-900/60 border-slate-800';bloco.className=cls+' border rounded-2xl p-4 shadow-xl';const iconMap={orange:'text-orange-400',yellow:'text-yellow-400',red:'text-red-400',purple:'text-purple-400',slate:'text-slate-400'};const badgeMap={orange:'badge-orange',yellow:'badge-warning',red:'badge-danger',purple:'badge-purple',slate:'badge-default'};bloco.innerHTML='<div class="flex items-center justify-between pb-3 mb-3 border-b flex-wrap gap-2 '+(cor==='orange'?'border-orange-500/30':cor==='yellow'?'border-yellow-500/30':cor==='red'?'border-red-500/30':cor==='purple'?'border-purple-500/30':'border-slate-700/30')+'"><h2 class="text-sm font-bold flex items-center gap-2 '+(iconMap[cor]||'text-slate-400')+'">'+icon+' '+titulo+' <span class="text-[10px] font-normal opacity-70">'+(subtitulo||'')+'</span></h2><span class="badge '+(badgeMap[cor]||'badge-default')+'">'+bt+'</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">'+itens.map(function(c){return cardColaborador(c,cor)}).join('')+'</div>';return bloco}
 
-function criarBlocoDiaristas(){const d=getDiaristasDia();const total=d.presentes+d.faltantes;const pd=d.pedidos>0;const dif=d.presentes-d.pedidos;const exc=d.presentes>=d.pedidos&&d.pedidos>0;let status='';let cs='';if(d.pedidos===0){status='Defina o pedido';cs='text-slate-400'}else if(dif===0){status='Meta atendida';cs='text-emerald-400'}else if(dif>0){status=dif+' alem';cs='text-cyan-400'}else{status='Faltam '+Math.abs(dif)+' do pedido';cs='text-yellow-400'}const bloco=document.createElement('div');bloco.className='bg-cyan-950/20 border border-cyan-500/40 rounded-2xl p-4 shadow-xl';const clP=pd&&!exc?'bg-slate-900 border border-emerald-500/40 cursor-pointer active:scale-[0.98]':'bg-slate-900 border border-slate-800 opacity-60 cursor-not-allowed';const clF=pd?'bg-slate-900 border border-red-500/40 cursor-pointer active:scale-[0.98]':'bg-slate-900 border border-slate-800 opacity-60 cursor-not-allowed';bloco.innerHTML='<div class="flex items-center justify-between pb-3 mb-3 border-b border-cyan-500/30 flex-wrap gap-2"><h2 class="text-sm font-bold text-cyan-400">Diaristas Hoje <span class="text-[10px] font-normal opacity-70">- quantidades por dia</span></h2><span class="badge badge-info">'+total+' registrado(s)</span></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl"><button onclick="abrirModalDiaristasPedidos()" class="text-left bg-slate-900 border border-cyan-500/40 rounded-xl p-3.5 cursor-pointer active:scale-[0.98]"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-cyan-400 font-bold">Pedidos</span><i data-lucide="edit-3" class="w-4 h-4 text-cyan-400"></i></div><div class="text-3xl font-extrabold text-cyan-300">'+d.pedidos+'</div><div class="text-[10px] '+cs+' font-semibold mt-1">'+status+'</div></button><button onclick="'+(pd&&!exc?"abrirModalAddDiarista('presente')":'')+'" '+(pd&&!exc?'':'disabled')+' class="text-left rounded-xl p-3.5 transition '+clP+'"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-emerald-400 font-bold">Presentes</span><i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i></div><div class="text-3xl font-extrabold text-emerald-300">'+d.presentes+'</div><div class="text-[10px] text-slate-500 mt-1">'+(pd?'de '+d.pedidos+' pedido(s)':'sem pedido')+' \u00b7 somam em <span class="text-emerald-400 font-bold">Opera\u00e7\u00e3o</span></div></button><button onclick="'+(pd?"abrirModalAddDiarista('faltou')":'')+'" '+(pd?'':'disabled')+' class="text-left rounded-xl p-3.5 transition '+clF+'"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-red-400 font-bold">Faltaram</span><i data-lucide="edit-3" class="w-4 h-4 text-red-400"></i></div><div class="text-3xl font-extrabold text-red-300">'+d.faltantes+'</div><div class="text-[10px] text-slate-500 mt-1">Total: '+total+' \u00b7 somam em <span class="text-yellow-400 font-bold">Faltas</span></div></button></div>'+(pd?'':'<div class="mt-3 pt-3 border-t border-cyan-500/20 text-[11px] text-yellow-400">Defina primeiro a quantidade de diaristas pedidos.</div>');return bloco}
+function criarBlocoDiaristas(){const d=getDiaristasDia();const total=d.presentes+d.faltantes;const pd=d.pedidos>0;const dif=d.presentes-d.pedidos;const exc=d.presentes>=d.pedidos&&d.pedidos>0;let status='';let cs='';if(d.pedidos===0){status='Defina o pedido';cs='text-slate-400'}else if(dif===0){status='Meta atendida';cs='text-emerald-400'}else if(dif>0){status=dif+' alem';cs='text-cyan-400'}else{status='Faltam '+Math.abs(dif)+' do pedido';cs='text-yellow-400'}const bloco=document.createElement('div');bloco.className='bg-cyan-950/20 border border-cyan-500/40 rounded-2xl p-4 shadow-xl';const clP=pd&&!exc?"abrirModalAddDiarista('presente')":'';const clF=pd?"abrirModalAddDiarista('faltou')":'';bloco.innerHTML='<div class="flex items-center justify-between pb-3 mb-3 border-b border-cyan-500/30 flex-wrap gap-2"><h2 class="text-sm font-bold text-cyan-400">Diaristas Hoje <span class="text-[10px] font-normal opacity-70">- quantidades por dia</span></h2><span class="badge badge-info">'+total+' registrado(s)</span></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl"><button onclick="abrirModalDiaristasPedidos()" class="text-left bg-slate-900 border border-cyan-500/40 rounded-xl p-3.5 cursor-pointer active:scale-[0.98]"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-cyan-400 font-bold">Pedidos</span><i data-lucide="edit-3" class="w-4 h-4 text-cyan-400"></i></div><div class="text-3xl font-extrabold text-cyan-300">'+d.pedidos+'</div><div class="text-[10px] '+cs+' font-semibold mt-1">'+status+'</div></button><button onclick="'+clP+'" '+(pd&&!exc?'':'disabled')+' class="text-left rounded-xl p-3.5 transition '+(pd&&!exc?'bg-slate-900 border border-emerald-500/40 cursor-pointer active:scale-[0.98]':'bg-slate-900 border border-slate-800 opacity-60 cursor-not-allowed')+'"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-emerald-400 font-bold">Presentes</span><i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i></div><div class="text-3xl font-extrabold text-emerald-300">'+d.presentes+'</div><div class="text-[10px] text-slate-500 mt-1">'+(pd?'de '+d.pedidos+' pedido(s)':'sem pedido')+' \u00b7 somam em <span class="text-emerald-400 font-bold">Opera\u00e7\u00e3o</span></div></button><button onclick="'+clF+'" '+(pd?'':'disabled')+' class="text-left rounded-xl p-3.5 transition '+(pd?'bg-slate-900 border border-red-500/40 cursor-pointer active:scale-[0.98]':'bg-slate-900 border border-slate-800 opacity-60 cursor-not-allowed')+'"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-red-400 font-bold">Faltaram</span><i data-lucide="edit-3" class="w-4 h-4 text-red-400"></i></div><div class="text-3xl font-extrabold text-red-300">'+d.faltantes+'</div><div class="text-[10px] text-slate-500 mt-1">Total: '+total+' \u00b7 somam em <span class="text-yellow-400 font-bold">Faltas</span></div></button></div>'+(pd?'':'<div class="mt-3 pt-3 border-t border-cyan-500/20 text-[11px] text-yellow-400">Defina primeiro a quantidade de diaristas pedidos.</div>');return bloco}
 
 function criarListaPresentes(colsOperacao) {
   const d = getDiaristasDia();
@@ -1041,9 +1043,11 @@ const pF=fl(g.presente);const oF=fl(g.operacao);const dF=fl(g.dsr);const bhF=fl(
 const dd=getDiaristasDia();
 const td=dd.presentes;
 const totalPresentes=g.presente.length+dd.presentes;
+const totalOperacaoAlocados=colaboradores.filter(function(c){return estaEmOperacaoHoje(c);}).length;
+
 document.getElementById('kpi-total').innerText=totalEquipeAtual;
 document.getElementById('kpi-presentes').innerText=totalPresentes;
-document.getElementById('kpi-operacao').innerText=totalPresentes;
+document.getElementById('kpi-operacao').innerText=totalOperacaoAlocados;
 document.getElementById('kpi-dsr').innerText=g.dsr.length;
 document.getElementById('kpi-banco-horas').innerText=g.banco_horas.length;
 document.getElementById('kpi-faltas').innerText=g.falta.length+dd.faltantes;
@@ -1052,8 +1056,8 @@ document.getElementById('kpi-diaristas').innerText=td;
 const detP=document.getElementById('kpi-presentes-detalhe');
 if(detP)detP.innerText=g.presente.length+' PHD + '+dd.presentes+' diar.';
 const det=document.getElementById('kpi-operacao-detalhe');
-if(det)det.innerText='Total de presentes hoje';
-const bg={'badge-todos':totalEquipeAtual,'badge-presentes':totalPresentes,'badge-operacao':totalPresentes,'badge-dsr':g.dsr.length,'badge-faltas':g.falta.length+dd.faltantes,'badge-atestados':g.atestado.length,'badge-diaristas':td};
+if(det)det.innerText=totalOperacaoAlocados+' alocado(s) em setores';
+const bg={'badge-todos':totalEquipeAtual,'badge-presentes':totalPresentes,'badge-operacao':totalOperacaoAlocados,'badge-dsr':g.dsr.length,'badge-faltas':g.falta.length+dd.faltantes,'badge-atestados':g.atestado.length,'badge-diaristas':td};
 Object.keys(bg).forEach(function(id){const el=document.getElementById(id);if(el)el.innerText=bg[id];const elM=document.getElementById(id+'-m');if(elM)elM.innerText=bg[id]});
 
 if(termo){
