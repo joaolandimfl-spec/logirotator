@@ -131,9 +131,8 @@
         LogiRotator &bull; Pit Stop Shopee &copy; 2026 &bull; Desenvolvido para operações de Alta Performance
     </footer>
 
-    <!-- JavaScript Lógica & Dados -->
+    <!-- JavaScript Lógica & Dados Corrigida -->
     <script>
-        // Lista completa de colaboradores extraída da base oficial
         const colaboradoresData = [
             { nome: "JUSCILENE PEREIRA DIAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "ROBERTA CARVALHO DE SOUSA", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
@@ -192,27 +191,33 @@
             { nome: "JOAO PAULO DE OLIVEIRA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
             { nome: "CLEIDIANA PESSOA FERREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
             { nome: "EDIGLEI LUIZ DE SOUSA FILHO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
-            { nome: "JOAO VICTOR VILARDE ARAUJO", escala: "6X1 SEX A Qua 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" }
+            { nome: "JOAO VICTOR VILARDE ARAUJO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" }
         ];
 
         let filtroAtual = 'TODOS';
         let termoBusca = '';
 
-        // Validação rigorosa e estrita da folga de hoje
+        // Correção definitiva da lógica de verificação de DSR
         function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
             const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-            const diaHojeStr = diasSemana[dataAtual.getDay()]; // Retorna exatamente o dia atual (ex: DOM, SEG...)
+            const diaHojeStr = diasSemana[dataAtual.getDay()]; // Identifica o dia atual com exatidão (DOM, SEG, TER...)
             
             const folgaPred = (colaborador.folga || '').trim().toUpperCase();
             
-            // Verifica se o dia atual da semana confere exatamente com a folga predominante cadastrada
-            // Ex: se folga for "QUA" e hoje for "QUA", retorna true. Se hoje for "DOM", retorna false.
+            // Valida se o dia de hoje bate exatamente com a folga ou está contido na regra de folgas duplas (ex: "SAB e DOM")
             if (folgaPred === diaHojeStr || folgaPred.includes(diaHojeStr)) {
-                // Tratamento especial para evitar falsos positivos caso a string contenha subpartes
+                // Se for uma folga de 3 letras exata (ex: "TER", "QUA", "QUI")
                 if (folgaPred.length === 3 && folgaPred === diaHojeStr) {
                     return true;
                 }
-                if (folgaPred.includes(diaHojeStr)) {
+                // Se for escala com folgas múltiplas (ex: "SAB e DOM")
+                if (folgaPred.includes('E') || folgaPred.includes('Y') || folgaPred.length > 3) {
+                    // Divide as folgas por espaço ou 'E' para checar individualmente
+                    const partesFolga = folgaPred.split(/[\s+E]+/);
+                    if (partesFolga.includes(diaHojeStr)) {
+                        return true;
+                    }
+                } else if (folgaPred === diaHojeStr) {
                     return true;
                 }
             }
