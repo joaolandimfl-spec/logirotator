@@ -61,7 +61,7 @@
             <div class="bg-shopee-card border border-shopee-border p-4 rounded-xl shadow-sm flex items-center justify-between">
                 <div>
                     <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Total Colaboradores</p>
-                    <h3 id="stat-total" class="text-2xl font-ext500 font-bold text-white mt-1">0</h3>
+                    <h3 id="stat-total" class="text-2xl font-bold text-white mt-1">0</h3>
                 </div>
                 <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg">
                     <i class="fa-solid fa-users text-xl"></i>
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <!-- Tabela / Cards de Colaboradores -->
+        <!-- Tabela de Colaboradores -->
         <div class="bg-shopee-card border border-shopee-border rounded-xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -133,53 +133,88 @@
 
     <!-- JavaScript Lógica & Dados -->
     <script>
-        // Base de dados simulada com os colaboradores reais do Hub
+        // Lista completa de colaboradores extraída da base oficial
         const colaboradoresData = [
-            { nome: "JUSCILENE PEREIRA DIAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "ROBERTA CARVALHO DE SOUSA", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "MADYSON KELVIN SILVA DE LIMA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "NATANAEL GHEOVANI BORGES DE FREITAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "SERGIO DOS SANTOS SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "PAULO HENRIQUE DOS SANTOS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "EMANUELE ROCHA BARBOSA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "AF (15 dias)" },
-            { nome: "DENILSON REGINALDO BATISTA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "ADEMIR DOS SANTOS SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "MATEUS VIEIRA NOGUEIRA GAMA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "DANILO DE JESUS SANTOS", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "CLAUDIO RODGER CAVALCANTE DA SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "CAUA LIMA FERNANDES MACEDO MATOS", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "CICERO CELIO JANUARIO DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "KLEBER SOUSA ARAUJO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "LUANA MARTINIANO GONÇALO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "RICARDO PEREIRA DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "LUIZ RAFAEL COELHO DO NASCIMENTO SANTOS", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "FLAVIO HENRIQUE DE SOUSA SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "ANA CLARA ALVES RODRIGUES", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "ANDERSON DA SILVA NASCIMENTO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "AURIANE BENEDITA DOS SANTOS", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "JULIANA ARAUJO DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "GEISY LEITE TAVARES PEREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "HENRIQUE SILVA FARIA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "JARDEL RODRIGUES ALVES", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "EDINALDO GOMES PEREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "JOSE ALEXANDRE ALVES SOBREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "LEONARDO DA SILVA BARBOSA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM", statusGeral: "Ativo" },
-            { nome: "FELIPE GONCALVES DE OLIVEIRA", escala: "5X2 SEG A SEX 18:00 ÀS 03:02", folga: "SAB e DOM", operacao: "FM", statusGeral: "Ativo" }
+            { nome: "JUSCILENE PEREIRA DIAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "ROBERTA CARVALHO DE SOUSA", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
+            { nome: "MADYSON KELVIN SILVA DE LIMA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "NATANAEL GHEOVANI BORGES DE FREITAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "SERGIO DOS SANTOS SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "PAULO HENRIQUE DOS SANTOS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "EMANUELE ROCHA BARBOSA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "DENILSON REGINALDO BATISTA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "ADEMIR DOS SANTOS SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "MATEUS VIEIRA NOGUEIRA GAMA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "DANILO DE JESUS SANTOS", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
+            { nome: "CLAUDIO RODGER CAVALCANTE DA SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "CAUA LIMA FERNANDES MACEDO MATOS", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "CICERO CELIO JANUARIO DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "KLEBER SOUSA ARAUJO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "LUANA MARTINIANO GONÇALO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "RICARDO PEREIRA DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "LUIZ RAFAEL COELHO DO NASCIMENTO SANTOS", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "FLAVIO HENRIQUE DE SOUSA SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "ANA CLARA ALVES RODRIGUES", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "ANDERSON DA SILVA NASCIMENTO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "AURIANE BENEDITA DOS SANTOS", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "JULIANA ARAUJO DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "GEISY LEITE TAVARES PEREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "HENRIQUE SILVA FARIA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "JARDEL RODRIGUES ALVES", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "EDINALDO GOMES PEREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "JOSE ALEXANDRE ALVES SOBREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "LEONARDO DA SILVA BARBOSA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "ALUIZIO NERI ROCHA NETO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "CICERO LUCAS RODRIGUES MOREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "EVERSON GILLIARD DE QUEROIS PEQUENO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "JOSE AIRTON DA SILVA COSMO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "JOHNATHAN INALDO RODRIGUES DE SOUZA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "CICERO GABRIEL SANTOS DE SA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "FRANCISCO HELTON ALVES DA SILVA", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
+            { nome: "HERNANDES FERREIRA GONCALVES", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
+            { nome: "JONAILSON DOS SANTOS FARIAS", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
+            { nome: "LEANDRO DA CUNHA RIBEIRO", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
+            { nome: "VANDERLAN DANTAS DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "ALISSON IURE COSTA ALVES", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
+            { nome: "PEDRO VICTOR RIBEIRO DE ANDRADE", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "FM" },
+            { nome: "JOANA CARLOS DOS SANTOS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "ADRIANO RODRIGUES FLOR", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", operacao: "AM" },
+            { nome: "RAIANE ALVINO GONÇALVES", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "FELIPE GONCALVES DE OLIVEIRA", escala: "5X2 SEG A SEX 18:00 ÀS 03:02", folga: "SAB e DOM", operacao: "FM" },
+            { nome: "FRANCISCA VARLA FELIX DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "JOSUE IRAILDES COSTA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "LARISSA SANTOS TELES", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "JOSE WATHYLLA DOS SANTOS SOUZA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "GABRIEL WILLOSON DA SILVA GOMES", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "MILENA ALVES DA SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "HODIAS NASCIMENTO DOS SANTOS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "EVERALDO ALVES OLIVEIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "JOAO PAULO DE OLIVEIRA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "CLEIDIANA PESSOA FERREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", operacao: "AM" },
+            { nome: "EDIGLEI LUIZ DE SOUSA FILHO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" },
+            { nome: "JOAO VICTOR VILARDE ARAUJO", escala: "6X1 SEX A Qua 01:00 ÀS 08:54", folga: "QUI", operacao: "AM" }
         ];
 
         let filtroAtual = 'TODOS';
         let termoBusca = '';
 
-        // Função robusta e correta para validar se o colaborador está de DSR hoje
+        // Validação rigorosa e estrita da folga de hoje
         function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
             const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-            const diaHojeStr = diasSemana[dataAtual.getDay()]; // 0: Dom, 1: Seg ... 6: Sáb
+            const diaHojeStr = diasSemana[dataAtual.getDay()]; // Retorna exatamente o dia atual (ex: DOM, SEG...)
             
-            const folgaPred = (colaborador.folga || '').toUpperCase();
+            const folgaPred = (colaborador.folga || '').trim().toUpperCase();
             
-            // Verifica correspondência exata com a folga predominante cadastrada
-            if (folgaPred.includes(diaHojeStr)) {
-                return true;
+            // Verifica se o dia atual da semana confere exatamente com a folga predominante cadastrada
+            // Ex: se folga for "QUA" e hoje for "QUA", retorna true. Se hoje for "DOM", retorna false.
+            if (folgaPred === diaHojeStr || folgaPred.includes(diaHojeStr)) {
+                // Tratamento especial para evitar falsos positivos caso a string contenha subpartes
+                if (folgaPred.length === 3 && folgaPred === diaHojeStr) {
+                    return true;
+                }
+                if (folgaPred.includes(diaHojeStr)) {
+                    return true;
+                }
             }
             
             return false;
@@ -189,7 +224,6 @@
             const tbody = document.getElementById('tabela-colaboradores');
             const dataHoje = new Date();
             
-            // Formata data atual para o cabeçalho
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('txt-data').innerText = dataHoje.toLocaleDateString('pt-BR', options);
 
@@ -204,7 +238,6 @@
                 return { ...c, emDsr };
             });
 
-            // Conta estatísticas
             colaboradoresProcessados.forEach(c => {
                 if (c.emDsr) totalDsr++;
                 else totalTrabalhando++;
@@ -214,7 +247,6 @@
             document.getElementById('stat-trabalhando').innerText = totalTrabalhando;
             document.getElementById('stat-dsr').innerText = totalDsr;
 
-            // Filtra e exibe na tabela
             const filtrados = colaboradoresProcessados.filter(c => {
                 const matchNome = c.nome.toLowerCase().includes(termoBusca.toLowerCase());
                 if (!matchNome) return false;
@@ -265,7 +297,6 @@
             renderizarDashboard();
         });
 
-        // Inicializa ao carregar a página
         window.onload = () => {
             renderizarDashboard();
         };
