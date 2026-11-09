@@ -1,6 +1,4 @@
-import pg from "pg";
-
-const { Pool } = pg;
+import { neon } from '@neondatabase/serverless';
 
 const TABLES = new Set([
   "colaboradores",
@@ -9,21 +7,6 @@ const TABLES = new Set([
   "logirotator_diaristas_diarios",
   "logirotator_perfis"
 ]);
-
-let pool;
-function db(env) {
-  if (!env.DATABASE_URL) throw new Error("DATABASE_URL não configurada no Worker.");
-  if (!pool) {
-    pool = new Pool({
-      connectionString: env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-      max: 5,
-      idleTimeoutMillis: 10000,
-      connectionTimeoutMillis: 10000
-    });
-  }
-  return pool;
-}
 
 function ident(value) {
   if (typeof value !== "string" || !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
@@ -87,75 +70,75 @@ async function processarRequisicao(request, env) {
     return json(405, { error: "Método não permitido." });
   }
   try {
+    const sql = neon(env.DATABASE_URL);
     const body = await request.json();
     const { table, action = "select", columns = "*", values: inputValues, filters = [], orders = [], limit, range, conflict, returning = false, single = false } = body;
     if (!TABLES.has(table)) return json(400, { error: "Tabela não autorizada." });
 
-    const client = await db(env).connect();
-    try {
-      let result;
-      if (action === "select") {
-        const selected = columns === "*" ? "*" : String(columns).split(",").map(x => ident(x.trim())).join(", ");
-        const params = [];
-        let sql = `SELECT ${selected} FROM ${ident(table)}` + buildWhere(filters, params);
-        if (orders.length) {
-          const orderSql = orders.map(o => `${ident(o.column)} ${o.ascending === false ? "DESC" : "ASC"}`).join(", ");
-          sql += ` ORDER BY ${orderSql}`;
-        }
-        if (range && Number.isInteger(range.from) && Number.isInteger(range.to)) {
-          sql += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-          params.push(Math.max(0, range.to - range.from + 1), Math.max(0, range.from));
-        } else if (Number.isInteger(limit) && limit >= 0) {
-          sql += ` LIMIT $${params.length + 1}`;
-          params.push(limit);
-        }
-        result = await client.query(sql, params);
-      } else if (action === "insert" || action === "upsert") {
-        const rows = Array.isArray(inputValues) ? inputValues : [inputValues];
-        if (!rows.length || !rows[0] || typeof rows[0] !== "object") throw new Error("Dados para gravação inválidos.");
-        const cols = [...new Set(rows.flatMap(r => Object.keys(r)))];
-        if (!cols.length) throw new Error("Nenhuma coluna informada.");
-        const params = [];
-        const tuples = rows.map(row => {
-          const marks = cols.map(col => {
-            params.push(row[col] === undefined ? null : row[col]);
-            return `$${params.length}`;
-          });
-          return `(${marks.join(",")})`;
-        });
-        let sql = `INSERT INTO ${ident(table)} (${cols.map(ident).join(",")}) VALUES ${tuples.join(",")}`;
-        if (action === "upsert") {
-          const conflictCols = String(conflict || "").split(",").filter(Boolean);
-          if (!conflictCols.length) throw new Error("Informe a coluna de conflito para upsert.");
-          const updates = cols.filter(c => !conflictCols.includes(c));
-          sql += ` ON CONFLICT (${conflictCols.map(ident).join(",")}) `;
-          sql += updates.length ? `DO UPDATE SET ${updates.map(c => `${ident(c)} = EXCLUDED.${ident(c)}`).join(", ")}` : "DO NOTHING";
-        }
-        sql += " RETURNING *";
-        result = await client.query(sql, params);
-      } else if (action === "update" || action === "delete") {
-        const params = [];
-        const where = buildWhere(filters, params);
-        if (!filters.length) throw new Error("Operação sem filtro bloqueada por segurança.");
-        let sql;
-        if (action === "delete") sql = `DELETE FROM ${ident(table)}${where} RETURNING *`;
-        else {
-          if (!inputValues || typeof inputValues !== "object" || Array.isArray(inputValues)) throw new Error("Dados de atualização inválidos.");
-          const sets = Object.entries(inputValues).map(([col, val]) => {
-            params.push(val);
-            return `${ident(col)} = $${params.length}`;
-          });
-          if (!sets.length) throw new Error("Nenhuma alteração informada.");
-          sql = `UPDATE ${ident(table)} SET ${sets.join(", ")}${where} RETURNING *`;
-        }
-        result = await client.query(sql, params);
-      } else {
-        return json(400, { error: "Operação não permitida." });
+    let result;
+    if (action === "select") {
+      const selected = columns === "*" ? "*" : String(columns).split(",").map(x => ident(x.trim())).join(", ");
+      const params = [];
+      let sqlText = `SELECT ${selected} FROM ${ident(table)}` + buildWhere(filters, params);
+      if (orders.length) {
+        const orderSql = orders.map(o => `${ident(o.column)} ${o.ascending === false ? "DESC" : "ASC"}`).join(", ");
+        sqlText += ` ORDER BY ${orderSql}`;
       }
-      return json(200, { data: single ? (result.rows[0] || null) : result.rows, count: result.rowCount });
-    } finally {
-      client.release();
+      if (range && Number.isInteger(range.from) && Number.isInteger(range.to)) {
+        sqlText += ` LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+        params.push(Math.max(0, range.to - range.from + 1), Math.max(0, range.from));
+      } else if (Number.isInteger(limit) && limit >= 0) {
+        sqlText += ` LIMIT $${params.length + 1}`;
+        params.push(limit);
+      }
+      result = await sql.query(sqlText, params);
+    } else if (action === "insert" || action === "upsert") {
+      const rows = Array.isArray(inputValues) ? inputValues : [inputValues];
+      if (!rows.length || !rows[0] || typeof rows[0] !== "object") throw new Error("Dados para gravação inválidos.");
+      const cols = [...new Set(rows.flatMap(r => Object.keys(r)))];
+      if (!cols.length) throw new Error("Nenhuma coluna informada.");
+      const params = [];
+      const tuples = rows.map(row => {
+        const marks = cols.map(col => {
+          params.push(row[col] === undefined ? null : row[col]);
+          return `$${params.length}`;
+        });
+        return `(${marks.join(",")})`;
+      });
+      let sqlText = `INSERT INTO ${ident(table)} (${cols.map(ident).join(",")}) VALUES ${tuples.join(",")}`;
+      if (action === "upsert") {
+        const conflictCols = String(conflict || "").split(",").filter(Boolean);
+        if (!conflictCols.length) throw new Error("Informe a coluna de conflito para upsert.");
+        const updates = cols.filter(c => !conflictCols.includes(c));
+        sqlText += ` ON CONFLICT (${conflictCols.map(ident).join(",")}) `;
+        sqlText += updates.length ? `DO UPDATE SET ${updates.map(c => `${ident(c)} = EXCLUDED.${ident(c)}`).join(", ")}` : "DO NOTHING";
+      }
+      sqlText += " RETURNING *";
+      result = await sql.query(sqlText, params);
+    } else if (action === "update" || action === "delete") {
+      const params = [];
+      const where = buildWhere(filters, params);
+      if (!filters.length) throw new Error("Operação sem filtro bloqueada por segurança.");
+      let sqlText;
+      if (action === "delete") sqlText = `DELETE FROM ${ident(table)}${where} RETURNING *`;
+      else {
+        if (!inputValues || typeof inputValues !== "object" || Array.isArray(inputValues)) throw new Error("Dados de atualização inválidos.");
+        const sets = Object.entries(inputValues).map(([col, val]) => {
+          params.push(val);
+          return `${ident(col)} = $${params.length}`;
+        });
+        if (!sets.length) throw new Error("Nenhuma alteração informada.");
+        sqlText = `UPDATE ${ident(table)} SET ${sets.join(", ")}${where} RETURNING *`;
+      }
+      result = await sql.query(sqlText, params);
+    } else {
+      return json(400, { error: "Operação não permitida." });
     }
+    
+    let data = result === undefined ? null : result;
+    if (single && Array.isArray(data)) data = data[0] || null;
+    return json(200, { data, count: Array.isArray(result) ? result.length : 0 });
+
   } catch (error) {
     console.error("Neon API:", error);
     return json(500, { error: error.message || "Erro interno na API Neon." });
