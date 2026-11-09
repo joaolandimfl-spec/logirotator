@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pit Stop Shopee - LogiRotator | Controle de DSR</title>
     <style>
-        /* ===== CSS puro (sem CDN Tailwind) ===== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background: #121212; color: #e5e7eb;
@@ -139,6 +138,16 @@
             text-align: center; padding: 24px; font-size: 11px; color: #6b7280;
             border-top: 1px solid #2D2D2D; margin-top: 48px;
         }
+        /* 🔄 indicador de atualização */
+        .sync-dot {
+            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+            background: #34d399; margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .3; }
+        }
     </style>
 </head>
 <body>
@@ -154,6 +163,9 @@
             </div>
             <div class="header-right">
                 <div class="pill">📅 <span id="txt-data">Carregando data...</span></div>
+                <div class="pill" id="pill-sync" title="Última atualização automática">
+                    <span class="sync-dot"></span><span id="txt-sync">agora</span>
+                </div>
                 <div class="pill orange">Ops118655</div>
             </div>
         </div>
@@ -290,7 +302,6 @@
             { nome: "GUILHERME NELO ALVES", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "2° Domingo/Mês", operacao: "AM" }
         ];
 
-        // 🔑 EXPÕE O ARRAY AO WINDOW (para auditoria no Console)
         window.colaboradoresData = colaboradoresData;
 
         let filtroAtual = 'TODOS';
@@ -325,15 +336,17 @@
         }
 
         // ============================================================
-        // RENDERIZAÇÃO
+        // RENDERIZAÇÃO (recalcula tudo do zero a cada chamada)
         // ============================================================
         function renderizarDashboard() {
             const tbody = document.getElementById('tabela-colaboradores');
             const dataHoje = new Date();
 
+            // Atualiza cabeçalho com a data atual
             document.getElementById('txt-data').innerText =
                 dataHoje.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
+            // Zera contadores (recalcula do zero)
             let totalTrabalhando = 0;
             let totalDsr = 0;
 
@@ -348,6 +361,7 @@
             document.getElementById('stat-trabalhando').innerText = totalTrabalhando;
             document.getElementById('stat-dsr').innerText = totalDsr;
 
+            // Aplica filtros
             const filtrados = processados.filter(c => {
                 if (termoBusca && !c.nome.toLowerCase().includes(termoBusca.toLowerCase())) return false;
                 if (filtroAtual === 'TRABALHANDO') return !c.emDsr;
@@ -382,4 +396,73 @@
             filtroAtual = status;
             document.querySelectorAll('.filtro-btn').forEach(btn => {
                 btn.classList.toggle('ativo', btn.dataset.filtro === status);
-           
+            });
+            renderizarDashboard();
+        }
+
+        document.getElementById('input-busca').addEventListener('input', (e) => {
+            termoBusca = e.target.value;
+            renderizarDashboard();
+        });
+
+        // ============================================================
+        // 🔄 ATUALIZAÇÃO AUTOMÁTICA NA VIRADA DO DIA
+        // ============================================================
+        let diaAtual = new Date().toDateString();   // ex: "Sun Nov 08 2026"
+        let ultimaSync = new Date();
+
+        function atualizarIndicadorSync() {
+            const el = document.getElementById('txt-sync');
+            if (!el) return;
+            const diff = Math.floor((new Date() - ultimaSync) / 1000);
+            if (diff < 60) el.innerText = `agora`;
+            else if (diff < 3600) el.innerText = `há ${Math.floor(diff / 60)} min`;
+            else el.innerText = `há ${Math.floor(diff / 3600)} h`;
+        }
+
+        function verificarViradaDoDia() {
+            const agora = new Date();
+            const diaAgora = agora.toDateString();
+
+            if (diaAgora !== diaAtual) {
+                // 🎯 Virou o dia: zera operação e recalcula DSR automaticamente
+                diaAtual = diaAgora;
+                ultimaSync = agora;
+
+                // Reseta filtros? (opcional — mantém o filtro atual)
+                // Se quiser forçar "Todos" ao virar o dia, descomente:
+                // filtroAtual = 'TODOS';
+                // document.querySelectorAll('.filtro-btn').forEach(b => b.classList.toggle('ativo', b.dataset.filtro === 'TODOS'));
+
+                renderizarDashboard();  // recalcula tudo do zero com a nova data
+                atualizarIndicadorSync();
+
+                console.log(`🔄 Virada do dia detectada: ${diaAgora}. DSR recalculado.`);
+            } else {
+                // Mesmo dia: só atualiza o "há X min" do indicador
+                atualizarIndicadorSync();
+            }
+        }
+
+        // Verifica a cada 30 segundos (pega a virada em até 30s)
+        setInterval(verificarViradaDoDia, 30 * 1000);
+
+        // Também verifica quando a aba volta a ficar visível (ex: usuário voltou de outra aba)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) verificarViradaDoDia();
+        });
+
+        // E ao recuperar o foco da janela
+        window.addEventListener('focus', verificarViradaDoDia);
+
+        // ============================================================
+        // INICIALIZAÇÃO
+        // ============================================================
+        window.onload = () => {
+            ultimaSync = new Date();
+            renderizarDashboard();
+            atualizarIndicadorSync();
+        };
+    </script>
+</body>
+</html>
