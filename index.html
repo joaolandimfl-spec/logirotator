@@ -30,7 +30,7 @@
         }
         .brand h1 { font-size: 16px; font-weight: 700; color: #fff; }
         .brand p { font-size: 12px; color: #9ca3af; }
-        .header-right { display: flex; align-items: center; gap: 12px; }
+        .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .pill {
             background: #2D2D2D; color: #d1d5db;
             padding: 6px 12px; border-radius: 8px;
@@ -41,6 +41,12 @@
             border: 1px solid rgba(238,77,45,.3);
             color: #EE4D2D; font-weight: 600;
         }
+        .pill.sync {
+            background: rgba(52,211,153,.1);
+            border: 1px solid rgba(52,211,153,.3);
+            color: #34d399; cursor: pointer; user-select: none;
+        }
+        .pill.sync:hover { background: rgba(52,211,153,.2); }
         main { max-width: 1280px; margin: 0 auto; padding: 24px 16px; }
 
         .stats {
@@ -138,16 +144,6 @@
             text-align: center; padding: 24px; font-size: 11px; color: #6b7280;
             border-top: 1px solid #2D2D2D; margin-top: 48px;
         }
-        /* 🔄 indicador de atualização */
-        .sync-dot {
-            display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-            background: #34d399; margin-right: 6px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .3; }
-        }
     </style>
 </head>
 <body>
@@ -162,9 +158,9 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="pill">📅 <span id="txt-data">Carregando data...</span></div>
-                <div class="pill" id="pill-sync" title="Última atualização automática">
-                    <span class="sync-dot"></span><span id="txt-sync">agora</span>
+                <div class="pill">📅 <span id="txt-data">Carregando...</span></div>
+                <div class="pill sync" id="pill-sync" onclick="forcarAtualizacao()" title="Clique para forçar atualização">
+                    🔄 <span id="txt-sync">sincronizando</span>
                 </div>
                 <div class="pill orange">Ops118655</div>
             </div>
@@ -310,8 +306,9 @@
         // ============================================================
         // FUNÇÃO DSR — folga semanal + domingo fixo
         // ============================================================
-        function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
+        function verificarSeEstaDeDSR(colaborador, dataAtual) {
             if (!colaborador) return false;
+            dataAtual = dataAtual || new Date();
 
             const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
             const diaHojeStr = diasSemana[dataAtual.getDay()];
@@ -336,17 +333,20 @@
         }
 
         // ============================================================
-        // RENDERIZAÇÃO (recalcula tudo do zero a cada chamada)
+        // RENDERIZAÇÃO — sempre usa new Date() do momento
         // ============================================================
         function renderizarDashboard() {
             const tbody = document.getElementById('tabela-colaboradores');
-            const dataHoje = new Date();
+            const dataHoje = new Date();  // 🔑 data SEMPRE atual
 
-            // Atualiza cabeçalho com a data atual
-            document.getElementById('txt-data').innerText =
-                dataHoje.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            // Cabeçalho com data + hora
+            const dataFmt = dataHoje.toLocaleDateString('pt-BR', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+            const horaFmt = dataHoje.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('txt-data').innerText = `${dataFmt} — ${horaFmt}`;
 
-            // Zera contadores (recalcula do zero)
+            // 🔑 ZERA os contadores e recalcula do zero
             let totalTrabalhando = 0;
             let totalDsr = 0;
 
@@ -361,7 +361,7 @@
             document.getElementById('stat-trabalhando').innerText = totalTrabalhando;
             document.getElementById('stat-dsr').innerText = totalDsr;
 
-            // Aplica filtros
+            // Filtros
             const filtrados = processados.filter(c => {
                 if (termoBusca && !c.nome.toLowerCase().includes(termoBusca.toLowerCase())) return false;
                 if (filtroAtual === 'TRABALHANDO') return !c.emDsr;
@@ -390,6 +390,9 @@
                     </tr>
                 `;
             }).join('');
+
+            // Atualiza indicador de sync
+            document.getElementById('txt-sync').innerText = `sync ${horaFmt}`;
         }
 
         function filtrarStatus(status) {
@@ -406,62 +409,46 @@
         });
 
         // ============================================================
-        // 🔄 ATUALIZAÇÃO AUTOMÁTICA NA VIRADA DO DIA
+        // 🔄 ATUALIZAÇÃO AUTOMÁTICA — VERIFICAÇÃO AGRESSIVA
         // ============================================================
-        let diaAtual = new Date().toDateString();   // ex: "Sun Nov 08 2026"
-        let ultimaSync = new Date();
-
-        function atualizarIndicadorSync() {
-            const el = document.getElementById('txt-sync');
-            if (!el) return;
-            const diff = Math.floor((new Date() - ultimaSync) / 1000);
-            if (diff < 60) el.innerText = `agora`;
-            else if (diff < 3600) el.innerText = `há ${Math.floor(diff / 60)} min`;
-            else el.innerText = `há ${Math.floor(diff / 3600)} h`;
-        }
+        let diaAtual = new Date().toDateString();
 
         function verificarViradaDoDia() {
             const agora = new Date();
             const diaAgora = agora.toDateString();
 
             if (diaAgora !== diaAtual) {
-                // 🎯 Virou o dia: zera operação e recalcula DSR automaticamente
                 diaAtual = diaAgora;
-                ultimaSync = agora;
-
-                // Reseta filtros? (opcional — mantém o filtro atual)
-                // Se quiser forçar "Todos" ao virar o dia, descomente:
-                // filtroAtual = 'TODOS';
-                // document.querySelectorAll('.filtro-btn').forEach(b => b.classList.toggle('ativo', b.dataset.filtro === 'TODOS'));
-
-                renderizarDashboard();  // recalcula tudo do zero com a nova data
-                atualizarIndicadorSync();
-
-                console.log(`🔄 Virada do dia detectada: ${diaAgora}. DSR recalculado.`);
-            } else {
-                // Mesmo dia: só atualiza o "há X min" do indicador
-                atualizarIndicadorSync();
+                console.log(`🔄 Virada do dia: ${diaAgora}`);
             }
+            // 🔑 SEMPRE re-renderiza (não só na virada) — isso garante
+            // que a data/hora do cabeçalho e o DSR estejam sempre atualizados
+            renderizarDashboard();
         }
 
-        // Verifica a cada 30 segundos (pega a virada em até 30s)
-        setInterval(verificarViradaDoDia, 30 * 1000);
+        function forcarAtualizacao() {
+            diaAtual = new Date().toDateString();
+            renderizarDashboard();
+            console.log('🔄 Atualização manual forçada');
+        }
 
-        // Também verifica quando a aba volta a ficar visível (ex: usuário voltou de outra aba)
+        // Verifica a cada 5 segundos (agressivo, pega virada rápido)
+        setInterval(verificarViradaDoDia, 5 * 1000);
+
+        // Verifica ao voltar para a aba
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) verificarViradaDoDia();
         });
 
-        // E ao recuperar o foco da janela
+        // Verifica ao ganhar foco
         window.addEventListener('focus', verificarViradaDoDia);
 
         // ============================================================
         // INICIALIZAÇÃO
         // ============================================================
         window.onload = () => {
-            ultimaSync = new Date();
             renderizarDashboard();
-            atualizarIndicadorSync();
+            console.log('✅ LogiRotator inicializado. Dia atual:', new Date().toDateString());
         };
     </script>
 </body>
