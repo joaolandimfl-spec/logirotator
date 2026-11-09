@@ -184,7 +184,6 @@ body.role-admin #logi-admin-account{display:flex!important}
 <button onclick="abrirRelatorioAcumulado();toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400"></i> Relatório</span></button><button onclick="abrirRastreioMensal();toggleSidebarMobile()" class="sidebar-item text-cyan-300"><span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> Rastreio Mensal</span></button><button onclick="abrirPainelOperacao();toggleSidebarMobile()" class="sidebar-item text-amber-400"><span class="flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4"></i> Operação / Movimentação</span></button>
 </nav>
 </aside>
-
 <!-- MODAIS -->
 <div id="modal-add" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
@@ -462,8 +461,7 @@ function isColabEmDSRHoje(c) {
     }
     return false;
 }
-
-function obterStatusHoje(c){
+ function obterStatusHoje(c){
   const pres=(c.presencaDias&&c.presencaDias[diaHoje-1])||"-";
   if(pres==="DSR"||pres==="FO")return'dsr';
   if(["F","FJ"].includes(pres))return'falta';
@@ -482,7 +480,6 @@ function colaboradoresOperacionaisHoje(){
     return st && st!=='-' && !foraDoQuadro.has(st);
   });
 }
-
 function colaboradoresOperacionaisMes(){
   const foraDoQuadro=new Set(['DF','DP','DV','NC','NS']);
   return colaboradores.filter(function(c){
@@ -494,13 +491,11 @@ function colaboradoresOperacionaisMes(){
     });
   });
 }
-
 function estaEmOperacaoHoje(c){
   const f=(c.historicoDias&&c.historicoDias[diaHoje-1])||'-';
   const p=(c.presencaDias&&c.presencaDias[diaHoje-1])||'-';
   return ["P","S2"].includes(p) && isFuncaoAlocada(f);
 }
-
 function contarDiasNaFuncaoAtual(h){const f=h[diaHoje-1];if(!f||isStatusEspecial(f))return{funcao:"Nenhuma",dias:0,dataInicio:null,dataFim:null};let c=0;let idx=diaHoje-1;for(let i=diaHoje-1;i>=0;i--){if(h[i]===f&&!isStatusEspecial(h[i])){c++;idx=i}else{break}}return{funcao:f,dias:c,dataInicio:new Date(anoAtual,mesAtualIndex,idx+1),dataFim:new Date(anoAtual,mesAtualIndex,diaHoje)}}
 
 function obterChaveDiaristasDia(){return'diaristas_'+anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(diaHoje).padStart(2,'0')}
@@ -704,7 +699,7 @@ async function carregarDadosSupabase(){
         escala:c.escala||'6x1',
         horario:'Horário operacional: 00:00 - 07:54',
         dsr:c.dsr||'Domingo',
-        domingoFixo:Number(c.domingo_fixo||0),  // ← NOVO: coluna domingo_fixo do banco
+        domingoFixo:Number(c.domingo_fixo||0),
         codigoSPX:String(c.codigo_spx||c.codigo||c.spx||c.matricula||'').trim().toUpperCase(),
         email:c.email||'',
         opsId:c.ops_id||'',
@@ -817,17 +812,14 @@ async function atualizarDiaSupabase(colabId,dia,funcao){
   if(String(colabId||'').startsWith('excel-')){
     throw new Error('Este colaborador existe somente no Excel e ainda não possui vínculo com o cadastro do banco.');
   }
-
   if(isStatusEspecial(funcao)){
     throw new Error('A presença é somente leitura nesta grade. Use a aba Presentes para alterar o status.');
   }
-
   const dataStr=anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(dia).padStart(2,'0');
   let setor='Recebimento';
   for(const s of Object.keys(SETORES_E_FUNCOES)){
     if(SETORES_E_FUNCOES[s].includes(funcao)){setor=s;break}
   }
-
   const existente=await supabaseClient
     .from('historico_escala')
     .select('id')
@@ -835,9 +827,7 @@ async function atualizarDiaSupabase(colabId,dia,funcao){
     .eq('data_inicio',dataStr)
     .is('hora_inicio',null)
     .limit(1);
-
   if(existente.error) throw existente.error;
-
   let r;
   if(existente.data && existente.data.length){
     r=await supabaseClient.from('historico_escala')
@@ -890,53 +880,39 @@ function criarBloco(titulo,subtitulo,itens,cor,icon,bt){if(itens.length===0)retu
 
 function criarBlocoDiaristas(){const d=getDiaristasDia();const total=d.presentes+d.faltantes;const pd=d.pedidos>0;const dif=d.presentes-d.pedidos;const exc=d.presentes>=d.pedidos&&d.pedidos>0;let status='';let cs='';if(d.pedidos===0){status='Defina o pedido';cs='text-slate-400'}else if(dif===0){status='Meta atendida';cs='text-emerald-400'}else if(dif>0){status=dif+' alem';cs='text-cyan-400'}else{status='Faltam '+Math.abs(dif)+' do pedido';cs='text-yellow-400'}const bloco=document.createElement('div');bloco.className='bg-cyan-950/20 border border-cyan-500/40 rounded-2xl p-4 shadow-xl';const clP=pd&&!exc?'bg-slate-900 border border-emerald-500/40 cursor-pointer active:scale-[0.98]':'bg-slate-900 border border-slate-800 opacity-60 cursor-not-allowed';const clF=pd?'bg-slate-900 border border-red-500/40 cursor-pointer active:scale-[0.98]':'bg-slate-900 border border-slate-800 opacity-60 cursor-not-allowed';bloco.innerHTML='<div class="flex items-center justify-between pb-3 mb-3 border-b border-cyan-500/30 flex-wrap gap-2"><h2 class="text-sm font-bold text-cyan-400">Diaristas Hoje <span class="text-[10px] font-normal opacity-70">- quantidades por dia</span></h2><span class="badge badge-info">'+total+' registrado(s)</span></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl"><button onclick="abrirModalDiaristasPedidos()" class="text-left bg-slate-900 border border-cyan-500/40 rounded-xl p-3.5 cursor-pointer active:scale-[0.98]"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-cyan-400 font-bold">Pedidos</span><i data-lucide="edit-3" class="w-4 h-4 text-cyan-400"></i></div><div class="text-3xl font-extrabold text-cyan-300">'+d.pedidos+'</div><div class="text-[10px] '+cs+' font-semibold mt-1">'+status+'</div></button><button onclick="'+(pd&&!exc?"abrirModalAddDiarista('presente')":'')+'" '+(pd&&!exc?'':'disabled')+' class="text-left rounded-xl p-3.5 transition '+clP+'"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-emerald-400 font-bold">Presentes</span><i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i></div><div class="text-3xl font-extrabold text-emerald-300">'+d.presentes+'</div><div class="text-[10px] text-slate-500 mt-1">'+(pd?'de '+d.pedidos+' pedido(s)':'sem pedido')+' · somam em <span class="text-emerald-400 font-bold">Operação</span></div></button><button onclick="'+(pd?"abrirModalAddDiarista('faltou')":'')+'" '+(pd?'':'disabled')+' class="text-left rounded-xl p-3.5 transition '+clF+'"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-red-400 font-bold">Faltaram</span><i data-lucide="edit-3" class="w-4 h-4 text-red-400"></i></div><div class="text-3xl font-extrabold text-red-300">'+d.faltantes+'</div><div class="text-[10px] text-slate-500 mt-1">Total: '+total+' · somam em <span class="text-yellow-400 font-bold">Faltas</span></div></button></div>'+(pd?'':'<div class="mt-3 pt-3 border-t border-cyan-500/20 text-[11px] text-yellow-400">Defina primeiro a quantidade de diaristas pedidos.</div>');return bloco}
 
-// ============================================================
-// ABA PRESENTES COM SELECT INTERATIVO DE STATUS (Legenda Oficial)
-// ============================================================
 function criarListaPresentes(colsOperacao) {
   const d = getDiaristasDia();
   const bloco = document.createElement('div');
   bloco.className = 'bg-emerald-950/20 border border-emerald-500/40 rounded-2xl p-4 shadow-xl';
-  
   const totalPres = colsOperacao.length + d.presentes;
   let h = '<div class="flex items-center justify-between pb-3 mb-3 border-b border-emerald-500/30 flex-wrap gap-2"><h2 class="text-sm font-bold text-emerald-400 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Presentes Hoje <span class="text-[10px] font-normal opacity-70">- alteração rápida de presença</span></h2><span class="badge badge-success">' + totalPres + ' presente(s)</span></div>';
-  
   h += '<div class="grid grid-cols-2 gap-2 mb-3">';
   h += '<div class="bg-slate-900 border border-emerald-500/30 rounded-lg p-2"><div class="text-[10px] uppercase text-emerald-400 font-bold">Escalados</div><div class="text-xl font-extrabold text-emerald-300">' + colsOperacao.length + '</div></div>';
   h += '<div class="bg-slate-900 border border-cyan-500/30 rounded-lg p-2"><div class="text-[10px] uppercase text-cyan-400 font-bold">Diaristas</div><div class="text-xl font-extrabold text-cyan-300">' + d.presentes + '</div></div>';
   h += '</div>';
-  
   if (totalPres === 0) {
     h += '<p class="text-xs text-slate-500 italic py-4 text-center">Nenhum presente hoje.</p>';
     bloco.innerHTML = h;
     return bloco;
   }
-  
   h += '<div class="space-y-2">';
-  
   colsOperacao.forEach(function(c) {
     const statusAtual = (c.presencaDias && c.presencaDias[diaHoje - 1]) || 'P';
     const funcaoStatus = contarDiasNaFuncaoAtual(c.historicoDias);
     const funcao = funcaoStatus.funcao || '-';
     const alocadoSetor = isFuncaoAlocada(funcao);
-    
     let optionsHtml = '';
     STATUS_ESPECIAIS.forEach(function(s) {
       optionsHtml += '<option value="' + s.valor + '" ' + (s.valor === statusAtual ? 'selected' : '') + '>' + s.label + '</option>';
     });
-    
     h += '<div class="bg-slate-900 border border-emerald-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">';
     h += '<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-100 truncate">' + c.nome + '</div>';
     h += '<div class="text-[10px] text-slate-400 truncate">' + c.escala + ' · DSR: ' + c.dsr + '</div>';
     h += '<div class="text-[10px] ' + (alocadoSetor ? 'text-amber-400' : 'text-slate-500') + ' font-semibold mt-0.5">Função: <strong>' + (alocadoSetor ? funcao : 'Sem setor') + '</strong></div></div>';
-    
     h += '<div class="flex items-center gap-2 w-full sm:w-auto justify-end">';
     h += '<select onchange="alterarPresencaRapida(\'' + c.id + '\', this.value)" class="select text-xs bg-slate-950 border-slate-700 text-slate-200 py-1 px-2 rounded-lg">' + optionsHtml + '</select>';
-    h += '</div>';
-    
-    h += '</div>';
+    h += '</div></div>';
   });
-  
   for (let i = 1; i <= d.presentes; i++) {
     h += '<div class="bg-slate-900 border border-cyan-500/30 rounded-xl p-3 flex items-center justify-between gap-2">';
     h += '<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-100">Diarista ' + i + '</div>';
@@ -945,31 +921,25 @@ function criarListaPresentes(colsOperacao) {
     h += '<span class="badge badge-info shrink-0">Diarista</span>';
     h += '</div>';
   }
-  
   h += '</div>';
   bloco.innerHTML = h;
   return bloco;
 }
 
-// Função para gravar a alteração rápida de presença no banco Neon
 async function alterarPresencaRapida(colabId, novoStatus) {
   try {
     const dataStr = anoAtual + '-' + String(mesAtualIndex + 1).padStart(2, '0') + '-' + String(diaHoje).padStart(2, '0');
-    
     const r = await supabaseClient.from('presenca_diaria').upsert({
       colaborador_id: colabId,
       data: dataStr,
       status: novoStatus
     }, { onConflict: 'colaborador_id,data' });
-
     if (r.error) throw r.error;
-
     const colab = colaboradores.find(function(c) { return String(c.id) === String(colabId); });
     if (colab) {
       if (!colab.presencaDias) colab.presencaDias = new Array(totalDiasDoMes).fill('-');
       colab.presencaDias[diaHoje - 1] = novoStatus;
     }
-
     toast('Status de presença alterado para ' + novoStatus, 'ok');
     renderizar();
   } catch (e) {
@@ -982,18 +952,14 @@ async function alterarPresencaRapida(colabId, novoStatus) {
 function criarListaGeral(cols) {
   const bloco = document.createElement('div');
   bloco.className = 'bg-amber-950/10 border-2 border-amber-500/40 rounded-2xl p-4 shadow-2xl';
-  
   let h = '<div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-500/30 flex-wrap gap-2"><h2 class="text-sm font-bold text-amber-400 flex items-center gap-2"><i data-lucide="layout-grid" class="w-4 h-4"></i> Lista Geral <span class="text-[10px] font-normal opacity-70">- todos os logistas</span></h2><span class="badge badge-warning">' + cols.length + ' colaborador(es)</span></div>';
-  
   if (cols.length === 0) {
     h += '<p class="text-xs text-slate-500 italic py-4 text-center">Nenhum colaborador cadastrado.</p>';
     bloco.innerHTML = h;
     return bloco;
   }
-  
   const contagem = {operacao:0, dsr:0, falta:0, atestado:0, ferias:0, afastamento:0, banco_horas:0, outro_status:0, sem_escala:0};
   cols.forEach(function(c){ const st = obterStatusHoje(c); if (contagem[st] !== undefined) contagem[st]++; });
-  
   h += '<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 mb-3">';
   h += '<div class="bg-slate-900 border border-emerald-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-emerald-400 font-bold">Operação</div><div class="text-lg font-extrabold text-emerald-300">' + contagem.operacao + '</div></div>';
   h += '<div class="bg-slate-900 border border-orange-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-orange-400 font-bold">DSR</div><div class="text-lg font-extrabold text-orange-300">' + contagem.dsr + '</div></div>';
@@ -1003,7 +969,6 @@ function criarListaGeral(cols) {
   h += '<div class="bg-slate-900 border border-slate-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-slate-400 font-bold">Afast.</div><div class="text-lg font-extrabold text-slate-300">' + contagem.afastamento + '</div></div>';
   h += '<div class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-slate-400 font-bold">Outros status</div><div class="text-lg font-extrabold text-slate-300">' + (contagem.outro_status + contagem.sem_escala + contagem.banco_horas) + '</div></div>';
   h += '</div>';
-  
   h += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">';
   cols.forEach(function(c){
     const st = obterStatusHoje(c);
@@ -1019,7 +984,6 @@ function criarListaGeral(cols) {
       outro_status: {tipo:'outro_status', label:'Outro status', badge:'badge-default'},
       sem_escala: {tipo:'sem_escala', label:'Sem informação no Excel', badge:'badge-default'}
     }[st] || {tipo:'sem_escala', label:'-', badge:'badge-default'};
-    
     const rawPresenca = String((c.presencaDias&&c.presencaDias[diaHoje-1]) || '-').toUpperCase();
     const labelsPresenca = {
       'P':'Presente (P)', 'AF':'Afastamento (AF)', 'AL':'Afastamento longo (AL)', 'AM':'Atestado médico (AM)',
@@ -1031,7 +995,6 @@ function criarListaGeral(cols) {
       'SU':'Suspensão (SU)', 'FC':'Folga compensatória (FC)', 'IN':'Internalização (IN)', '-':'Sem informação de presença'
     };
     const statusLabel = labelsPresenca[rawPresenca] || rawPresenca;
-    
     h += '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-start justify-between gap-2">';
     h += '<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-100 truncate">' + c.nome + '</div>';
     h += '<div class="text-[10px] text-slate-400 truncate">' + c.escala + ' · DSR: ' + c.dsr + '</div>';
@@ -1041,7 +1004,6 @@ function criarListaGeral(cols) {
     h += '</div>';
   });
   h += '</div>';
-  
   bloco.innerHTML = h;
   return bloco;
 }
@@ -1101,22 +1063,18 @@ if(filtroAtivo==='todos'){
   cont.appendChild(criarListaGeral(todosVisiveis));
   return;
 }
-
 if(filtroAtivo==='presentes'){
   cont.appendChild(criarListaPresentes([].concat(pF,oF)));
   return;
 }
-
 if(filtroAtivo==='operacao'){
   renderizarSetores(oF,cont,true);
   return;
 }
-
 if(filtroAtivo==='diaristas'){
   cont.appendChild(criarBlocoDiaristas());
   return;
 }
-
 if(filtroAtivo==='dsr'){
   if(dF.length>0){const b=criarBloco('Em DSR Hoje','nao podem ser escalados',dF,'orange','',dF.length);if(b)cont.appendChild(b);}
   else cont.innerHTML='<p class="text-center text-slate-500 italic py-8">Nenhum em DSR hoje.</p>';
@@ -1147,7 +1105,6 @@ function renderizarSetores(cols,cont,forcarTodos){
     const cs=cols.filter(function(c){const f=c.historicoDias[diaHoje-1]||"-";return funcs.includes(f)});
     if(cs.length>0||forcarTodos)setoresComColabs[setor]=cs;
   }
-
   for(const setor of Object.keys(setoresComColabs)){
     const cs=setoresComColabs[setor];
     const b=document.createElement('div');
@@ -1254,7 +1211,6 @@ function fecharModalHistorico(){document.getElementById('modal-historico').class
 function fecharRelatorioAcumulado(){
   document.getElementById('modal-relatorio-acumulado').classList.add('hidden');
 }
-
 function resumoMensalColaborador(c){
   const r={operacao:0,P:0,S2:0,F:0,FJ:0,AM:0,BH:0,DSR:0,FO:0,FE:0,AF:0,AL:0,TD:0,SU:0,outros:0};
   (c.presencaDias||[]).forEach(function(v){
@@ -1266,67 +1222,35 @@ function resumoMensalColaborador(c){
   (c.historicoDias||[]).forEach(function(v){if(isFuncaoAlocada(v))r.operacao++});
   return r;
 }
-
 function abrirRelatorioAcumulado(){
   const modal=document.getElementById('modal-relatorio-acumulado');
   const cont=document.getElementById('relatorio-conteudo');
   const sub=document.getElementById('relatorio-subtitulo');
-
-  const linhas=colaboradores.map(function(c){
-    return {c:c,r:resumoMensalColaborador(c)};
-  });
-
+  const linhas=colaboradores.map(function(c){return {c:c,r:resumoMensalColaborador(c)};});
   const tot={operacao:0,P:0,S2:0,F:0,FJ:0,AM:0,BH:0,DSR:0,FO:0,FE:0,AF:0};
-  linhas.forEach(function(x){
-    Object.keys(tot).forEach(function(k){tot[k]+=x.r[k]||0});
-  });
-
+  linhas.forEach(function(x){Object.keys(tot).forEach(function(k){tot[k]+=x.r[k]||0});});
   sub.innerText=nomeMesAtual+' / '+anoAtual+' · '+colaboradoresOperacionaisHoje().length+' no quadro de hoje · '+totalCadastroBanco+' no cadastro';
-
   let h='<div id="area-impressao-relatorio">';
   h+='<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 mb-4">';
-  [
-    ['Dias em Operação',tot.operacao],
-    ['Presenças P/S2',tot.P+tot.S2],
-    ['Faltas F/FJ',tot.F+tot.FJ],
-    ['Atestados AM',tot.AM],
-    ['Banco de Horas BH',tot.BH],
-    ['DSR',tot.DSR]
-  ].forEach(function(k){
+  [['Dias em Operação',tot.operacao],['Presenças P/S2',tot.P+tot.S2],['Faltas F/FJ',tot.F+tot.FJ],['Atestados AM',tot.AM],['Banco de Horas BH',tot.BH],['DSR',tot.DSR]].forEach(function(k){
     h+='<div class="bg-slate-950 border border-slate-800 rounded-xl p-3"><div class="text-[9px] uppercase text-slate-400">'+k[0]+'</div><div class="text-xl font-extrabold text-emerald-400">'+k[1]+'</div></div>';
   });
   h+='</div>';
-
-  h+='<div class="overflow-auto rounded-xl border border-slate-800"><table class="w-full text-xs text-left"><thead class="bg-slate-900 text-amber-400"><tr>'+
-     '<th class="p-2">Colaborador</th><th class="p-2 text-center">Operação</th><th class="p-2 text-center">P/S2</th>'+
-     '<th class="p-2 text-center">F/FJ</th><th class="p-2 text-center">AM</th><th class="p-2 text-center">BH</th>'+
-     '<th class="p-2 text-center">DSR</th><th class="p-2 text-center">FE</th><th class="p-2 text-center">AF/AL</th></tr></thead><tbody>';
+  h+='<div class="overflow-auto rounded-xl border border-slate-800"><table class="w-full text-xs text-left"><thead class="bg-slate-900 text-amber-400"><tr><th class="p-2">Colaborador</th><th class="p-2 text-center">Operação</th><th class="p-2 text-center">P/S2</th><th class="p-2 text-center">F/FJ</th><th class="p-2 text-center">AM</th><th class="p-2 text-center">BH</th><th class="p-2 text-center">DSR</th><th class="p-2 text-center">FE</th><th class="p-2 text-center">AF/AL</th></tr></thead><tbody>';
   linhas.forEach(function(x){
-    h+='<tr class="border-t border-slate-800"><td class="p-2 font-semibold text-slate-200">'+x.c.nome+'</td>'+
-        '<td class="p-2 text-center">'+x.r.operacao+'</td>'+
-        '<td class="p-2 text-center">'+(x.r.P+x.r.S2)+'</td>'+
-        '<td class="p-2 text-center">'+(x.r.F+x.r.FJ)+'</td>'+
-        '<td class="p-2 text-center">'+x.r.AM+'</td>'+
-        '<td class="p-2 text-center">'+x.r.BH+'</td>'+
-        '<td class="p-2 text-center">'+x.r.DSR+'</td>'+
-        '<td class="p-2 text-center">'+x.r.FE+'</td>'+
-        '<td class="p-2 text-center">'+(x.r.AF+x.r.AL)+'</td></tr>';
+    h+='<tr class="border-t border-slate-800"><td class="p-2 font-semibold text-slate-200">'+x.c.nome+'</td><td class="p-2 text-center">'+x.r.operacao+'</td><td class="p-2 text-center">'+(x.r.P+x.r.S2)+'</td><td class="p-2 text-center">'+(x.r.F+x.r.FJ)+'</td><td class="p-2 text-center">'+x.r.AM+'</td><td class="p-2 text-center">'+x.r.BH+'</td><td class="p-2 text-center">'+x.r.DSR+'</td><td class="p-2 text-center">'+x.r.FE+'</td><td class="p-2 text-center">'+(x.r.AF+x.r.AL)+'</td></tr>';
   });
   h+='</tbody></table></div></div>';
   cont.innerHTML=h;
   modal.classList.remove('hidden');
   lucide.createIcons();
 }
-
 function imprimirRelatorio(){
   const area=document.getElementById('area-impressao-relatorio');
   if(!area){toast('Abra o relatório primeiro.','warn');return;}
   const w=window.open('','_blank','width=1100,height=800');
   if(!w){toast('O navegador bloqueou a janela de impressão.','warn');return;}
-  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Relatório LogiRotator</title>'+
-    '<style>body{font-family:Arial,sans-serif;padding:24px;color:#111}table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:6px;font-size:11px}th{background:#eee}div{box-sizing:border-box}</style></head><body>'+
-    '<div id="neon-api-notice" style="position:fixed;bottom:8px;right:8px;z-index:9999;background:#172554;color:#bfdbfe;border:1px solid #1d4ed8;border-radius:8px;padding:7px 10px;font:11px sans-serif;max-width:310px">Banco: Neon DB • API segura necessária em /.netlify/functions/api</div>'+
-    '<h2>LogiRotator — Relatório '+nomeMesAtual+' / '+anoAtual+'</h2>'+area.innerHTML+'</body></html>');
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Relatório LogiRotator</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:6px;font-size:11px}th{background:#eee}div{box-sizing:border-box}</style></head><body><h2>LogiRotator — Relatório '+nomeMesAtual+' / '+anoAtual+'</h2>'+area.innerHTML+'</body></html>');
   w.document.close();
   w.focus();
   setTimeout(function(){w.print();},250);
@@ -1427,15 +1351,71 @@ function opAtualizar(){const c=opColabSelecionado();document.getElementById("op-
 async function registrarEntradaOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value,f=document.getElementById("op-funcao").value;if(!c||!f)return toast("Selecione colaborador e função.","warn");if(d!==opHojeISO())return toast("A entrada deve ser registrada no dia atual.","warn");const agora=opAgora();if(opMin(agora)>474)return toast("Entrada permitida somente até 07:54.","warn");const q=await supabaseClient.from("historico_escala").select("id").eq("colaborador_id",c.id).eq("data_inicio",d).is("hora_fim",null).limit(1);if(q.error)return toast(q.error.message,"erro");if(q.data?.length)return toast("Já existe uma operação em aberto.","warn");const r=await supabaseClient.from("historico_escala").insert([{colaborador_id:c.id,data_inicio:d,data_fim:d,setor:setorDaFuncao(f),funcao:f,hora_inicio:agora,hora_fim:null}]);if(r.error)return toast(r.error.message,"erro");toast("Entrada registrada às "+agora.slice(0,5)+".","ok");buscarMovimentosOperacao()}
 async function trocarFuncaoOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value,f=document.getElementById("op-funcao").value;if(!c||!f)return;const q=await supabaseClient.from("historico_escala").select("*").eq("colaborador_id",c.id).eq("data_inicio",d).is("hora_fim",null).order("hora_inicio",{ascending:false}).limit(1);if(q.error||!q.data?.length)return toast(q.error?.message||"Não há operação aberta.","warn");const atual=q.data[0],agora=opAgora();if(String(atual.funcao)===f)return toast("A função já é a atual.","warn");let r=await supabaseClient.from("historico_escala").update({hora_fim:agora,data_fim:d}).eq("id",atual.id);if(r.error)return toast(r.error.message,"erro");r=await supabaseClient.from("historico_escala").insert([{colaborador_id:c.id,data_inicio:d,data_fim:d,setor:setorDaFuncao(f),funcao:f,hora_inicio:agora,hora_fim:null}]);if(r.error)return toast(r.error.message,"erro");toast("Função alterada às "+agora.slice(0,5)+".","ok");buscarMovimentosOperacao()}
 async function registrarSaidaOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value;if(!c)return;const q=await supabaseClient.from("historico_escala").select("id").eq("colaborador_id",c.id).eq("data_inicio",d).is("hora_fim",null).order("hora_inicio",{ascending:false}).limit(1);if(q.error||!q.data?.length)return toast(q.error?.message||"Não há operação aberta.","warn");const agora=opAgora(),r=await supabaseClient.from("historico_escala").update({hora_fim:agora,data_fim:d}).eq("id",q.data[0].id);if(r.error)return toast(r.error.message,"erro");toast("Saída registrada às "+agora.slice(0,5)+".","ok");buscarMovimentosOperacao()}
-function abrirPainelOperacao(){const m=document.getElementById("modal-operacao"),s=document.getElementById("op-colaborador");s.innerHTML='<option value="">Selecione...</option>'+colaboradores.map(c=>'<option value="'+c.id+'">'+c.nome+"</option>").join("");document.getElementById("op-data").value=opHojeISO();preencherFuncoesOperacao();m.classList.remove("hidden");m.classList.add("flex");s.onchange=opAtualizar;document.getElementById("op-data").onchange=buscarMovimentosOperacao;opAtualizar()}
-function fecharPainelOperacao(){const m=document.getElementById("modal-operacao");m.classList.add("hidden");m.classList.remove("flex")}
+
+function abrirPainelOperacao(){
+  const m=document.getElementById("modal-operacao");
+  const s=document.getElementById("op-colaborador");
+  if(!m||!s)return;
+  s.innerHTML='<option value="">Selecione...</option>'+colaboradores.map(c=>'<option value="'+c.id+'">'+c.nome+"</option>").join("");
+  document.getElementById("op-data").value=opHojeISO();
+  preencherFuncoesOperacao();
+  m.classList.remove("hidden");
+  m.classList.add("flex");
+  s.onchange=opAtualizar;
+  document.getElementById("op-data").onchange=buscarMovimentosOperacao;
+  opAtualizar();
+}
+function fecharPainelOperacao(){
+  const m=document.getElementById("modal-operacao");
+  if(!m)return;
+  m.classList.add("hidden");
+  m.classList.remove("flex");
+}
 
 function minutosHoraRastreio(h){if(!h)return null;const m=String(h).match(/(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null;}
 function formatarMinutosRastreio(m){if(!Number.isFinite(m)||m<=0)return '0h00';return Math.floor(m/60)+'h'+String(Math.round(m%60)).padStart(2,'0');}
 function abrirRastreioMensal(){if(papelLogi!=='admin'){toast('Rastreio mensal disponível somente para administrador.','erro');return;}const el=document.getElementById('rastreio-mes');if(el&&!el.value)el.value=String(anoAtual)+'-'+String(mesAtualIndex+1).padStart(2,'0');const m=document.getElementById('modal-rastreio-mensal');m.classList.remove('hidden');m.classList.add('flex');renderizarRastreioMensal();}
 function fecharRastreioMensal(){const m=document.getElementById('modal-rastreio-mensal');m.classList.add('hidden');m.classList.remove('flex');}
 function obterDadosRastreioMensal(){const mes=document.getElementById('rastreio-mes')?.value;if(!mes)return {mes:'',rows:[],porColab:[],setores:{},minutos:0,semHora:0};const [aa,mm]=mes.split('-').map(Number);const inicio=mes+'-01';const fim=mes+'-'+String(new Date(aa,mm,0).getDate()).padStart(2,'0');const hoje=opHojeISO();const agora=opAgora();const rows=historicoMovimentosGlobal.filter(r=>{const d=String(r.data_inicio||r.data||'').slice(0,10);return d>=inicio&&d<=fim&&!!r.hora_inicio;});const porId={};const setores={};let minutosTotal=0,semHora=0;rows.forEach(r=>{const c=colaboradores.find(x=>String(x.id)===String(r.colaborador_id));const nome=c?.nome||'Colaborador não localizado';const setor=r.setor||setorDaFuncao(r.funcao||'')||'Setor não informado';const funcao=r.funcao||setor;let ini=minutosHoraRastreio(r.hora_inicio),f=minutosHoraRastreio(r.hora_fim);if(ini===null){semHora++;return;}if(f===null){if(String(r.data_inicio||'').slice(0,10)===hoje)f=minutosHoraRastreio(agora);else{semHora++;return;}}if(f!==null&&f<ini)f+=1440;const dur=Math.max(0,(f??ini)-ini);minutosTotal+=dur;if(!porId[r.colaborador_id])porId[r.colaborador_id]={id:r.colaborador_id,nome:nome,total:0,setores:{},dias:{},movimentos:0};const x=porId[r.colaborador_id];x.total+=dur;x.setores[setor]=(x.setores[setor]||0)+dur;x.movimentos++;const dia=String(r.data_inicio||r.data||'').slice(0,10);if(!x.dias[dia])x.dias[dia]=[];x.dias[dia].push({setor,funcao,inicio:r.hora_inicio,fim:r.hora_fim||((dia===hoje)?agora:null),minutos:dur});if(!setores[setor])setores[setor]={minutos:0,pessoas:{}};setores[setor].minutos+=dur;setores[setor].pessoas[r.colaborador_id]=true;});return {mes,rows,porColab:Object.values(porId).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')),setores,minutos:minutosTotal,semHora};}
-function renderizarRastreioMensal(){const d=obterDadosRastreioMensal();const resumo=document.getElementById('rastreio-resumo'),cont=document.getElementById('rastreio-conteudo');if(!resumo||!cont)return;const pessoas=d.porColab.length,reg=d.rows.length,qtSetores=Object.keys(d.setores).length;resumo.innerHTML=[['LOGIs rastreados',pessoas],['Movimentações',reg],['Setores utilizados',qtSetores],['Tempo rastreado',formatarMinutosRastreio(d.minutos)]].map(x=>'<div class="bg-slate-950 border border-slate-800 rounded-xl p-3"><div class="text-[9px] uppercase text-slate-400">'+x[0]+'</div><div class="text-xl font-extrabold text-cyan-300 mt-1">'+x[1]+'</div></div>').join('');const termo=normalizarTexto(document.getElementById('rastreio-busca')?.value||'');const setores=Object.entries(d.setores).sort((a,b)=>b[1].minutos-a[1].minutos);let h='<section class="bg-slate-950 border border-slate-800 rounded-xl p-3"><h4 class="text-xs font-bold text-cyan-300 mb-3">Permanência por setor / função</h4>';if(!setores.length)h+='<p class="text-xs text-slate-500">Nenhuma movimentação com horário foi registrada neste mês.</p>';else{const max=Math.max(1,...setores.map(x=>x[1].minutos));setores.forEach(([nome,x])=>{h+='<div class="mb-3"><div class="flex justify-between gap-2 text-xs"><b>'+escaparHtmlLogi(nome)+'</b><span class="text-cyan-300">'+formatarMinutosRastreio(x.minutos)+' · '+Object.keys(x.pessoas).length+' LOGIs</span></div><div class="h-2 bg-slate-800 rounded-full mt-1 overflow-hidden"><div class="h-full bg-cyan-500 rounded-full" style="width:'+Math.round(x.minutos/max*100)+'%"></div></div></div>';});}h+='</section><section><h4 class="text-xs font-bold text-slate-200 mb-2">Rastreio individual</h4>';const lista=d.porColab.filter(x=>!termo||matchBuscaAvancada(termo,x.nome,Object.keys(x.setores).join(' ')));if(!lista.length)h+='<p class="text-xs text-slate-500">Nenhum colaborador encontrado.</p>';lista.forEach(x=>{const ss=Object.entries(x.setores).sort((a,b)=>b[1]-a[1]);h+='<details class="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-2"><summary class="cursor-pointer flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-100">'+escaparHtmlLogi(x.nome)+'</span><span class="text-[10px] text-cyan-300">'+formatarMinutosRastreio(x.total)+' · '+x.movimentos+' movimentações</span></summary><div class="mt-3 grid md:grid-cols-2 gap-3"><div><div class="text-[10px] uppercase text-slate-500 mb-2">Tempo por setor</div>'+ss.map(z=>'<div class="flex justify-between text-[10px] border-b border-slate-800 py-1"><span>'+escaparHtmlLogi(z[0])+'</span><b class="text-cyan-300">'+formatarMinutosRastreio(z[1])+'</b></div>').join('')+'</div><div><div class="text-[10px] uppercase text-slate-500 mb-2">Linha do tempo diária</div>';Object.keys(x.dias).sort().forEach(
+function renderizarRastreioMensal(){
+  const d=obterDadosRastreioMensal();
+  const resumo=document.getElementById('rastreio-resumo');
+  const cont=document.getElementById('rastreio-conteudo');
+  if(!resumo||!cont)return;
+  const pessoas=d.porColab.length;
+  const reg=d.rows.length;
+  const qtSetores=Object.keys(d.setores).length;
+  resumo.innerHTML=[['LOGIs rastreados',pessoas],['Movimentações',reg],['Setores utilizados',qtSetores],['Tempo rastreado',formatarMinutosRastreio(d.minutos)]].map(x=>'<div class="bg-slate-950 border border-slate-800 rounded-xl p-3"><div class="text-[9px] uppercase text-slate-400">'+x[0]+'</div><div class="text-xl font-extrabold text-cyan-300 mt-1">'+x[1]+'</div></div>').join('');
+  const termo=normalizarTexto(document.getElementById('rastreio-busca')?.value||'');
+  const setores=Object.entries(d.setores).sort((a,b)=>b[1].minutos-a[1].minutos);
+  let h='<section class="bg-slate-950 border border-slate-800 rounded-xl p-3"><h4 class="text-xs font-bold text-cyan-300 mb-3">Permanência por setor / função</h4>';
+  if(!setores.length)h+='<p class="text-xs text-slate-500">Nenhuma movimentação com horário foi registrada neste mês.</p>';
+  else{
+    const max=Math.max(1,...setores.map(x=>x[1].minutos));
+    setores.forEach(([nome,x])=>{h+='<div class="mb-3"><div class="flex justify-between gap-2 text-xs"><b>'+escaparHtmlLogi(nome)+'</b><span class="text-cyan-300">'+formatarMinutosRastreio(x.minutos)+' · '+Object.keys(x.pessoas).length+' LOGIs</span></div><div class="h-2 bg-slate-800 rounded-full mt-1 overflow-hidden"><div class="h-full bg-cyan-500 rounded-full" style="width:'+Math.round(x.minutos/max*100)+'%"></div></div></div>';});
+  }
+  h+='</section><section><h4 class="text-xs font-bold text-slate-200 mb-2">Rastreio individual</h4>';
+  const lista=d.porColab.filter(x=>!termo||matchBuscaAvancada(termo,x.nome,Object.keys(x.setores).join(' ')));
+  if(!lista.length)h+='<p class="text-xs text-slate-500">Nenhum colaborador encontrado.</p>';
+  lista.forEach(x=>{
+    const ss=Object.entries(x.setores).sort((a,b)=>b[1]-a[1]);
+    h+='<details class="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-2"><summary class="cursor-pointer flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-100">'+escaparHtmlLogi(x.nome)+'</span><span class="text-[10px] text-cyan-300">'+formatarMinutosRastreio(x.total)+' · '+x.movimentos+' movimentações</span></summary><div class="mt-3 grid md:grid-cols-2 gap-3"><div><div class="text-[10px] uppercase text-slate-500 mb-2">Tempo por setor</div>'+ss.map(z=>'<div class="flex justify-between text-[10px] border-b border-slate-800 py-1"><span>'+escaparHtmlLogi(z[0])+'</span><b class="text-cyan-300">'+formatarMinutosRastreio(z[1])+'</b></div>').join('')+'</div><div><div class="text-[10px] uppercase text-slate-500 mb-2">Linha do tempo diária</div>';
+    Object.keys(x.dias).sort().forEach(dia=>{
+      h+='<div class="mb-2"><div class="text-[10px] font-bold text-slate-400">'+dia+'</div>';
+      x.dias[dia].forEach(y=>{
+        h+='<div class="text-[10px] text-slate-300 border-b border-slate-800 py-0.5">'+escaparHtmlLogi(y.setor)+' · '+escaparHtmlLogi(y.funcao)+' · '+String(y.inicio||'').slice(0,5)+' → '+String(y.fim||'em aberto').slice(0,5)+' <b class="text-cyan-300">('+formatarMinutosRastreio(y.minutos)+')</b></div>';
+      });
+      h+='</div>';
+    });
+    h+='</div></div></details>';
+  });
+  h+='</section>';
+  cont.innerHTML=h;
+}
+
+window.addEventListener('error', function(e){
+  console.error('Erro JS:', e.message, 'em', e.filename, 'linha', e.lineno);
+});
 </script>
 </body>
 </html>
