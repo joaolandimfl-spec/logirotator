@@ -1,125 +1,233 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pit Stop Shopee - LogiRotator | Controle de DSR</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        shopee: {
-                            orange: '#EE4D2D',
-                            dark: '#121212',
-                            card: '#1E1E1E',
-                            border: '#2D2D2D'
-                        }
-                    }
-                }
-            }
+    <style>
+        /* ============================================================
+           CSS puro (sem CDN Tailwind) — para funcionar 100% offline.
+           Se quiser usar Tailwind, troque este bloco pelo CDN.
+           ============================================================ */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #121212;
+            color: #e5e7eb;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            line-height: 1.5;
         }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body class="bg-shopee-dark text-gray-100 min-h-screen font-sans antialiased">
+        header {
+            background: #1E1E1E;
+            border-bottom: 1px solid #2D2D2D;
+            position: sticky; top: 0; z-index: 50;
+            padding: 12px 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.4);
+        }
+        .header-inner {
+            max-width: 1280px; margin: 0 auto;
+            display: flex; flex-wrap: wrap; align-items: center;
+            justify-content: space-between; gap: 12px;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-icon {
+            background: #EE4D2D; color: #fff;
+            padding: 10px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: bold;
+        }
+        .brand h1 { font-size: 16px; font-weight: 700; color: #fff; }
+        .brand p { font-size: 12px; color: #9ca3af; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .pill {
+            background: #2D2D2D; color: #d1d5db;
+            padding: 6px 12px; border-radius: 8px;
+            font-size: 12px; display: flex; align-items: center; gap: 6px;
+        }
+        .pill.orange {
+            background: rgba(238,77,45,.1);
+            border: 1px solid rgba(238,77,45,.3);
+            color: #EE4D2D; font-weight: 600;
+        }
+        main { max-width: 1280px; margin: 0 auto; padding: 24px 16px; }
 
-    <header class="bg-shopee-card border-b border-shopee-border sticky top-0 z-50 px-4 py-3 shadow-md">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center space-x-3">
-                <div class="bg-shopee-orange text-white p-2.5 rounded-xl font-bold flex items-center justify-center shadow-lg">
-                    <i class="fa-solid fa-truck-fast text-lg"></i>
-                </div>
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #1E1E1E; border: 1px solid #2D2D2D;
+            border-radius: 12px; padding: 16px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .stat-card p { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+        .stat-card h3 { font-size: 24px; font-weight: 700; margin-top: 4px; }
+        .stat-card .icon {
+            padding: 12px; border-radius: 8px; font-size: 20px;
+        }
+        .stat-blue { color: #60a5fa; } .stat-blue .icon { background: rgba(96,165,250,.1); color: #60a5fa; }
+        .stat-green { color: #34d399; } .stat-green .icon { background: rgba(52,211,153,.1); color: #34d399; }
+        .stat-orange { color: #EE4D2D; } .stat-orange .icon { background: rgba(238,77,45,.1); color: #EE4D2D; }
+
+        .toolbar {
+            background: #1E1E1E; border: 1px solid #2D2D2D;
+            border-radius: 12px; padding: 16px;
+            display: flex; flex-wrap: wrap; gap: 12px;
+            align-items: center; justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .search-wrap { position: relative; flex: 1 1 300px; }
+        .search-wrap input {
+            width: 100%; background: #121212; border: 1px solid #2D2D2D;
+            border-radius: 8px; padding: 8px 12px 8px 36px;
+            color: #e5e7eb; font-size: 14px; outline: none;
+        }
+        .search-wrap input:focus { border-color: #EE4D2D; }
+        .search-wrap::before {
+            content: "🔍"; position: absolute; left: 12px; top: 50%;
+            transform: translateY(-50%); font-size: 12px; opacity: .6;
+        }
+        .filtros { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filtro-btn {
+            padding: 8px 16px; border-radius: 8px; font-size: 12px;
+            font-weight: 600; cursor: pointer; border: 1px solid #2D2D2D;
+            background: #121212; color: #d1d5db; transition: all .15s;
+        }
+        .filtro-btn:hover { background: #2D2D2D; }
+        .filtro-btn.ativo { background: #EE4D2D; color: #fff; border-color: #EE4D2D; }
+
+        .tabela-card {
+            background: #1E1E1E; border: 1px solid #2D2D2D;
+            border-radius: 12px; overflow: hidden;
+        }
+        .tabela-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        thead tr { background: rgba(18,18,18,.6); border-bottom: 1px solid #2D2D2D; }
+        th {
+            padding: 12px 16px; font-size: 11px; text-transform: uppercase;
+            letter-spacing: .05em; color: #9ca3af; font-weight: 600;
+        }
+        tbody tr { border-bottom: 1px solid #2D2D2D; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: rgba(18,18,18,.4); }
+        td { padding: 12px 16px; font-size: 13px; }
+        td.nome { color: #fff; font-weight: 500; }
+        td.muted { color: #9ca3af; font-size: 12px; }
+        td.folga { color: #d1d5db; font-weight: 600; font-size: 12px; }
+        .badge-op {
+            background: #121212; border: 1px solid #2D2D2D;
+            padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #9ca3af;
+        }
+        .badge-dsr {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 500;
+            background: rgba(238,77,45,.1); color: #EE4D2D;
+            border: 1px solid rgba(238,77,45,.3);
+        }
+        .badge-trab {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 500;
+            background: rgba(52,211,153,.1); color: #34d399;
+            border: 1px solid rgba(52,211,153,.3);
+        }
+        .badge-af {
+            margin-left: 8px; display: inline-flex;
+            padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700;
+            background: rgba(245,158,11,.1); color: #f59e0b;
+            border: 1px solid rgba(245,158,11,.3);
+        }
+        .empty-row td { text-align: center; padding: 32px; color: #9ca3af; }
+
+        footer {
+            text-align: center; padding: 24px; font-size: 11px; color: #6b7280;
+            border-top: 1px solid #2D2D2D; margin-top: 48px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-icon">🚚</div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight text-white">HUB-LCE-04 | Juazeiro do Norte</h1>
-                    <p class="text-xs text-gray-400">Pit Stop Shopee • Controle Operacional de DSR</p>
+                    <h1>HUB-LCE-04 | Juazeiro do Norte</h1>
+                    <p>Pit Stop Shopee • Controle Operacional de DSR</p>
                 </div>
             </div>
-            <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
-                <div class="bg-shopee-border px-3 py-1.5 rounded-lg text-xs font-medium text-gray-300 flex items-center gap-2">
-                    <i class="fa-regular fa-calendar text-shopee-orange"></i>
-                    <span id="txt-data">Carregando data...</span>
-                </div>
-                <div class="bg-orange-500/10 text-shopee-orange border border-shopee-orange/30 px-3 py-1.5 rounded-lg text-xs font-semibold">
-                    Ops118655
-                </div>
+            <div class="header-right">
+                <div class="pill">📅 <span id="txt-data">Carregando data...</span></div>
+                <div class="pill orange">Ops118655</div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
-
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-shopee-card border border-shopee-border p-4 rounded-xl shadow-sm flex items-center justify-between">
+    <main>
+        <section class="stats">
+            <div class="stat-card stat-blue">
                 <div>
-                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Total Colaboradores</p>
-                    <h3 id="stat-total" class="text-2xl font-bold text-white mt-1">0</h3>
+                    <p>Total Colaboradores</p>
+                    <h3 id="stat-total">0</h3>
                 </div>
-                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg">
-                    <i class="fa-solid fa-users text-xl"></i>
-                </div>
+                <div class="icon">👥</div>
             </div>
-            <div class="bg-shopee-card border border-shopee-border p-4 rounded-xl shadow-sm flex items-center justify-between">
+            <div class="stat-card stat-green">
                 <div>
-                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Trabalhando Hoje</p>
-                    <h3 id="stat-trabalhando" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
+                    <p>Trabalhando Hoje</p>
+                    <h3 id="stat-trabalhando">0</h3>
                 </div>
-                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg">
-                    <i class="fa-solid fa-user-check text-xl"></i>
-                </div>
+                <div class="icon">✅</div>
             </div>
-            <div class="bg-shopee-card border border-shopee-border p-4 rounded-xl shadow-sm flex items-center justify-between">
+            <div class="stat-card stat-orange">
                 <div>
-                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Em DSR (Folga Hoje)</p>
-                    <h3 id="stat-dsr" class="text-2xl font-bold text-shopee-orange mt-1">0</h3>
+                    <p>Em DSR (Folga Hoje)</p>
+                    <h3 id="stat-dsr">0</h3>
                 </div>
-                <div class="p-3 bg-shopee-orange/10 text-shopee-orange rounded-lg">
-                    <i class="fa-solid fa-mug-hot text-xl"></i>
-                </div>
+                <div class="icon">☕</div>
             </div>
-        </div>
+        </section>
 
-        <div class="bg-shopee-card border border-shopee-border p-4 rounded-xl shadow-sm flex flex-col md:flex-row gap-3 justify-between items-center">
-            <div class="w-full md:w-96 relative">
-                <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
-                <input type="text" id="input-busca" placeholder="Pesquisar colaborador por nome..."
-                    class="w-full bg-shopee-dark border border-shopee-border rounded-lg pl-10 pr-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-shopee-orange transition-colors">
+        <section class="toolbar">
+            <div class="search-wrap">
+                <input type="text" id="input-busca" placeholder="Pesquisar colaborador por nome...">
             </div>
-            <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-                <button onclick="filtrarStatus('TODOS')" class="filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-orange text-white transition-all whitespace-nowrap">Todos</button>
-                <button onclick="filtrarStatus('TRABALHANDO')" class="filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-dark border border-shopee-border text-gray-300 hover:bg-shopee-border transition-all whitespace-nowrap">Trabalhando</button>
-                <button onclick="filtrarStatus('DSR')" class="filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-dark border border-shopee-border text-gray-300 hover:bg-shopee-border transition-all whitespace-nowrap">DSR Hoje</button>
+            <div class="filtros">
+                <button class="filtro-btn ativo" data-filtro="TODOS" onclick="filtrarStatus('TODOS')">Todos</button>
+                <button class="filtro-btn" data-filtro="TRABALHANDO" onclick="filtrarStatus('TRABALHANDO')">Trabalhando</button>
+                <button class="filtro-btn" data-filtro="DSR" onclick="filtrarStatus('DSR')">DSR Hoje</button>
             </div>
-        </div>
+        </section>
 
-        <div class="bg-shopee-card border border-shopee-border rounded-xl shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+        <section class="tabela-card">
+            <div class="tabela-scroll">
+                <table>
                     <thead>
-                        <tr class="bg-shopee-dark/60 border-b border-shopee-border text-xs uppercase tracking-wider text-gray-400">
-                            <th class="py-3.5 px-4 font-semibold">Colaborador</th>
-                            <th class="py-3.5 px-4 font-semibold">Escala</th>
-                            <th class="py-3.5 px-4 font-semibold">Folga</th>
-                            <th class="py-3.5 px-4 font-semibold">Domingo Fixo</th>
-                            <th class="py-3.5 px-4 font-semibold">Operação</th>
-                            <th class="py-3.5 px-4 font-semibold text-center">Status Hoje</th>
+                        <tr>
+                            <th>Colaborador</th>
+                            <th>Escala</th>
+                            <th>Folga</th>
+                            <th>Domingo Fixo</th>
+                            <th>Operação</th>
+                            <th style="text-align:center">Status Hoje</th>
                         </tr>
                     </thead>
-                    <tbody id="tabela-colaboradores" class="divide-y divide-shopee-border text-sm"></tbody>
+                    <tbody id="tabela-colaboradores">
+                        <tr class="empty-row"><td colspan="6">Carregando...</td></tr>
+                    </tbody>
                 </table>
             </div>
-        </div>
+        </section>
     </main>
 
-    <footer class="text-center py-6 text-xs text-gray-500 border-t border-shopee-border mt-12">
+    <footer>
         LogiRotator • Pit Stop Shopee © 2026 • Desenvolvido para operações de Alta Performance
     </footer>
 
     <script>
         // ============================================================
-        // DADOS EXTRAÍDOS DA PLANILHA (HUB-LCE-04 - Juazeiro do Norte)
+        // BANCO DE DADOS — EXTRAÍDO DA PLANILHA (HUB-LCE-04)
+        // 62 colaboradores, com "domingoFixo" preenchido
         // ============================================================
         const colaboradoresData = [
             { nome: "JUSCILENE PEREIRA DIAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
@@ -187,11 +295,14 @@
             { nome: "GUILHERME NELO ALVES", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "2° Domingo/Mês", operacao: "AM" }
         ];
 
+        // 🔑 EXPÕE O ARRAY AO WINDOW (para auditar no Console)
+        window.colaboradoresData = colaboradoresData;
+
         let filtroAtual = 'TODOS';
         let termoBusca = '';
 
         // ============================================================
-        // FUNÇÃO DE DSR CORRIGIDA (folga semanal + domingo fixo)
+        // FUNÇÃO DSR — folga semanal + domingo fixo
         // ============================================================
         function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
             if (!colaborador) return false;
@@ -199,18 +310,16 @@
             const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
             const diaHojeStr = diasSemana[dataAtual.getDay()];
 
-            // 1) Folga semanal normal (ex: "SAB e DOM", "QUA")
+            // 1) Folga semanal
             if (colaborador.folga) {
                 const folgaNorm = String(colaborador.folga)
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .toUpperCase()
-                    .trim();
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .toUpperCase().trim();
                 const partes = folgaNorm.split(/[^A-Z]+/).filter(Boolean);
                 if (partes.includes(diaHojeStr)) return true;
             }
 
-            // 2) Domingo fixo (só se hoje for domingo)
+            // 2) Domingo fixo (só no domingo)
             if (diaHojeStr === 'DOM' && colaborador.domingoFixo) {
                 const nDomingoHoje = Math.ceil(dataAtual.getDate() / 7);
                 const match = String(colaborador.domingoFixo).match(/(\d)/);
@@ -220,92 +329,52 @@
             return false;
         }
 
+        // ============================================================
+        // RENDERIZAÇÃO
+        // ============================================================
         function renderizarDashboard() {
             const tbody = document.getElementById('tabela-colaboradores');
             const dataHoje = new Date();
 
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('txt-data').innerText = dataHoje.toLocaleDateString('pt-BR', options);
+            document.getElementById('txt-data').innerText =
+                dataHoje.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-            let totalCollabs = colaboradoresData.length;
             let totalTrabalhando = 0;
             let totalDsr = 0;
 
-            tbody.innerHTML = '';
-
-            const colaboradoresProcessados = colaboradoresData.map(c => {
+            const processados = colaboradoresData.map(c => {
                 const emDsr = verificarSeEstaDeDSR(c, dataHoje);
                 return { ...c, emDsr };
             });
 
-            colaboradoresProcessados.forEach(c => {
-                if (c.emDsr) totalDsr++;
-                else totalTrabalhando++;
-            });
+            processados.forEach(c => { c.emDsr ? totalDsr++ : totalTrabalhando++; });
 
-            document.getElementById('stat-total').innerText = totalCollabs;
+            document.getElementById('stat-total').innerText = colaboradoresData.length;
             document.getElementById('stat-trabalhando').innerText = totalTrabalhando;
             document.getElementById('stat-dsr').innerText = totalDsr;
 
-            const filtrados = colaboradoresProcessados.filter(c => {
-                const matchNome = c.nome.toLowerCase().includes(termoBusca.toLowerCase());
-                if (!matchNome) return false;
+            const filtrados = processados.filter(c => {
+                if (termoBusca && !c.nome.toLowerCase().includes(termoBusca.toLowerCase())) return false;
                 if (filtroAtual === 'TRABALHANDO') return !c.emDsr;
                 if (filtroAtual === 'DSR') return c.emDsr;
                 return true;
             });
 
             if (filtrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum colaborador encontrado.</td></tr>`;
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Nenhum colaborador encontrado.</td></tr>';
                 return;
             }
 
-            filtrados.forEach(c => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-shopee-dark/40 transition-colors";
-
-                const statusEspecial = c.status
-                    ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">${c.status}</span>`
-                    : '';
-
-                const badgeStatus = c.emDsr
-                    ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-500/10 text-shopee-orange border border-shopee-orange/30"><i class="fa-solid fa-mug-hot mr-1.5"></i> DSR Hoje</span>`
-                    : `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"><i class="fa-solid fa-circle-check mr-1.5"></i> Trabalhando</span>`;
-
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-medium text-white">${c.nome}${statusEspecial}</td>
-                    <td class="py-3 px-4 text-gray-300 text-xs">${c.escala}</td>
-                    <td class="py-3 px-4 text-gray-300 text-xs font-semibold">${c.folga}</td>
-                    <td class="py-3 px-4 text-gray-400 text-xs">${c.domingoFixo || '—'}</td>
-                    <td class="py-3 px-4 text-gray-400 text-xs"><span class="bg-shopee-dark px-2 py-1 rounded border border-shopee-border">${c.operacao}</span></td>
-                    <td class="py-3 px-4 text-center">${badgeStatus}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function filtrarStatus(status) {
-            filtroAtual = status;
-            document.querySelectorAll('.filtro-btn').forEach(btn => {
-                const texto = btn.innerText.toUpperCase();
-                const ativo = (status === 'TODOS' && texto === 'TODOS') || texto.includes(status);
-                if (ativo) {
-                    btn.className = "filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-orange text-white transition-all whitespace-nowrap";
-                } else {
-                    btn.className = "filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-dark border border-shopee-border text-gray-300 hover:bg-shopee-border transition-all whitespace-nowrap";
-                }
-            });
-            renderizarDashboard();
-        }
-
-        document.getElementById('input-busca').addEventListener('input', (e) => {
-            termoBusca = e.target.value;
-            renderizarDashboard();
-        });
-
-        window.onload = () => {
-            renderizarDashboard();
-        };
-    </script>
-</body>
-</html>
+            tbody.innerHTML = filtrados.map(c => {
+                const statusAf = c.status ? `<span class="badge-af">${c.status}</span>` : '';
+                const badge = c.emDsr
+                    ? '<span class="badge-dsr">☕ DSR Hoje</span>'
+                    : '<span class="badge-trab">✅ Trabalhando</span>';
+                return `
+                    <tr>
+                        <td class="nome">${c.nome}${statusAf}</td>
+                        <td class="muted">${c.escala}</td>
+                        <td class="folga">${c.folga}</td>
+                        <td class="muted">${c.domingoFixo || '—'}</td>
+                        <td class="muted"><span class="badge-op">${c.operacao}</span></td>
+                        <td style
