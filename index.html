@@ -304,32 +304,73 @@
         let termoBusca = '';
 
         // ============================================================
-        // FUNÇÃO DSR — folga semanal + domingo fixo
+        // DSR AUTOMÁTICO — funções extraídas do LogiRotator
+        // ============================================================
+
+        // Normaliza texto: remove acentos, minúsculo, remove "feira"
+        const normFolga = t => t == null ? '' : String(t)
+            .toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/feira/g, '')
+            .replace(/[^\w\s,]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        // Mapa dia da semana -> número JS (0=domingo)
+        const DOW = { dom: 0, seg: 1, ter: 2, qua: 3, qui: 4, sex: 5, sab: 6 };
+
+        // Cache para não reprocessar a mesma folga
+        const folgaCache = new Map();
+
+        // Converte "SAB e DOM", "QUA e QUI", "SEG, TER,QUA,QUI" em Set de números
+        function parseFolga(s) {
+            const key = s || '';
+            if (folgaCache.has(key)) return folgaCache.get(key);
+            const set = new Set();
+            normFolga(key).split(/[\s,]+/).forEach(p => {
+                p = p.trim().slice(0, 3);
+                if (p in DOW) set.add(DOW[p]);
+            });
+            folgaCache.set(key, set);
+            return set;
+        }
+
+        // Qual é o N-ésimo domingo do mês? (dia 08 -> 2)
+        const nDomingo = d => Math.ceil(d.getDate() / 7);
+
+        // Folga semanal (ex: "QUA", "SAB e DOM")
+        function isFolgaSemanal(c, d) {
+            return parseFolga(c.folga).has(d.getDay());
+        }
+
+        // Domingo fixo do mês — adaptado para string "2° Domingo/Mês"
+        function isDomingoFixo(c, d) {
+            if (d.getDay() !== 0) return false;
+            if (!c.domingoFixo) return false;
+            const m = String(c.domingoFixo).match(/(\d)/);
+            if (!m) return false;
+            return Number(m[1]) === nDomingo(d);
+        }
+
+        // Combina as duas — é DSR se qualquer uma for verdadeira
+        function isFolga(c, d) {
+            return isFolgaSemanal(c, d) || isDomingoFixo(c, d);
+        }
+
+        // Motivo (para exibir no badge)
+        function motivoFolga(c, d) {
+            if (isFolgaSemanal(c, d)) return 'Folga semanal (' + (c.folga || '') + ')';
+            if (isDomingoFixo(c, d))  return 'Domingo de folga (' + c.domingoFixo + ')';
+            return 'Folga';
+        }
+
+        // ============================================================
+        // VERIFICAR DSR — usa as funções acima
         // ============================================================
         function verificarSeEstaDeDSR(colaborador, dataAtual) {
             if (!colaborador) return false;
             dataAtual = dataAtual || new Date();
-
-            const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-            const diaHojeStr = diasSemana[dataAtual.getDay()];
-
-            // 1) Folga semanal
-            if (colaborador.folga) {
-                const folgaNorm = String(colaborador.folga)
-                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                    .toUpperCase().trim();
-                const partes = folgaNorm.split(/[^A-Z]+/).filter(Boolean);
-                if (partes.includes(diaHojeStr)) return true;
-            }
-
-            // 2) Domingo fixo (só no domingo)
-            if (diaHojeStr === 'DOM' && colaborador.domingoFixo) {
-                const nDomingoHoje = Math.ceil(dataAtual.getDate() / 7);
-                const match = String(colaborador.domingoFixo).match(/(\d)/);
-                if (match && Number(match[1]) === nDomingoHoje) return true;
-            }
-
-            return false;
+            return isFolga(colaborador, dataAtual);
         }
 
         // ============================================================
@@ -337,22 +378,23 @@
         // ============================================================
         function renderizarDashboard() {
             const tbody = document.getElementById('tabela-colaboradores');
-            const dataHoje = new Date();  // 🔑 data SEMPRE atual
+            const dataHoje = new Date();  // data SEMPRE atual
 
-            // Cabeçalho com data + hora
+            // Cabeçalho com data + hora + segundos
             const dataFmt = dataHoje.toLocaleDateString('pt-BR', {
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
             const horaFmt = dataHoje.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             document.getElementById('txt-data').innerText = `${dataFmt} — ${horaFmt}`;
 
-            // 🔑 ZERA os contadores e recalcula do zero
+            // ZERA os contadores e recalcula do zero
             let totalTrabalhando = 0;
             let totalDsr = 0;
 
             const processados = colaboradoresData.map(c => {
                 const emDsr = verificarSeEstaDeDSR(c, dataHoje);
-                return { ...c, emDsr };
+                const motivo = emDsr ? motivoFolga(c, dataHoje) : '';
+                return { ...c, emDsr, motivo };
             });
 
             processados.forEach(c => { c.emDsr ? totalDsr++ : totalTrabalhando++; });
@@ -377,7 +419,7 @@
             tbody.innerHTML = filtrados.map(c => {
                 const statusAf = c.status ? `<span class="badge-af">${c.status}</span>` : '';
                 const badge = c.emDsr
-                    ? '<span class="badge-dsr">☕ DSR Hoje</span>'
+                    ? `<span class="badge-dsr" title="${c.motivo}">☕ DSR Hoje</span>`
                     : '<span class="badge-trab">✅ Trabalhando</span>';
                 return `
                     <tr>
@@ -409,21 +451,18 @@
         });
 
         // ============================================================
-        // 🔄 ATUALIZAÇÃO AUTOMÁTICA — VERIFICAÇÃO AGRESSIVA
+        // ATUALIZAÇÃO AUTOMÁTICA — VERIFICAÇÃO AGRESSIVA
         // ============================================================
         let diaAtual = new Date().toDateString();
 
         function verificarViradaDoDia() {
             const agora = new Date();
             const diaAgora = agora.toDateString();
-
             if (diaAgora !== diaAtual) {
                 diaAtual = diaAgora;
                 console.log(`🔄 Virada do dia: ${diaAgora}`);
             }
-            // 🔑 SEMPRE re-renderiza (não só na virada) — isso garante
-            // que a data/hora do cabeçalho e o DSR estejam sempre atualizados
-            renderizarDashboard();
+            renderizarDashboard();  // SEMPRE re-renderiza
         }
 
         function forcarAtualizacao() {
@@ -432,7 +471,7 @@
             console.log('🔄 Atualização manual forçada');
         }
 
-        // Verifica a cada 5 segundos (agressivo, pega virada rápido)
+        // Verifica a cada 5 segundos
         setInterval(verificarViradaDoDia, 5 * 1000);
 
         // Verifica ao voltar para a aba
