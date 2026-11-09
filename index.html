@@ -1,303 +1,1441 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-PT">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pit Stop Shopee - LogiRotator | Controle de DSR</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        shopee: {
-                            orange: '#EE4D2D',
-                            dark: '#121212',
-                            card: '#1E1E1E',
-                            border: '#2D2D2D'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<title>LogiRotator - HUB-LCE-04 Juazeiro do Norte</title>
+<meta name="theme-color" content="#09090b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='120' fill='%23f59e0b'/><path d='M130 180 L60 256 L130 332 M382 180 L452 256 L382 332 M275 140 L235 372' stroke='%2309090b' stroke-width='48' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--primary:38 92% 50%;--primary-fg:222 47% 4%;--secondary:217 33% 17%;--border:217 33% 20%;--muted:217 33% 15%;--bg:222 47% 4%}
+*{box-sizing:border-box}
+body{font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;white-space:nowrap;border-radius:.5rem;font-size:.8125rem;font-weight:600;height:2.25rem;padding:0 .875rem;border:1px solid transparent;transition:all .15s ease;cursor:pointer;user-select:none;outline:none}
+.btn:focus-visible{outline:2px solid hsl(var(--primary));outline-offset:2px}
+.btn:disabled{opacity:.5;cursor:not-allowed;pointer-events:none}
+.btn-primary{background:hsl(var(--primary));color:hsl(var(--primary-fg));border-color:hsl(var(--primary))}
+.btn-primary:hover{background:#fbbf24;border-color:#fbbf24}
+.btn-secondary{background:hsl(var(--secondary));color:#f8fafc;border-color:hsl(var(--border))}
+.btn-secondary:hover{background:#1e293b}
+.btn-outline{background:transparent;color:#f8fafc;border-color:hsl(var(--border))}
+.btn-outline:hover{background:hsl(var(--muted))}
+.btn-ghost{background:transparent;color:#f8fafc;border-color:transparent}
+.btn-ghost:hover{background:hsl(var(--muted))}
+.btn-success{background:#10b981;color:#000;border-color:#10b981}
+.btn-success:hover{background:#34d399}
+.btn-danger{background:#ef4444;color:#fff;border-color:#ef4444}
+.btn-danger:hover{background:#f87171;border-color:#f87171}
+.btn-blue{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.btn-blue:hover{background:#60a5fa;border-color:#60a5fa}
+.btn-sm{height:1.875rem;font-size:.75rem;padding:0 .625rem}
+.btn-icon{height:2.25rem;width:2.25rem;padding:0}
+.btn-icon-sm{height:1.875rem;width:1.875rem;padding:0}
+.input,.select{display:flex;width:100%;height:2.25rem;border-radius:.5rem;border:1px solid hsl(var(--border));background:hsl(var(--bg));color:#f8fafc;padding:0 .75rem;font-size:.8125rem;transition:all .15s ease;outline:none}
+.input:focus,.select:focus{border-color:hsl(var(--primary));box-shadow:0 0 0 3px hsl(var(--primary)/.15)}
+.input::placeholder{color:#64748b}
+.input:disabled,.select:disabled{opacity:.5;cursor:not-allowed}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;background-size:12px;padding-right:2rem;cursor:pointer}
+.label{display:block;font-size:.6875rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.375rem}
+.card{background:rgba(30,41,59,.5);border:1px solid hsl(var(--border));border-radius:.75rem;padding:1rem;backdrop-filter:blur(8px);transition:border-color .15s ease,background .15s ease}
+.card:hover{border-color:hsl(var(--primary)/.4)}
+.badge{display:inline-flex;align-items:center;gap:.25rem;padding:.125rem .5rem;border-radius:9999px;font-size:.625rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;border:1px solid}
+.badge-success{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:#6ee7b7}
+.badge-warning{background:rgba(234,179,8,.15);border-color:rgba(234,179,8,.3);color:#fde047}
+.badge-danger{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:#fca5a5}
+.badge-info{background:rgba(6,182,212,.15);border-color:rgba(6,182,212,.3);color:#67e8f9}
+.badge-orange{background:rgba(249,115,22,.15);border-color:rgba(249,115,22,.3);color:#fdba74}
+.badge-purple{background:rgba(168,85,247,.15);border-color:rgba(168,85,247,.3);color:#d8b4fe}
+.badge-default{background:hsl(var(--secondary));border-color:hsl(var(--border));color:#cbd5e1}
+.sidebar-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;width:100%;padding:.625rem .75rem;border-radius:.5rem;font-size:.8125rem;color:#cbd5e1;transition:background .15s ease;text-align:left;border:1px solid transparent}
+.sidebar-item:hover{background:hsl(var(--muted))}
+.sidebar-item.active{background:hsl(var(--primary)/.1);color:hsl(var(--primary));border-color:hsl(var(--primary)/.3)}
+#logi-auth input,#logi-users-modal input,#logi-users-modal select{width:100%}
+body.role-user > .flex.min-h-screen,body.role-user > #sidebar-mobile-overlay,body.role-user > #sidebar-mobile{display:none!important}
+body.role-user #logi-user-view{display:block!important}
+body.role-admin #logi-admin-account{display:flex!important}
+</style>
 </head>
-<body class="bg-shopee-dark text-gray-100 min-h-screen font-sans antialiased">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
 
-    <header class="bg-shopee-card border-b border-shopee-border sticky top-0 z-50 px-4 py-3 shadow-md">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center space-x-3">
-                <div class="bg-shopee-orange text-white p-2.5 rounded-xl font-bold flex items-center justify-center shadow-lg">
-                    <i class="fa-solid fa-truck-fast text-lg"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight text-white">HUB-LCE-04 | Juazeiro do Norte</h1>
-                    <p class="text-xs text-gray-400">Pit Stop Shopee • Controle Operacional de DSR</p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
-                <div class="bg-shopee-border px-3 py-1.5 rounded-lg text-xs font-medium text-gray-300 flex items-center gap-2">
-                    <i class="fa-regular fa-calendar text-shopee-orange"></i>
-                    <span id="txt-data">Carregando data...</span>
-                </div>
-                <div class="bg-orange-500/10 text-shopee-orange border border-shopee-orange/30 px-3 py-1.5 rounded-lg text-xs font-semibold">
-                    Ops118655
-                </div>
-            </div>
-        </div>
-    </header>
+<div id="logi-auth" class="hidden fixed inset-0 z-[200] bg-slate-950 flex items-center justify-center p-4">
+ <form id="logi-login-form" class="w-full max-w-sm bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl" onsubmit="entrarLogi(event)">
+  <div class="flex items-center gap-3 mb-5"><div class="bg-amber-500/10 p-3 rounded-xl text-amber-400"><i data-lucide="layers" class="w-6 h-6"></i></div><div><h1 class="text-xl font-extrabold text-amber-400">LogiRotator</h1><p class="text-xs text-slate-400">Acesso seguro • HUB-LCE-04</p></div></div>
+  <label class="label block mb-1" for="logi-email">E-mail</label><input id="logi-email" class="input mb-3" type="email" autocomplete="username" required placeholder="seu@email.com">
+  <label class="label block mb-1" for="logi-password">Senha</label><input id="logi-password" class="input mb-4" type="password" autocomplete="current-password" required placeholder="Sua senha">
+  <p id="logi-login-error" class="text-sm text-red-400 mb-3" role="alert"></p>
+  <button id="logi-login-submit" class="btn btn-primary w-full" type="submit">Entrar</button>
+  <p class="text-[11px] text-slate-500 mt-4 text-center">Contas criadas pelo administrador do sistema.</p>
+ </form>
+</div>
+<div id="logi-user-view" class="hidden min-h-screen max-w-5xl mx-auto p-4 sm:p-6">
+ <header class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4 mb-5">
+  <div><h1 class="text-xl font-extrabold text-amber-400">LogiRotator</h1><p id="user-view-subtitle" class="text-xs text-slate-400">Painel operacional • HUB-LCE-04</p></div>
+  <div class="flex items-center gap-2"><span id="user-view-name" class="text-xs text-slate-300"></span><button class="btn btn-secondary btn-sm" onclick="sairLogi()">Sair</button></div>
+ </header>
+ <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5" id="user-kpis"></div>
+ <div class="flex flex-wrap items-center justify-between gap-2 mb-3"><h2 id="user-list-title" class="font-bold text-slate-100">Em Operação</h2><span id="user-list-count" class="badge badge-info">0</span></div>
+ <div id="user-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+ <p class="text-[10px] text-slate-500 mt-6">Acesso de consulta. Alterações e cadastros são realizados pelo administrador.</p>
+</div>
+<div id="logi-admin-account" class="hidden max-w-md mx-auto px-3 pb-3 flex flex-wrap items-center justify-end gap-2">
+ <span id="logi-admin-name" class="text-xs text-slate-400"></span>
+ <button class="btn btn-secondary btn-sm" onclick="abrirGestaoUsuarios()"><i data-lucide="users" class="w-4 h-4"></i> Usuários</button>
+ <button class="btn btn-secondary btn-sm" onclick="sairLogi()">Sair</button>
+</div>
+<div id="logi-users-modal" class="hidden fixed inset-0 z-[150] bg-slate-950/80 flex items-center justify-center p-4">
+ <div class="w-full max-w-xl max-h-[90vh] overflow-auto bg-slate-900 border border-slate-700 rounded-2xl p-5">
+  <div class="flex items-center justify-between mb-4"><h2 class="font-bold text-amber-400">Gerenciar usuários</h2><button class="btn btn-secondary btn-sm" onclick="fecharGestaoUsuarios()">Fechar</button></div>
+  <form id="logi-create-user-form" onsubmit="criarUsuarioLogi(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-b border-slate-700 pb-4 mb-4">
+   <div><label class="label">Nome</label><input id="new-user-name" class="input" required maxlength="100"></div>
+   <div><label class="label">E-mail</label><input id="new-user-email" class="input" type="email" required></div>
+   <div><label class="label">Senha inicial</label><input id="new-user-password" class="input" type="password" minlength="8" required></div>
+   <div><label class="label">Perfil</label><select id="new-user-role" class="select"><option value="usuario">Usuário</option><option value="admin">Administrador</option></select></div>
+   <div class="sm:col-span-2 flex justify-end"><button id="new-user-submit" class="btn btn-primary" type="submit">Criar usuário</button></div>
+  </form>
+  <p id="logi-users-message" class="text-xs text-slate-300 mb-3"></p><div id="logi-users-list" class="space-y-2"></div>
+ </div>
+</div>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+<div id="logi-test-mode-banner" class="bg-amber-500 text-slate-950 text-center text-xs font-bold px-3 py-2">MODO DE TESTE — autenticação desativada temporariamente. Não publique esta versão em produção.</div>
+<div class="flex min-h-screen">
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-shopee-card border border-shopee-border p-4 rounded-xl shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Total Colaboradores</p>
-                    <h3 id="stat-total" class="text-2xl font-bold text-white mt-1">0</h3>
-                </div>
-                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg">
-                    <i class="fa-solid fa-users text-xl"></i>
-                </div>
-            </div>
-            <div class="bg-shopee-card border border-shopee-border p-4 rounded-xl shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Trabalhando Hoje</p>
-                    <h3 id="stat-trabalhando" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
-                </div>
-                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg">
-                    <i class="fa-solid fa-user-check text-xl"></i>
-                </div>
-            </div>
-            <div class="bg-shopee-card border border-shopee-border p-4 rounded-xl shadow-sm flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-gray-400 uppercase tracking-wider font-semibold">Em DSR (Folga Hoje)</p>
-                    <h3 id="stat-dsr" class="text-2xl font-bold text-shopee-orange mt-1">0</h3>
-                </div>
-                <div class="p-3 bg-shopee-orange/10 text-shopee-orange rounded-lg">
-                    <i class="fa-solid fa-mug-hot text-xl"></i>
-                </div>
-            </div>
-        </div>
+<aside id="sidebar-desktop" class="hidden lg:flex lg:flex-col w-64 bg-slate-900/70 border-r border-slate-800 backdrop-blur-sm sticky top-0 h-screen">
+<div class="p-4 border-b border-slate-800"><div class="flex items-center gap-2.5">
+<div class="bg-amber-500/10 p-2 rounded-xl border border-amber-500/30 text-amber-400"><i data-lucide="layers" class="w-5 h-5"></i></div>
+<div><h1 class="text-base font-extrabold text-amber-400">LogiRotator</h1><span class="text-[10px] text-emerald-400">&#9679; HUB-LCE-04</span></div>
+</div></div>
+<nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+<p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 pt-2 pb-1">Filtros</p>
+<button onclick="setFiltro('todos')" id="menu-todos" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="layout-grid" class="w-4 h-4 text-amber-400"></i> Todos</span><span id="badge-todos" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('presentes')" id="menu-presentes" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> Presentes</span><span id="badge-presentes" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('operacao')" id="menu-operacao" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Em Operação</span><span id="badge-operacao" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('diaristas')" id="menu-diaristas" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="hard-hat" class="w-4 h-4 text-cyan-400"></i> Diaristas</span><span id="badge-diaristas" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('dsr')" id="menu-dsr" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="palmtree" class="w-4 h-4 text-orange-400"></i> Em DSR Hoje</span><span id="badge-dsr" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('faltas')" id="menu-faltas" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-400"></i> Faltas Hoje</span><span id="badge-faltas" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('atestados')" id="menu-atestados" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="stethoscope" class="w-4 h-4 text-red-400"></i> Atestados Hoje</span><span id="badge-atestados" class="badge badge-default">0</span></button>
+<p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 pt-4 pb-1">Ações</p>
+<button onclick="abrirModalDiaristasPedidos()" class="sidebar-item text-cyan-400"><span class="flex items-center gap-2"><i data-lucide="clipboard-list" class="w-4 h-4"></i> Diaristas Pedidos</span></button>
+<button onclick="abrirModalMatriz()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4 text-amber-400"></i> Grade Mensal</span></button>
+<button onclick="abrirRelatorioAcumulado()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400"></i> Relatório</span></button><button onclick="abrirRastreioMensal()" class="sidebar-item text-cyan-300"><span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> Rastreio Mensal</span></button><button onclick="abrirPainelOperacao()" class="sidebar-item text-amber-400"><span class="flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4"></i> Operação / Movimentação</span></button>
+</nav>
+<div class="p-3 border-t border-slate-800 text-[10px] text-slate-500"><p id="label-mes-ano-sidebar">&mdash;</p></div>
+</aside>
 
-        <div class="bg-shopee-card border border-shopee-border p-4 rounded-xl shadow-sm flex flex-col md:flex-row gap-3 justify-between items-center">
-            <div class="w-full md:w-96 relative">
-                <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
-                <input type="text" id="input-busca" placeholder="Pesquisar colaborador por nome..."
-                    class="w-full bg-shopee-dark border border-shopee-border rounded-lg pl-10 pr-4 py-2 text-sm text-gray-200 focus:outline-none focus:border-shopee-orange transition-colors">
-            </div>
-            <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-                <button onclick="filtrarStatus('TODOS')" class="filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-orange text-white transition-all whitespace-nowrap">Todos</button>
-                <button onclick="filtrarStatus('TRABALHANDO')" class="filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-dark border border-shopee-border text-gray-300 hover:bg-shopee-border transition-all whitespace-nowrap">Trabalhando</button>
-                <button onclick="filtrarStatus('DSR')" class="filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-dark border border-shopee-border text-gray-300 hover:bg-shopee-border transition-all whitespace-nowrap">DSR Hoje</button>
-            </div>
-        </div>
+<main class="flex-1 min-w-0">
+<div id="app" class="max-w-md md:max-w-6xl mx-auto p-3 sm:p-6 pb-12">
+<header class="flex flex-col gap-4 mb-6 pb-4 border-b border-slate-800">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<button onclick="toggleSidebarMobile()" class="lg:hidden btn btn-secondary btn-icon"><i data-lucide="menu" class="w-5 h-5 text-amber-400"></i></button>
+<div class="bg-amber-500/10 p-2 rounded-xl border border-amber-500/30 text-amber-400 hidden sm:block"><i data-lucide="layers" class="w-6 h-6"></i></div>
+<div><h1 class="text-lg sm:text-2xl font-extrabold tracking-tight text-amber-400">LogiRotator <span class="text-[10px] sm:text-xs font-normal text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 rounded-full">&#9679; HUB-LCE-04</span></h1>
+<p id="label-mes-ano" class="text-[10px] sm:text-xs text-slate-400">A carregar...</p></div>
+</div>
+</div>
+</header>
 
-        <div class="bg-shopee-card border border-shopee-border rounded-xl shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-shopee-dark/60 border-b border-shopee-border text-xs uppercase tracking-wider text-gray-400">
-                            <th class="py-3.5 px-4 font-semibold">Colaborador</th>
-                            <th class="py-3.5 px-4 font-semibold">Escala</th>
-                            <th class="py-3.5 px-4 font-semibold">Folga</th>
-                            <th class="py-3.5 px-4 font-semibold">Domingo Fixo</th>
-                            <th class="py-3.5 px-4 font-semibold">Operação</th>
-                            <th class="py-3.5 px-4 font-semibold text-center">Status Hoje</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-colaboradores" class="divide-y divide-shopee-border text-sm"></tbody>
-                </table>
-            </div>
-        </div>
-    </main>
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
+<button onclick="setFiltro('todos')" class="text-left card hover:border-blue-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Total Atual</span><h2 id="kpi-total" class="text-2xl font-extrabold text-slate-100 mt-0.5">0</h2></div><div class="bg-blue-500/10 p-2.5 rounded-lg border border-blue-500/20 text-blue-400"><i data-lucide="users" class="w-5 h-5"></i></div></button>
+<button onclick="setFiltro('presentes')" class="text-left card hover:border-emerald-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Presentes</span><h2 id="kpi-presentes" class="text-2xl font-extrabold text-emerald-400 mt-0.5">0</h2><span id="kpi-presentes-detalhe" class="text-[9px] text-slate-500">&mdash;</span></div><div class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-400"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div></button>
+<button onclick="setFiltro('operacao')" class="text-left card hover:border-emerald-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Em Operação</span><h2 id="kpi-operacao" class="text-2xl font-extrabold text-emerald-400 mt-0.5">0</h2><span id="kpi-operacao-detalhe" class="text-[9px] text-slate-500">Total de presentes hoje</span></div><div class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-400"><i data-lucide="activity" class="w-5 h-5"></i></div></button>
+<button onclick="setFiltro('diaristas')" class="text-left card hover:border-cyan-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-cyan-400">Diaristas</span><h2 id="kpi-diaristas" class="text-2xl font-extrabold text-cyan-400 mt-0.5">0</h2></div><div class="bg-cyan-500/10 p-2.5 rounded-lg border border-cyan-500/20 text-cyan-400"><i data-lucide="hard-hat" class="w-5 h-5"></i></div></button>
+<button onclick="setFiltro('dsr')" class="text-left card hover:border-orange-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Em DSR</span><h2 id="kpi-dsr" class="text-2xl font-extrabold text-orange-400 mt-0.5">0</h2></div><div class="bg-orange-500/10 p-2.5 rounded-lg border border-orange-500/20 text-orange-400"><i data-lucide="palmtree" class="w-5 h-5"></i></div></button>
+<button onclick="setFiltro('banco_horas')" class="text-left card hover:border-violet-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Banco de Horas</span><h2 id="kpi-banco-horas" class="text-2xl font-extrabold text-violet-400 mt-0.5">0</h2><span class="text-[9px] text-slate-500">Status BH hoje</span></div><div class="bg-violet-500/10 p-2.5 rounded-lg border border-violet-500/20 text-violet-400"><i data-lucide="clock-3" class="w-5 h-5"></i></div></button>
+<button onclick="setFiltro('faltas')" class="text-left card hover:border-yellow-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Faltas</span><h2 id="kpi-faltas" class="text-2xl font-extrabold text-yellow-400 mt-0.5">0</h2></div><div class="bg-yellow-500/10 p-2.5 rounded-lg border border-yellow-500/20 text-yellow-400"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div></button>
+<button onclick="setFiltro('atestados')" class="text-left card hover:border-red-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Atestados</span><h2 id="kpi-atestados" class="text-2xl font-extrabold text-red-400 mt-0.5">0</h2></div><div class="bg-red-500/10 p-2.5 rounded-lg border border-red-500/20 text-red-400"><i data-lucide="stethoscope" class="w-5 h-5"></i></div></button>
+</div>
 
-    <footer class="text-center py-6 text-xs text-gray-500 border-t border-shopee-border mt-12">
-        LogiRotator • Pit Stop Shopee © 2026 • Desenvolvido para operações de Alta Performance
-    </footer>
+<div class="card mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
+<div class="relative w-full"><i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i><input type="text" id="input-busca" placeholder="Pesquisar por nome, escala ou DSR..." oninput="renderizar()" class="input pl-9"></div>
+<div class="w-full sm:w-auto flex justify-end gap-2"><span id="label-filtro-ativo" class="badge badge-info px-3 py-2"><i data-lucide="filter" class="w-3.5 h-3.5"></i> Todos</span></div>
+</div>
 
-    <script>
-        const colaboradoresData = [
-            { nome: "JUSCILENE PEREIRA DIAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "ROBERTA CARVALHO DE SOUSA", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "MADYSON KELVIN SILVA DE LIMA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "NATANAEL GHEOVANI BORGES DE FREITAS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "SERGIO DOS SANTOS SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "PAULO HENRIQUE DOS SANTOS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "EMANUELE ROCHA BARBOSA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "2° Domingo/Mês", operacao: "AM", status: "AF (15 dias)" },
-            { nome: "DENILSON REGINALDO BATISTA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "ADEMIR DOS SANTOS SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "MATEUS VIEIRA NOGUEIRA GAMA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "DANILO DE JESUS SANTOS", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "CLAUDIO RODGER CAVALCANTE DA SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "CAUA LIMA FERNANDES MACEDO MATOS", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "CICERO CELIO JANUARIO DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "KLEBER SOUSA ARAUJO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "LUANA MARTINIANO GONÇALO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "RICARDO PEREIRA DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "LUIZ RAFAEL COELHO DO NASCIMENTO SANTOS", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "FLAVIO HENRIQUE DE SOUSA SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "ANA CLARA ALVES RODRIGUES", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "ANDERSON DA SILVA NASCIMENTO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "AURIANE BENEDITA DOS SANTOS", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "JULIANA ARAUJO DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "GEISY LEITE TAVARES PEREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "HENRIQUE SILVA FARIA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "JARDEL RODRIGUES ALVES", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "EDINALDO GOMES PEREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "JOSE ALEXANDRE ALVES SOBREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "LEONARDO DA SILVA BARBOSA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "ALUIZIO NERI ROCHA NETO", escala: "5x2 - 220h - SEX A TER - 00:00 às 09:13", folga: "QUA e QUI", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "CICERO LUCAS RODRIGUES MOREIRA", escala: "5x2 - 220h - SEX A TER - 00:00 às 09:13", folga: "QUA e QUI", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "EVERSON GILLIARD DE QUEROIS PEQUENO", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "JOSE AIRTON DA SILVA COSMO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "JOHNATHAN INALDO RODRIGUES DE SOUZA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "CICERO GABRIEL SANTOS DE SA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "FRANCISCO HELTON ALVES DA SILVA", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "HERNANDES FERREIRA GONCALVES", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "JONAILSON DOS SANTOS FARIAS", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "LEANDRO DA CUNHA RIBEIRO", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "VANDERLAN DANTAS DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "ALISSON IURE COSTA ALVES", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "PEDRO VICTOR RIBEIRO DE ANDRADE", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "4° Domingo/Mês", operacao: "FM" },
-            { nome: "JOANA CARLOS DOS SANTOS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "ADRIANO RODRIGUES FLOR", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "RAIANE ALVINO GONÇALVES", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "FELIPE GONCALVES DE OLIVEIRA", escala: "5X2 SEG A SEX 18:00 ÀS 03:02", folga: "SAB e DOM", domingoFixo: "3° Domingo/Mês", operacao: "FM" },
-            { nome: "FRANCISCA VARLA FELIX DA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "JOSUE IRAILDES COSTA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "LARISSA SANTOS TELES", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "JOSE WATHYLLA DOS SANTOS SOUZA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "GABRIEL WILLOSON DA SILVA GOMES", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "MILENA ALVES DA SILVA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "HODIAS NASCIMENTO DOS SANTOS", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "EVERALDO ALVES OLIVEIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "JOAO PAULO DE OLIVEIRA SILVA", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "CLEIDIANA PESSOA FERREIRA", escala: "6X1 QUI A TER 01:00 ÀS 08:54", folga: "QUA", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "EDIGLEI LUIZ DE SOUSA FILHO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "2° Domingo/Mês", operacao: "AM" },
-            { nome: "JOAO VICTOR VILARDE ARAUJO", escala: "6X1 SEX A QUA 01:00 ÀS 08:54", folga: "QUI", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "JOSE NEILSON ALVES GOMES", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", domingoFixo: "3° Domingo/Mês", operacao: "AM" },
-            { nome: "ISRAEL ALENCAR DO VALE", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "ADRIAN NUNES LIMA SOARES", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", domingoFixo: "4° Domingo/Mês", operacao: "AM" },
-            { nome: "HELOÍSA KELLY DA SILVA NASCIMENTO", escala: "3x4 - SEX A DOM - 00:00 às 09:05", folga: "SEG, TER,QUA,QUI", domingoFixo: "1° Domingo/Mês", operacao: "AM" },
-            { nome: "GUILHERME NELO ALVES", escala: "6X1 QUA A SEG 01:00 ÀS 08:54", folga: "TER", domingoFixo: "2° Domingo/Mês", operacao: "AM" }
-        ];
+<div id="container-setores" class="space-y-6"></div>
+</div>
+</main>
+</div>
 
-        let filtroAtual = 'TODOS';
-        let termoBusca = '';
+<div id="sidebar-mobile-overlay" onclick="toggleSidebarMobile()" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+<aside id="sidebar-mobile" class="fixed top-0 left-0 h-full w-72 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 lg:hidden flex flex-col">
+<div class="p-4 border-b border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="bg-amber-500/10 p-2 rounded-xl border border-amber-500/30 text-amber-400"><i data-lucide="layers" class="w-5 h-5"></i></div>
+<div><h1 class="text-base font-extrabold text-amber-400">LogiRotator</h1><span class="text-[10px] text-emerald-400">&#9679; HUB-LCE-04</span></div>
+</div>
+<button onclick="toggleSidebarMobile()" class="btn btn-ghost btn-icon-sm"><i data-lucide="x" class="w-5 h-5"></i></button>
+</div>
+<nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+<p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 pt-2 pb-1">Filtros</p>
+<button onclick="setFiltro('todos');toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="layout-grid" class="w-4 h-4 text-amber-400"></i> Todos</span><span id="badge-todos-m" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('presentes');toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> Presentes</span><span id="badge-presentes-m" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('operacao');toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-emerald-400"></i> Em Operação</span><span id="badge-operacao-m" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('diaristas');toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="hard-hat" class="w-4 h-4 text-cyan-400"></i> Diaristas</span><span id="badge-diaristas-m" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('dsr');toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="palmtree" class="w-4 h-4 text-orange-400"></i> Em DSR Hoje</span><span id="badge-dsr-m" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('faltas');toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-400"></i> Faltas Hoje</span><span id="badge-faltas-m" class="badge badge-default">0</span></button>
+<button onclick="setFiltro('atestados');toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="stethoscope" class="w-4 h-4 text-red-400"></i> Atestados Hoje</span><span id="badge-atestados-m" class="badge badge-default">0</span></button>
+<p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 pt-4 pb-1">Ações</p>
+<button onclick="abrirModalDiaristasPedidos();toggleSidebarMobile()" class="sidebar-item text-cyan-400"><span class="flex items-center gap-2"><i data-lucide="clipboard-list" class="w-4 h-4"></i> Diaristas Pedidos</span></button>
+<button onclick="abrirModalMatriz();toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4 text-amber-400"></i> Grade Mensal</span></button>
+<button onclick="abrirRelatorioAcumulado();toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400"></i> Relatório</span></button><button onclick="abrirRastreioMensal();toggleSidebarMobile()" class="sidebar-item text-cyan-300"><span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> Rastreio Mensal</span></button><button onclick="abrirPainelOperacao();toggleSidebarMobile()" class="sidebar-item text-amber-400"><span class="flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4"></i> Operação / Movimentação</span></button>
+</nav>
+</aside>
 
-        function verificarSeEstaDeDSR(colaborador, dataAtual = new Date()) {
-            if (!colaborador) return false;
+<!-- MODAIS -->
+<div id="modal-add" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
+<div class="flex justify-between items-center mb-4"><h3 id="modal-titulo" class="text-base font-bold text-amber-400">Adicionar Auxiliar</h3><button onclick="fecharModalAdd()" class="btn btn-ghost btn-icon-sm"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+<div class="space-y-3">
+<input type="hidden" id="edit-id" value="">
+<div><label class="label">Nome Completo</label><input type="text" id="input-nome-colab" placeholder="Nome..." class="input"></div>
+<div id="campos-add-extras" class="space-y-3">
+<div class="grid grid-cols-2 gap-2">
+<div><label class="label">Escala</label><select id="select-escala" class="select"><option value="6x1">6x1</option><option value="5x2">5x2</option><option value="12x36">12x36</option><option value="3x4">3x4</option></select></div>
+<div><label class="label">DSR</label><select id="select-dsr" class="select"><option value="Domingo">Domingo</option><option value="Segunda-feira">Segunda-feira</option><option value="Terça-feira">Terça-feira</option><option value="Quarta-feira">Quarta-feira</option><option value="Quinta-feira">Quinta-feira</option><option value="Sexta-feira">Sexta-feira</option><option value="Sábado">Sábado</option><option value="Seg, Ter, Qua, Qui">Seg, Ter, Qua, Qui</option><option value="Sábado e Domingo">Sábado e Domingo</option></select></div>
+</div>
+<div><label class="label">Horário</label><input type="text" id="input-horario" value="08:00 - 17:00" class="input"></div>
+</div>
+<div><label class="label">Função / Setor</label><select id="novo-funcao" class="select"></select></div>
+<div class="flex justify-end gap-2 pt-3 border-t border-slate-800"><button onclick="fecharModalAdd()" class="btn btn-secondary">Cancelar</button><button onclick="salvarColaborador()" class="btn btn-primary">Salvar</button></div>
+</div>
+</div>
+</div>
 
-            const diasSemana = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-            const diaHojeStr = diasSemana[dataAtual.getDay()];
+<div id="modal-alterar-setor" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[70] hidden flex items-center justify-center p-4">
+<div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
+<div class="flex justify-between items-center mb-4"><h3 id="alterar-setor-titulo" class="text-base font-bold text-amber-400">Alterar setor</h3><button onclick="fecharModalAlterarSetor()" class="btn btn-ghost btn-icon-sm"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+<div class="space-y-3">
+<input type="hidden" id="alterar-setor-id" value="">
+<div class="bg-slate-950 border border-slate-800 rounded-lg p-3"><div class="text-[10px] uppercase text-slate-500 font-bold">Setor / função atual</div><div id="alterar-setor-atual" class="text-sm font-bold text-slate-200 mt-1">-</div></div>
+<div><label class="label">Novo setor / função</label><select id="alterar-setor-funcao" class="select"></select></div>
+<div class="bg-amber-950/20 border border-amber-500/20 rounded-lg p-3 text-[10px] text-amber-300">A alteração move o LOGI para a nova função/setor no quadro de hoje. A presença permanece inalterada.</div>
+<div class="flex justify-end gap-2 pt-3 border-t border-slate-800"><button onclick="fecharModalAlterarSetor()" class="btn btn-secondary">Cancelar</button><button onclick="confirmarAlteracaoSetor()" class="btn btn-primary"><i data-lucide="save" class="w-3 h-3"></i> Alterar</button></div>
+</div></div></div>
 
-            if (colaborador.folga) {
-                const folgaNorm = String(colaborador.folga)
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .toUpperCase()
-                    .trim();
-                const partes = folgaNorm.split(/[^A-Z]+/).filter(Boolean);
-                if (partes.includes(diaHojeStr)) return true;
-            }
+<div id="modal-alocar" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
+<div class="flex justify-between items-center mb-4"><h3 id="alocar-titulo" class="text-base font-bold text-amber-400">Alocar em Setor</h3><button onclick="fecharModalAlocar()" class="btn btn-ghost btn-icon-sm"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+<div class="space-y-3">
+<input type="hidden" id="alocar-setor" value="">
+<div><label class="label">Buscar</label><input type="text" id="alocar-busca" placeholder="Nome..." oninput="filtrarColabsAlocar()" class="input"></div>
+<div><label class="label">Colaborador</label><div id="alocar-lista" class="bg-slate-950 border border-slate-800 rounded-lg max-h-56 overflow-y-auto"></div></div>
+<div><label class="label">Função</label><select id="alocar-funcao" class="select"></select></div>
+<div class="flex justify-end gap-2 pt-3 border-t border-slate-800"><button onclick="fecharModalAlocar()" class="btn btn-secondary">Cancelar</button><button onclick="confirmarAlocacao()" class="btn btn-primary">Alocar</button></div>
+</div>
+</div>
+</div>
 
-            if (diaHojeStr === 'DOM' && colaborador.domingoFixo) {
-                const nDomingoHoje = Math.ceil(dataAtual.getDate() / 7);
-                const match = String(colaborador.domingoFixo).match(/(\d)/);
-                if (match && Number(match[1]) === nDomingoHoje) return true;
-            }
+<div id="modal-add-diarista-qtd" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+<div class="flex justify-between items-center mb-4"><h3 class="text-base font-bold text-cyan-400">Registrar Diaristas</h3><button onclick="fecharModalAddDiarista()" class="btn btn-ghost btn-icon-sm"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+<div class="space-y-4">
+<div class="bg-cyan-950/20 border border-cyan-500/30 rounded-lg p-2.5 text-center"><span class="text-[10px] uppercase text-cyan-400 font-bold">Pedido do dia</span><div id="info-pedido-modal" class="text-xl font-extrabold text-cyan-300">0</div></div>
+<div><label class="label text-emerald-400">Presentes</label><input type="number" id="input-diaristas-presentes" min="0" value="0" class="input text-2xl font-extrabold text-emerald-300 text-center h-14"><p id="aviso-limite-presentes" class="hidden text-[10px] text-yellow-400 mt-1 text-center"></p></div>
+<div><label class="label text-red-400">Faltaram</label><input type="number" id="input-diaristas-faltantes" min="0" value="0" class="input text-2xl font-extrabold text-red-300 text-center h-14"></div>
+<div class="flex justify-end gap-2 pt-3 border-t border-slate-800"><button onclick="fecharModalAddDiarista()" class="btn btn-secondary">Cancelar</button><button onclick="salvarDiaristasQtd()" class="btn btn-primary">Salvar</button></div>
+</div>
+</div>
+</div>
 
-            return false;
+<div id="modal-diaristas-pedidos" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+<div class="flex justify-between items-center mb-4"><h3 class="text-base font-bold text-cyan-400">Diaristas Pedidos Hoje</h3><button onclick="fecharModalDiaristasPedidos()" class="btn btn-ghost btn-icon-sm"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+<div class="space-y-3">
+<div><label class="label">Quantidade pedida</label><input type="number" id="input-diaristas-pedidos" min="0" value="0" class="input text-2xl font-extrabold text-cyan-300 text-center h-14"></div>
+<div class="flex justify-end gap-2 pt-3 border-t border-slate-800"><button onclick="fecharModalDiaristasPedidos()" class="btn btn-secondary">Cancelar</button><button onclick="salvarDiaristasPedidos()" class="btn btn-primary">Salvar</button></div>
+</div>
+</div>
+</div>
+
+<div id="modal-matriz" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2 sm:p-4">
+<div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-[98vw] w-full h-[95vh] flex flex-col p-4 sm:p-6 shadow-2xl">
+<div class="flex justify-between items-center pb-3 border-b border-slate-800 flex-wrap gap-3">
+<div><h3 id="titulo-matriz-mes" class="text-sm sm:text-lg font-bold text-amber-400">Matriz Mensal</h3><p class="text-[11px] text-slate-400">Passado &larr; HOJE &rarr; Futuros</p></div>
+<div class="flex items-center gap-2"><button id="btn-modo-admin" onclick="alternarModoAdmin()" class="btn btn-secondary btn-sm"><i data-lucide="lock" class="w-4 h-4"></i> Admin: bloqueado</button><button onclick="abrirRelatorioAcumulado()" class="btn btn-success btn-sm"><i data-lucide="bar-chart-3" class="w-4 h-4"></i> Relatório</button><button onclick="fecharModalMatriz()" class="btn btn-ghost btn-icon"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+</div>
+<div class="mt-3 relative"><i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i><input type="text" id="matriz-busca" placeholder="Buscar colaborador..." oninput="renderizarMatriz()" class="input pl-9"><span id="matriz-busca-contador" class="absolute right-3 top-3 text-[10px] text-slate-500 font-mono"></span></div>
+<div class="flex-grow overflow-auto my-3 relative rounded-lg border border-slate-800"><table id="tabela-matriz-unica" class="text-left border-collapse text-xs" style="border-spacing:0"></table></div>
+<div class="flex justify-end pt-2 border-t border-slate-800"><button onclick="fecharModalMatriz()" class="btn btn-secondary">Fechar</button></div>
+</div>
+</div>
+
+<div id="modal-relatorio-acumulado" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-2 sm:p-4">
+<div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-[98vw] w-full h-[92vh] flex flex-col p-4 sm:p-6 shadow-2xl">
+<div class="flex justify-between items-center pb-3 border-b border-slate-800 flex-wrap gap-3">
+<div><h3 class="text-sm sm:text-lg font-bold text-emerald-400">Relatório Acumulado</h3><p id="relatorio-subtitulo" class="text-[11px] text-slate-400">&mdash;</p></div>
+<div class="flex items-center gap-2"><button onclick="imprimirRelatorio()" class="btn btn-secondary btn-sm"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir</button><button onclick="fecharRelatorioAcumulado()" class="btn btn-ghost btn-icon"><i data-lucide="x" class="w-5 h-5"></i></button></div>
+</div>
+<div id="relatorio-conteudo" class="flex-grow overflow-auto my-3 pr-1"></div>
+<div class="flex justify-end pt-2 border-t border-slate-800"><button onclick="fecharRelatorioAcumulado()" class="btn btn-success">Fechar</button></div>
+</div>
+</div>
+
+<div id="modal-historico" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+<div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 shadow-2xl">
+<div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-800"><div><h3 id="titulo-modal-hist" class="text-sm sm:text-base font-bold text-amber-400">Editar Histórico</h3><p class="text-[11px] text-slate-400">O dia atual fica fixo no topo.</p></div><button onclick="fecharModalHistorico()" class="btn btn-ghost btn-icon-sm"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+<div id="conteudo-historico-dias" class="max-h-[55vh] overflow-y-auto space-y-2 pr-1"></div>
+<div class="flex justify-end pt-3 border-t border-slate-800 mt-3"><button onclick="fecharModalHistorico()" class="btn btn-primary">Concluir</button></div>
+</div>
+</div>
+
+<script>
+const LOGI_API_URL = '/.netlify/functions/api';
+
+function criarErroApi(mensagem, status) {
+  const e = new Error(mensagem || 'Falha na comunicação com a API Neon.');
+  e.status = status || 500;
+  return e;
+}
+async function requisicaoNeon(payload) {
+  let response;
+  try {
+    response = await fetch(LOGI_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) {
+    throw criarErroApi('Não foi possível acessar a API do Neon. Publique também as Netlify Functions do projeto.', 0);
+  }
+  let body = {};
+  try { body = await response.json(); } catch (_) {}
+  if (!response.ok || body.error) throw criarErroApi(body.error || 'Erro HTTP ' + response.status, response.status);
+  return body;
+}
+
+class NeonQuery {
+  constructor(table) {
+    this.table = table; this.action = 'select'; this.columns = '*';
+    this.values = null; this.filters = []; this.orders = [];
+    this.limitValue = null; this.rangeValue = null; this.single = false;
+    this.conflict = null; this.returning = false; this.executed = false;
+  }
+  select(columns) { this.columns = columns || '*'; this.returning = true; return this; }
+  insert(values) { this.action = 'insert'; this.values = values; return this; }
+  update(values) { this.action = 'update'; this.values = values; return this; }
+  upsert(values, options) { this.action = 'upsert'; this.values = values; this.conflict = options && options.onConflict || null; return this; }
+  delete() { this.action = 'delete'; return this; }
+  eq(column, value) { this.filters.push({ op: 'eq', column, value }); return this; }
+  neq(column, value) { this.filters.push({ op: 'neq', column, value }); return this; }
+  gte(column, value) { this.filters.push({ op: 'gte', column, value }); return this; }
+  lte(column, value) { this.filters.push({ op: 'lte', column, value }); return this; }
+  is(column, value) { this.filters.push({ op: 'is', column, value }); return this; }
+  not(column, operator, value) { this.filters.push({ op: 'not', column, operator, value }); return this; }
+  in(column, values) { this.filters.push({ op: 'in', column, values }); return this; }
+  order(column, options) { this.orders.push({ column, ascending: !options || options.ascending !== false }); return this; }
+  limit(value) { this.limitValue = value; return this; }
+  range(from, to) { this.rangeValue = { from, to }; return this; }
+  maybeSingle() { this.single = true; return this; }
+  async execute() {
+    if (this.executed) return this.result;
+    this.executed = true;
+    try {
+      const body = await requisicaoNeon({
+        table: this.table, action: this.action, columns: this.columns,
+        values: this.values, filters: this.filters, orders: this.orders,
+        limit: this.limitValue, range: this.rangeValue,
+        conflict: this.conflict, returning: this.returning, single: this.single
+      });
+      let data = body.data === undefined ? null : body.data;
+      if (this.single && Array.isArray(data)) data = data[0] || null;
+      this.result = { data, error: null, count: body.count ?? null };
+    } catch (error) { this.result = { data: null, error, count: null }; }
+    return this.result;
+  }
+  then(resolve, reject) { return this.execute().then(resolve, reject); }
+}
+const supabaseClient = {
+  from(table) { return new NeonQuery(table); },
+  auth: {
+    async signOut() { return { error: null }; },
+    async signInWithPassword() { return { data: { session: null }, error: criarErroApi('Autenticação ainda não configurada na API Neon. Use o modo de teste.', 501) }; }
+  }
+};
+
+function toast(msg,tipo){tipo=tipo||'ok';const el=document.createElement('div');el.className='fixed top-4 right-4 z-[999] px-4 py-3 rounded-xl shadow-2xl text-sm font-semibold border '+(tipo==='ok'?'bg-emerald-500/20 border-emerald-500/40 text-emerald-200':tipo==='warn'?'bg-yellow-500/20 border-yellow-500/40 text-yellow-200':'bg-red-500/20 border-red-500/40 text-red-200');el.textContent=msg;document.body.appendChild(el);setTimeout(function(){el.remove()},3500)}
+
+const SETORES_E_FUNCOES={
+"Recebimento":["Bipador Recebimento","Patoleiro"],
+"Bancada de Triagem Fly / XPT":["Abastecedor Triagem","Sorting Triagem Fly"],
+"Triagem de Volumoso XPT / LM":["Bipador Vol XPT","Sorting Triagem Vol"],
+"Sorting 1 Volumoso LM":["Bipador Volumoso LM","Sorting 1 Volumoso LM"],
+"Sorting 1 Fly LM":["Abastecedor Fly LM","Bipador Fly LM","Etequitador","Sorting 1 Fly LM"],
+"Sorting 2 LM":["Sorting 2 LM"],
+"XPT Fly":["Bipador XPT Fly","Abastecedor XPT Fly"],
+"Expedição XPT":["Bipador Expedição XPT","Gaioleiro Expedição"],
+"Inventário":["Aux Inventário"],
+"Flip":["Aux Flip"],
+"FM":["Aux FM"],
+"Avarias":["Aux Avarias"],
+"Expedição LM":["Bipador Expedição LM","Abastecedor Expedição LM"],
+"Bancada de Inversão":["Aux Bancada de Inversão","Bipador Bancada de Inversão"],
+"5S":["Aux 5S", "Facilitador 5S"]
+};
+
+const STATUS_ESPECIAIS=[
+{valor:"-",label:"- (Sem informação cadastrada)"},
+{valor:"P",label:"P: Presente"},{valor:"AF",label:"AF: Afastamento"},{valor:"AL",label:"AL: Afastamento longo"},
+{valor:"AM",label:"AM: Atestado médico"},{valor:"BH",label:"BH: Banco de Horas"},{valor:"DF",label:"DF: Desligamento forçado"},
+{valor:"DP",label:"DP: Desligamento Programado"},{valor:"DSR",label:"DSR: Descanso Semanal Remunerado"},{valor:"DV",label:"DV: Desligamento voluntário"},
+{valor:"F",label:"F: Falta Injustificada"},{valor:"FE",label:"FE: Férias"},{valor:"FJ",label:"FJ: Falta Justificada"},{valor:"FO",label:"FO: Folga"},
+{valor:"NC",label:"NC: Não Contratado"},{valor:"NS",label:"NS: No-Show"},{valor:"PR",label:"PR: Promoção"},
+{valor:"S1",label:"S1: Sinergia Enviada"},{valor:"S2",label:"S2: Sinergia Recebida"},{valor:"TR",label:"TR: Transferência"},
+{valor:"TD",label:"TD: Treinamento e desenvolvimento"},{valor:"SU",label:"SU: Suspensão"},{valor:"FC",label:"FC: Folga compensatória"},{valor:"IN",label:"IN: Internalização"}
+];
+function isStatusEspecial(v){return STATUS_ESPECIAIS.some(function(s){return s.valor===v})}
+
+const FUNCAO_PRESENTE_EXCEL = "PRESENTE";
+function isFuncaoAlocada(v){
+  if (!v || isStatusEspecial(v)) return false;
+  if (v === FUNCAO_PRESENTE_EXCEL) return false;
+  if (v === "Recebimento") return false;
+  return true;
+}
+
+const dataAtualSistema=new Date();
+const anoAtual=dataAtualSistema.getFullYear();
+const mesAtualIndex=dataAtualSistema.getMonth();
+let diaHoje=dataAtualSistema.getDate();
+function obterTotalDiasMes(a,m){return new Date(a,m+1,0).getDate()}
+const totalDiasDoMes=obterTotalDiasMes(anoAtual,mesAtualIndex);
+const nomesMeses=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const nomeMesAtual=nomesMeses[mesAtualIndex];
+let modoAdmin=false;
+let sessaoLogi=null;
+let perfilLogi=null;
+let papelLogi=null;
+const LIMITE_DIAS_FUNCAO=20;
+let colaboradores=[];
+let historicoMovimentosGlobal=[];
+let totalCadastroBanco=0;
+let filtroAtivo='todos';
+let alocarColabSelecionadoId=null;
+
+function normalizarTexto(t){if(t===null||t===undefined)return"";return String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w\s,]/g," ").replace(/\s+/g," ").trim()}
+function matchBuscaAvancada(termo){if(!termo)return true;const palavras=termo.split(" ").filter(function(p){return p.length>0});const campos=Array.prototype.slice.call(arguments,1);const alvo=normalizarTexto(campos.filter(function(c){return c}).join(" "));return palavras.every(function(p){return alvo.includes(p)})}
+
+const DIAS_SEMANA_MAP={"dom":0,"domingo":0,"seg":1,"segunda":1,"ter":2,"terca":2,"terca feira":2,"qua":3,"quarta":3,"quarta feira":3,"qui":4,"quinta":4,"quinta feira":4,"sex":5,"sexta":5,"sexta feira":5,"sab":6,"sabado":6,"sabado feira":6};
+
+// ============================================================
+// FUNÇÃO DSR CORRIGIDA — reconhece "2° Domingo/Mês" + formatos antigos
+// ============================================================
+function isDiaDSR(dsrTexto, dataObj) {
+    if (!dsrTexto) return false;
+    const d = dataObj.getDay();
+
+    // 1) Padrão "2° Domingo/Mês" no próprio campo dsr
+    const matchDom = String(dsrTexto).match(/(\d)\s*°?\s*Domingo\s*\/?\s*M[êe]s/i);
+    if (matchDom && d === 0) {
+        const nDomingoHoje = Math.ceil(dataObj.getDate() / 7);
+        if (Number(matchDom[1]) === nDomingoHoje) return true;
+    }
+
+    // 2) Folga semanal normal (código original)
+    const dn = normalizarTexto(dsrTexto).replace(/feira/g, '').replace(/-/g, ' ');
+    const dn2 = dn.replace(/\s+/g, ' ').trim();
+    const p = dn2.split(/,|\se\s/).map(function(x){ return x.trim().replace(/\s+/g, ' '); }).filter(function(x){ return x; });
+    for (let i = 0; i < p.length; i++) {
+        const parte = p[i];
+        if (DIAS_SEMANA_MAP[parte] === d) return true;
+        const prim = parte.split(' ')[0];
+        if (DIAS_SEMANA_MAP[prim] === d) return true;
+        if (DIAS_SEMANA_MAP[prim.slice(0, 3)] === d) return true;
+    }
+    return false;
+}
+
+// ============================================================
+// FUNÇÃO DSR HOJE — usa dsr + domingoFixo
+// ============================================================
+function isColabEmDSRHoje(c) {
+    const dataHoje = new Date(anoAtual, mesAtualIndex, diaHoje);
+    // 1) Folga semanal normal OU padrão "N° Domingo/Mês" no campo dsr
+    if (isDiaDSR(c.dsr, dataHoje)) return true;
+    // 2) Domingo fixo do mês (coluna domingo_fixo do banco)
+    if (dataHoje.getDay() === 0 && Number(c.domingoFixo) > 0) {
+        const nDomingoHoje = Math.ceil(dataHoje.getDate() / 7);
+        if (Number(c.domingoFixo) === nDomingoHoje) return true;
+    }
+    return false;
+}
+
+function obterStatusHoje(c){
+  const pres=(c.presencaDias&&c.presencaDias[diaHoje-1])||"-";
+  if(pres==="DSR"||pres==="FO")return'dsr';
+  if(["F","FJ"].includes(pres))return'falta';
+  if(pres==="AM")return'atestado';
+  if(pres==="FE")return'ferias';
+  if(pres==="BH")return'banco_horas';
+  if(["AF","AL"].includes(pres))return'afastamento';
+  if(["P","S2"].includes(pres))return'presente';
+  if(["S1","TD","SU","PR","TR","FC","IN"].includes(pres))return'outro_status';
+  return'sem_escala';
+}
+function colaboradoresOperacionaisHoje(){
+  const foraDoQuadro=new Set(['DF','DP','DV','NC','NS']);
+  return colaboradores.filter(function(c){
+    const st=String((c.presencaDias&&c.presencaDias[diaHoje-1])||'-').toUpperCase();
+    return st && st!=='-' && !foraDoQuadro.has(st);
+  });
+}
+
+function colaboradoresOperacionaisMes(){
+  const foraDoQuadro=new Set(['DF','DP','DV','NC','NS']);
+  return colaboradores.filter(function(c){
+    if(c.ativo===false)return false;
+    const dias=Array.isArray(c.presencaDias)?c.presencaDias:[];
+    return dias.some(function(valor){
+      const st=String(valor||'-').trim().toUpperCase();
+      return st!=='' && st!=='-' && !foraDoQuadro.has(st);
+    });
+  });
+}
+
+function estaEmOperacaoHoje(c){
+  const f=(c.historicoDias&&c.historicoDias[diaHoje-1])||'-';
+  const p=(c.presencaDias&&c.presencaDias[diaHoje-1])||'-';
+  return ["P","S2"].includes(p) && isFuncaoAlocada(f);
+}
+
+function contarDiasNaFuncaoAtual(h){const f=h[diaHoje-1];if(!f||isStatusEspecial(f))return{funcao:"Nenhuma",dias:0,dataInicio:null,dataFim:null};let c=0;let idx=diaHoje-1;for(let i=diaHoje-1;i>=0;i--){if(h[i]===f&&!isStatusEspecial(h[i])){c++;idx=i}else{break}}return{funcao:f,dias:c,dataInicio:new Date(anoAtual,mesAtualIndex,idx+1),dataFim:new Date(anoAtual,mesAtualIndex,diaHoje)}}
+
+function obterChaveDiaristasDia(){return'diaristas_'+anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(diaHoje).padStart(2,'0')}
+function getDiaristasDia(){const raw=localStorage.getItem(obterChaveDiaristasDia());if(!raw)return{pedidos:0,presentes:0,faltantes:0};try{const o=JSON.parse(raw);return{pedidos:parseInt(o.pedidos,10)||0,presentes:parseInt(o.presentes,10)||0,faltantes:parseInt(o.faltantes,10)||0}}catch(e){return{pedidos:0,presentes:0,faltantes:0}}}
+function setDiaristasDia(o){
+ const dados={pedidos:parseInt(o.pedidos,10)||0,presentes:parseInt(o.presentes,10)||0,faltantes:parseInt(o.faltantes,10)||0};
+ localStorage.setItem(obterChaveDiaristasDia(),JSON.stringify(dados));
+ if(papelLogi==='admin'&&supabaseClient){supabaseClient.from('logirotator_diaristas_diarios').upsert({data:opDataHojeISO(),pedidos:dados.pedidos,presentes:dados.presentes,faltantes:dados.faltantes,updated_by:sessaoLogi?.user?.id},{onConflict:'data'}).then(function(r){if(r.error)console.error('Falha ao sincronizar diaristas:',r.error.message);});}
+}
+function opDataHojeISO(){return anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(diaHoje).padStart(2,'0')}
+async function carregarDiaristasDiaBanco(){
+ try{const r=await supabaseClient.from('logirotator_diaristas_diarios').select('pedidos,presentes,faltantes').eq('data',opDataHojeISO()).maybeSingle();if(r.error){console.warn('Tabela de diaristas ainda não configurada:',r.error.message);return;}if(r.data){localStorage.setItem(obterChaveDiaristasDia(),JSON.stringify({pedidos:r.data.pedidos||0,presentes:r.data.presentes||0,faltantes:r.data.faltantes||0}));}else if(papelLogi==='admin'){const atual=getDiaristasDia();await supabaseClient.from('logirotator_diaristas_diarios').upsert({data:opDataHojeISO(),pedidos:atual.pedidos,presentes:atual.presentes,faltantes:atual.faltantes,updated_by:sessaoLogi?.user?.id},{onConflict:'data'});}}
+ catch(e){console.warn('Não foi possível carregar diaristas compartilhados:',e);}
+}
+function abrirModalDiaristasPedidos(){document.getElementById('input-diaristas-pedidos').value=getDiaristasDia().pedidos;document.getElementById('modal-diaristas-pedidos').classList.remove('hidden');lucide.createIcons();setTimeout(function(){document.getElementById('input-diaristas-pedidos').select()},100)}
+function fecharModalDiaristasPedidos(){document.getElementById('modal-diaristas-pedidos').classList.add('hidden')}
+function salvarDiaristasPedidos(){const v=parseInt(document.getElementById('input-diaristas-pedidos').value,10)||0;const a=getDiaristasDia();let np=a.presentes;let nf=a.faltantes;if(v>0){if(np>v)np=v;if((np+nf)>v)nf=Math.max(0,v-np);}setDiaristasDia({pedidos:v,presentes:np,faltantes:nf});toast('Pedido: '+v,'ok');fecharModalDiaristasPedidos();renderizar()}
+
+function abrirModalAddDiarista(statusPre){
+  const d=getDiaristasDia();
+  if(d.pedidos<=0){toast("Defina primeiro o pedido.",'warn');return}
+  const inpP=document.getElementById('input-diaristas-presentes');
+  const inpF=document.getElementById('input-diaristas-faltantes');
+  inpP.value=d.presentes;
+  inpF.value=d.faltantes;
+  document.getElementById('info-pedido-modal').innerText=d.pedidos;
+  const novoP=inpP.cloneNode(true);inpP.parentNode.replaceChild(novoP,inpP);
+  const novoF=inpF.cloneNode(true);inpF.parentNode.replaceChild(novoF,inpF);
+  const aviso=document.getElementById('aviso-limite-presentes');
+  aviso.classList.add('hidden');
+  function validar(){
+    const p=parseInt(novoP.value,10)||0;
+    const f=parseInt(novoF.value,10)||0;
+    const ped=d.pedidos;
+    let msg='';
+    if(p>ped){msg='Presentes max: '+ped;}
+    else if((p+f)>ped){msg='Presentes ('+p+') + Faltas ('+f+') = '+(p+f)+' ultrapassa o pedido ('+ped+'). Max faltas: '+(ped-p)+'.';}
+    if(msg){
+      aviso.innerText='⚠️ '+msg;
+      aviso.classList.remove('hidden');
+      novoP.classList.add('border-yellow-500');
+      novoF.classList.add('border-yellow-500');
+    } else {
+      aviso.classList.add('hidden');
+      novoP.classList.remove('border-yellow-500');
+      novoF.classList.remove('border-yellow-500');
+    }
+  }
+  novoP.addEventListener('input',validar);
+  novoF.addEventListener('input',validar);
+  document.getElementById('modal-add-diarista-qtd').classList.remove('hidden');
+  lucide.createIcons();
+  setTimeout(function(){const alvo=statusPre==='faltou'?novoF:novoP;if(alvo){alvo.focus();alvo.select();}},100);
+}
+function fecharModalAddDiarista(){document.getElementById('modal-add-diarista-qtd').classList.add('hidden')}
+
+function salvarDiaristasQtd(){
+  const p=parseInt(document.getElementById('input-diaristas-presentes').value,10)||0;
+  const f=parseInt(document.getElementById('input-diaristas-faltantes').value,10)||0;
+  if(p<0||f<0){toast("Negativo nao permitido.",'warn');return}
+  const a=getDiaristasDia();
+  if(a.pedidos>0&&p>a.pedidos){toast('Presentes ('+p+') maior que pedidos ('+a.pedidos+').','warn');return}
+  if(a.pedidos>0&&(p+f)>a.pedidos){const maxF=a.pedidos-p;toast('Presentes ('+p+') + Faltas ('+f+') ultrapassa o pedido ('+a.pedidos+'). Max faltas: '+maxF+'.','warn');return}
+  setDiaristasDia({pedidos:a.pedidos,presentes:p,faltantes:f});
+  toast('Diaristas: '+p+' presentes + '+f+' faltas.','ok');
+  fecharModalAddDiarista();
+  renderizar();
+}
+
+function toggleSidebarMobile(){const s=document.getElementById('sidebar-mobile');const o=document.getElementById('sidebar-mobile-overlay');const ab=!s.classList.contains('-translate-x-full');if(ab){s.classList.add('-translate-x-full');o.classList.add('hidden')}else{s.classList.remove('-translate-x-full');o.classList.remove('hidden')}}
+
+function setFiltro(f){filtroAtivo=f;document.querySelectorAll('.sidebar-item').forEach(function(b){b.classList.remove('active')});const btn=document.getElementById('menu-'+f);if(btn)btn.classList.add('active');const labels={'todos':'Todos','presentes':'Presentes','operacao':'Em Operação','diaristas':'Diaristas','dsr':'Em DSR Hoje','banco_horas':'Banco de Horas Hoje','faltas':'Faltas Hoje','atestados':'Atestados Hoje'};const icons={'todos':'layout-grid','presentes':'check-circle-2','operacao':'users','diaristas':'hard-hat','dsr':'palmtree','banco_horas':'clock-3','faltas':'alert-triangle','atestados':'stethoscope'};const el=document.getElementById('label-filtro-ativo');if(el)el.innerHTML='<i data-lucide="'+icons[f]+'" class="w-3.5 h-3.5"></i> '+labels[f];renderizar();lucide.createIcons()}
+
+async function init(){
+  try{
+    sessaoLogi=null;
+    perfilLogi={nome:'Administrador (modo de teste)',email:'',papel:'admin',ativo:true};
+    papelLogi='admin';
+    modoAdmin=true;
+    document.getElementById('logi-auth')?.classList.add('hidden');
+    document.body.classList.remove('role-user');
+    document.body.classList.add('role-admin');
+    const app=document.querySelector('body > .flex.min-h-screen');
+    if(app)app.style.display='';
+    const txt='HUB-LCE-04 • '+nomeMesAtual+' / '+anoAtual+' (Dia '+diaHoje+')';
+    const a=document.getElementById('label-mes-ano');if(a)a.innerText=txt;
+    const b=document.getElementById('label-mes-ano-sidebar');if(b)b.innerText=txt;
+    popularSelectFuncoesPorSetor();
+    await carregarDadosSupabase();
+    await carregarDiaristasDiaBanco();
+    atualizarBotaoModoAdmin();
+    setFiltro('todos');
+    const conta=document.getElementById('logi-admin-account');
+    if(conta)conta.classList.add('hidden');
+    lucide.createIcons();
+  }catch(e){
+    console.error('Falha ao iniciar modo de teste:',e);
+    toast('Não foi possível carregar os dados. Verifique a API do Netlify e a conexão com o Neon DB.','erro');
+    const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='';
+  }
+}
+
+async function carregarDadosSupabase(){
+  try{
+    const rc=await supabaseClient.from('colaboradores').select('*').order('nome');
+    if(rc.error)throw rc.error;
+
+    totalCadastroBanco=(rc.data||[]).length;
+
+    const inicioMes=anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-01';
+    const fimMes=anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(totalDiasDoMes).padStart(2,'0');
+
+    async function carregarPresencasDoMesCompleto(){
+      const todos=[];
+      const tamanhoPagina=1000;
+      let inicio=0;
+      while(true){
+        const rp=await supabaseClient
+          .from('presenca_diaria')
+          .select('*')
+          .gte('data',inicioMes)
+          .lte('data',fimMes)
+          .order('data',{ascending:true})
+          .range(inicio,inicio+tamanhoPagina-1);
+        if(rp.error)throw new Error('Erro ao carregar presenca_diaria: '+rp.error.message);
+        const parte=rp.data||[];
+        todos.push.apply(todos,parte);
+        if(parte.length<tamanhoPagina)break;
+        inicio+=tamanhoPagina;
+      }
+      return todos;
+    }
+    const presencas=await carregarPresencasDoMesCompleto();
+
+    const contagemPorDia={};
+    presencas.forEach(function(r){
+      const ds=String(r.data||'').slice(0,10);
+      if(!ds)return;
+      const d=Number(ds.slice(8,10));
+      if(d>=1&&d<=totalDiasDoMes&&d<=dataAtualSistema.getDate()){
+        contagemPorDia[d]=(contagemPorDia[d]||0)+1;
+      }
+    });
+    const diasComDados=Object.keys(contagemPorDia).map(Number).sort(function(a,b){return a-b});
+    if(diasComDados.length){
+      const maiorCarga=Math.max.apply(null,diasComDados.map(function(d){return contagemPorDia[d]}));
+      const minimoCarga=Math.max(1,Math.floor(maiorCarga*0.80));
+      const diasCompletos=diasComDados.filter(function(d){return contagemPorDia[d]>=minimoCarga});
+      if(diasCompletos.length)diaHoje=diasCompletos[diasCompletos.length-1];
+      else diaHoje=diasComDados[diasComDados.length-1];
+    }
+    const txtOperacional='HUB-LCE-04 • '+nomeMesAtual+' / '+anoAtual+' (Dia '+diaHoje+')';
+    const lm=document.getElementById('label-mes-ano'); if(lm)lm.innerText=txtOperacional;
+    const lms=document.getElementById('label-mes-ano-sidebar'); if(lms)lms.innerText=txtOperacional;
+
+    async function carregarHistoricoCompleto(){
+      const todos=[];
+      const tamanhoPagina=1000;
+      let inicio=0;
+      while(true){
+        const rh=await supabaseClient.from('historico_escala').select('*').range(inicio,inicio+tamanhoPagina-1);
+        if(rh.error){console.warn('LogiRotator: histórico de escala não carregado',rh.error);break;}
+        const parte=rh.data||[];
+        todos.push.apply(todos,parte);
+        if(parte.length<tamanhoPagina)break;
+        inicio+=tamanhoPagina;
+      }
+      return todos;
+    }
+    const historico=await carregarHistoricoCompleto();
+    historicoMovimentosGlobal=historico;
+    const diasMes=totalDiasDoMes;
+
+    colaboradores=(rc.data||[]).map(function(c){
+      const hd=new Array(diasMes).fill('-');
+      const pd=new Array(diasMes).fill('-');
+
+      presencas.forEach(function(r){
+        if(String(r.colaborador_id)!==String(c.id))return;
+        const dt=new Date(String(r.data).slice(0,10)+'T00:00:00');
+        if(dt.getFullYear()===anoAtual && dt.getMonth()===mesAtualIndex){
+          const d=dt.getDate();
+          if(d>=1&&d<=diasMes)pd[d-1]=String(r.status||'-').toUpperCase();
         }
+      });
 
-        function renderizarDashboard() {
-            const tbody = document.getElementById('tabela-colaboradores');
-            const dataHoje = new Date();
-
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('txt-data').innerText = dataHoje.toLocaleDateString('pt-BR', options);
-
-            let totalCollabs = colaboradoresData.length;
-            let totalTrabalhando = 0;
-            let totalDsr = 0;
-
-            tbody.innerHTML = '';
-
-            const colaboradoresProcessados = colaboradoresData.map(c => {
-                const emDsr = verificarSeEstaDeDSR(c, dataHoje);
-                return { ...c, emDsr };
-            });
-
-            colaboradoresProcessados.forEach(c => {
-                if (c.emDsr) totalDsr++;
-                else totalTrabalhando++;
-            });
-
-            document.getElementById('stat-total').innerText = totalCollabs;
-            document.getElementById('stat-trabalhando').innerText = totalTrabalhando;
-            document.getElementById('stat-dsr').innerText = totalDsr;
-
-            const filtrados = colaboradoresProcessados.filter(c => {
-                const matchNome = c.nome.toLowerCase().includes(termoBusca.toLowerCase());
-                if (!matchNome) return false;
-                if (filtroAtual === 'TRABALHANDO') return !c.emDsr;
-                if (filtroAtual === 'DSR') return c.emDsr;
-                return true;
-            });
-
-            if (filtrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum colaborador encontrado.</td></tr>`;
-                return;
-            }
-
-            filtrados.forEach(c => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-shopee-dark/40 transition-colors";
-
-                const statusEspecial = c.status
-                    ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">${c.status}</span>`
-                    : '';
-
-                const badgeStatus = c.emDsr
-                    ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-500/10 text-shopee-orange border border-shopee-orange/30"><i class="fa-solid fa-mug-hot mr-1.5"></i> DSR Hoje</span>`
-                    : `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"><i class="fa-solid fa-circle-check mr-1.5"></i> Trabalhando</span>`;
-
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-medium text-white">${c.nome}${statusEspecial}</td>
-                    <td class="py-3 px-4 text-gray-300 text-xs">${c.escala}</td>
-                    <td class="py-3 px-4 text-gray-300 text-xs font-semibold">${c.folga}</td>
-                    <td class="py-3 px-4 text-gray-400 text-xs">${c.domingoFixo || '—'}</td>
-                    <td class="py-3 px-4 text-gray-400 text-xs"><span class="bg-shopee-dark px-2 py-1 rounded border border-shopee-border">${c.operacao}</span></td>
-                    <td class="py-3 px-4 text-center">${badgeStatus}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+      historico.forEach(function(r){
+        if(String(r.colaborador_id)!==String(c.id))return;
+        const data=r.data || r.data_inicio;
+        if(!data)return;
+        const dt=new Date(String(data).slice(0,10)+'T00:00:00');
+        if(dt.getFullYear()===anoAtual && dt.getMonth()===mesAtualIndex){
+          const d=dt.getDate();
+          if(d>=1&&d<=diasMes)hd[d-1]=r.funcao || r.escala || r.turno || '-';
         }
+      });
 
-        function filtrarStatus(status) {
-            filtroAtual = status;
-            document.querySelectorAll('.filtro-btn').forEach(btn => {
-                const texto = btn.innerText.toUpperCase();
-                const ativo = (status === 'TODOS' && texto === 'TODOS') || texto.includes(status);
-                if (ativo) {
-                    btn.className = "filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-orange text-white transition-all whitespace-nowrap";
-                } else {
-                    btn.className = "filtro-btn px-4 py-2 rounded-lg text-xs font-semibold bg-shopee-dark border border-shopee-border text-gray-300 hover:bg-shopee-border transition-all whitespace-nowrap";
-                }
-            });
-            renderizarDashboard();
-        }
+      return {
+        id:c.id,
+        nome:c.nome,
+        escala:c.escala||'6x1',
+        horario:'Horário operacional: 00:00 - 07:54',
+        dsr:c.dsr||'Domingo',
+        domingoFixo:Number(c.domingo_fixo||0),  // ← NOVO: coluna domingo_fixo do banco
+        codigoSPX:String(c.codigo_spx||c.codigo||c.spx||c.matricula||'').trim().toUpperCase(),
+        email:c.email||'',
+        opsId:c.ops_id||'',
+        cargo:c.cargo||'',
+        funcao:c.funcao||'',
+        contrato:c.contrato||'',
+        station:c.station||'',
+        hub:c.hub||'',
+        subRegional:c.sub_regional||'',
+        ativo:c.ativo!==false,
+        historicoDias:hd,
+        presencaDias:pd,
+        movimentosDia:historico.filter(function(r){
+          return String(r.colaborador_id)===String(c.id) && String(r.data_inicio||r.data||'').slice(0,10)===String(anoAtual)+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(diaHoje).padStart(2,'0') && !!r.hora_inicio;
+        }).sort(function(a,b){return String(a.hora_inicio||'').localeCompare(String(b.hora_inicio||''));}),
+        origemExcelHoje:false
+      };
+    }).sort(function(a,b){return String(a.nome).localeCompare(String(b.nome),'pt-BR')});
 
-        document.getElementById('input-busca').addEventListener('input', (e) => {
-            termoBusca = e.target.value;
-            renderizarDashboard();
-        });
+    atualizarKPIs();
+  }catch(e){
+    console.error(e);
+    alert('Erro ao carregar o banco: '+e.message);
+  }
+}
 
-        window.onload = () => {
-            renderizarDashboard();
-        };
-    </script>
+function atualizarKPIs(){
+  const quadroHoje=colaboradoresOperacionaisHoje();
+  const totalAtual=colaboradoresOperacionaisMes().length;
+  const hoje=quadroHoje.map(function(c){return {c:c,status:obterStatusHoje(c)}});
+  const total=totalAtual;
+  const presentes=hoje.filter(function(x){return x.status==='presente'}).length;
+  const diaristas=hoje.filter(function(x){return x.status==='diarista'}).length;
+  const diaristasDia=getDiaristasDia();
+  const totalPresentes=presentes+diaristasDia.presentes;
+  const operacao=totalPresentes;
+  const dsr=hoje.filter(function(x){return x.status==='dsr'}).length;
+  const bh=hoje.filter(function(x){return x.status==='banco_horas'}).length;
+  const faltas=hoje.filter(function(x){return x.status==='falta'}).length;
+  const atestados=hoje.filter(function(x){return x.status==='atestado'}).length;
+
+  const vals={
+    'kpi-total':total,
+    'kpi-presentes':presentes,
+    'kpi-operacao':operacao,
+    'kpi-diaristas':diaristas,
+    'kpi-dsr':dsr,
+    'kpi-banco-horas':bh,
+    'kpi-faltas':faltas,
+    'kpi-atestados':atestados,
+    'badge-todos':total,
+    'badge-presentes':totalPresentes,
+    'badge-operacao':operacao,
+    'badge-diaristas':diaristas,
+    'badge-dsr':dsr,
+    'badge-faltas':faltas,
+    'badge-atestados':atestados,
+    'badge-todos-m':total,
+    'badge-presentes-m':presentes,
+    'badge-operacao-m':operacao,
+    'badge-diaristas-m':diaristas,
+    'badge-dsr-m':dsr,
+    'badge-faltas-m':faltas,
+    'badge-atestados-m':atestados
+  };
+  Object.keys(vals).forEach(function(id){
+    const el=document.getElementById(id); if(el)el.textContent=vals[id];
+  });
+  const pd=document.getElementById('kpi-presentes-detalhe'); if(pd)pd.textContent=totalPresentes+' de '+total;
+  const od=document.getElementById('kpi-operacao-detalhe'); if(od)od.textContent='Total de presentes hoje';
+}
+
+function popularSelectFuncoesPorSetor(def){const sel=document.getElementById('novo-funcao');sel.innerHTML="";let og=document.createElement('optgroup');og.label="Status Especiais";STATUS_ESPECIAIS.forEach(function(s){const o=document.createElement('option');o.value=s.valor;o.textContent=s.label;if(s.valor===def)o.selected=true;og.appendChild(o)});sel.appendChild(og);for(const setor of Object.keys(SETORES_E_FUNCOES)){const ogr=document.createElement('optgroup');ogr.label=setor;SETORES_E_FUNCOES[setor].forEach(function(f){const o=document.createElement('option');o.value=f;o.textContent=f;if(f===def)o.selected=true;ogr.appendChild(o)});sel.appendChild(ogr)}}
+
+function atualizarBotaoModoAdmin(){
+  const b=document.getElementById('btn-modo-admin');
+  if(!b)return;
+  b.innerHTML=modoAdmin ? '<i data-lucide="unlock" class="w-4 h-4"></i> Admin: desbloqueado' : '<i data-lucide="lock" class="w-4 h-4"></i> Admin: bloqueado';
+  b.className=modoAdmin ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+  if(window.lucide)lucide.createIcons();
+}
+function alternarModoAdmin(){
+  if(papelLogi!=='admin'){toast('Apenas administradores podem alterar a matriz.','erro');return;}
+  modoAdmin=true;atualizarBotaoModoAdmin();renderizarMatriz();toast('Acesso administrativo validado pela conta.','ok');
+}
+async function tentarAlterarDia(idColab,indexDia,el){
+  if(papelLogi!=='admin'){toast('Apenas administradores podem editar a matriz.','erro');renderizarMatriz();return;}
+  const numDia=indexDia+1;
+  const colab=colaboradores.find(function(c){return c.id===idColab});
+  if(!colab)return;
+  if(numDia<diaHoje && !modoAdmin){toast('Dia '+numDia+' está bloqueado. Somente o administrador pode alterar dias anteriores.','warn');renderizarMatriz();return;}
+  if(el.disabled)return;
+  el.disabled=true; el.style.opacity='0.5';
+  try{
+    const dataDoDia=new Date(anoAtual,mesAtualIndex,numDia);
+    const nf=el.value;
+    const eDSR=isDiaDSR(colab.dsr,dataDoDia);
+    if(eDSR&&!isStatusEspecial(nf)){toast(colab.nome+' esta de DSR.','warn');renderizarMatriz();return;}
+    if(!isStatusEspecial(nf)){
+      const st=contarDiasNaFuncaoAtual(colab.historicoDias);
+      if(st.dias>=LIMITE_DIAS_FUNCAO&&nf===st.funcao){toast('Limite de '+LIMITE_DIAS_FUNCAO+' dias.','warn');renderizarMatriz();return;}
+    }
+    await atualizarDiaSupabase(idColab,numDia,nf);
+    colab.historicoDias[indexDia]=nf;
+    renderizarMatriz();
+  }catch(e){console.error(e);toast('Erro: '+(e.message||e),'erro');renderizarMatriz();}
+}
+
+async function atualizarDiaSupabase(colabId,dia,funcao){
+  if(String(colabId||'').startsWith('excel-')){
+    throw new Error('Este colaborador existe somente no Excel e ainda não possui vínculo com o cadastro do banco.');
+  }
+
+  if(isStatusEspecial(funcao)){
+    throw new Error('A presença é somente leitura nesta grade. Use a aba Presentes para alterar o status.');
+  }
+
+  const dataStr=anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(dia).padStart(2,'0');
+  let setor='Recebimento';
+  for(const s of Object.keys(SETORES_E_FUNCOES)){
+    if(SETORES_E_FUNCOES[s].includes(funcao)){setor=s;break}
+  }
+
+  const existente=await supabaseClient
+    .from('historico_escala')
+    .select('id')
+    .eq('colaborador_id',colabId)
+    .eq('data_inicio',dataStr)
+    .is('hora_inicio',null)
+    .limit(1);
+
+  if(existente.error) throw existente.error;
+
+  let r;
+  if(existente.data && existente.data.length){
+    r=await supabaseClient.from('historico_escala')
+      .update({data_fim:dataStr,setor:setor,funcao:funcao})
+      .eq('id',existente.data[0].id);
+  }else{
+    r=await supabaseClient.from('historico_escala').insert([{
+      colaborador_id:colabId,
+      data_inicio:dataStr,
+      data_fim:dataStr,
+      setor:setor,
+      funcao:funcao,
+      hora_inicio:null,
+      hora_fim:null
+    }]);
+  }
+  if(r.error) throw r.error;
+}
+
+function escaparHtmlLogi(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function duracaoMovimentoLogi(inicio,fim){
+  if(!inicio)return '--';
+  const a=opMin(inicio);let b=fim?opMin(fim):opMin(opAgora());
+  if(a==null||b==null)return '--';
+  if(b<a)b+=1440;
+  const total=Math.max(0,b-a);return String(Math.floor(total/60)).padStart(2,'0')+'h'+String(total%60).padStart(2,'0');
+}
+function htmlLinhaTempoSetores(c){
+  const rows=Array.isArray(c.movimentosDia)?c.movimentosDia:[];
+  if(!rows.length)return '<div class="mt-2 rounded-lg border border-slate-800 bg-slate-950/70 p-2 text-[10px] text-slate-500">Nenhum ponto por setor registrado ainda. A primeira alocação iniciará o ponto.</div>';
+  return '<div class="mt-2 rounded-lg border border-slate-800 bg-slate-950/70 p-2.5"><div class="text-[9px] uppercase tracking-wider font-bold text-slate-400 mb-2">Ponto por setor · 00:00–07:54</div>'+
+    rows.map(function(r,i){
+      const aberto=!r.hora_fim;const ini=String(r.hora_inicio||'--:--').slice(0,5);const fim=aberto?'Em operação':String(r.hora_fim).slice(0,5);const func=escaparHtmlLogi(r.funcao||r.setor||'Setor não informado');const setor=escaparHtmlLogi(r.setor||setorDaFuncao(r.funcao||''));
+      return '<div class="flex gap-2 '+(i?'border-t border-slate-800 pt-2 mt-2':'')+'"><div class="pt-1"><span class="block w-2 h-2 rounded-full '+(aberto?'bg-emerald-400':'bg-cyan-400')+'"></span></div><div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2"><span class="text-[10px] font-bold text-slate-200">'+func+'</span>'+(aberto?'<span class="badge badge-success">EM OPERAÇÃO</span>':'')+'</div><div class="text-[9px] text-slate-400">'+setor+' · '+ini+' → '+fim+'</div><div class="text-[9px] text-cyan-300 mt-0.5">Permanência: '+duracaoMovimentoLogi(r.hora_inicio,r.hora_fim)+'</div></div></div>';
+    }).join('')+'</div>';
+}
+function cardColaborador(c,cor){
+  const mapa={orange:{label:'DSR',badge:'badge-orange'},yellow:{label:'FALTA',badge:'badge-warning'},red:{label:'ATESTADO',badge:'badge-danger'},purple:{label:'BANCO DE HORAS',badge:'badge-purple'},operacao:{label:'EM OPERAÇÃO',badge:'badge-success'},presente:{label:'PRESENTE',badge:'badge-success'}};
+  const info=mapa[cor]||{label:cor||'STATUS',badge:'badge-default'};
+  const pres=(c.presencaDias&&c.presencaDias[diaHoje-1])||'-';let detalhe=info.label;if(pres&&pres!=='-')detalhe=pres+' · '+info.label;
+  const nome=escaparHtmlLogi(c.nome),escala=escaparHtmlLogi(c.escala||''),dsr=escaparHtmlLogi(c.dsr||'-');
+  const horario='Horário operacional: 00:00 - 07:54';
+  return '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-start justify-between gap-3"><div class="min-w-0 flex-1">'+
+    '<div class="text-xs font-bold text-slate-100 break-words">'+nome+'</div><div class="text-[10px] text-slate-400 mt-1">Escala: '+escala+' · DSR: '+dsr+'</div><div class="text-[10px] text-slate-500 mt-0.5">'+horario+'</div><div class="text-[10px] text-amber-400 font-semibold mt-1">'+detalhe+'</div>'+
+    (cor==='operacao'?htmlLinhaTempoSetores(c)+'<div class="mt-2"><button type="button" onclick="abrirModalAlterarSetor(\''+c.id+'\')" class="btn btn-secondary btn-sm w-full"><i data-lucide="arrow-right-left" class="w-3 h-3"></i> Alterar setor</button></div>':'')+
+    '</div><div class="flex flex-col items-end gap-2 shrink-0"><span class="badge '+info.badge+'">'+info.label+'</span></div></div>';
+}
+
+function criarBloco(titulo,subtitulo,itens,cor,icon,bt){if(itens.length===0)return null;const bloco=document.createElement('div');const cls={orange:'bg-orange-950/20 border-orange-500/40',yellow:'bg-yellow-950/20 border-yellow-500/40',red:'bg-red-950/20 border-red-500/40',purple:'bg-purple-950/20 border-purple-500/40',slate:'bg-slate-900/60 border-slate-700'}[cor]||'bg-slate-900/60 border-slate-800';bloco.className=cls+' border rounded-2xl p-4 shadow-xl';const iconMap={orange:'text-orange-400',yellow:'text-yellow-400',red:'text-red-400',purple:'text-purple-400',slate:'text-slate-400'};const badgeMap={orange:'badge-orange',yellow:'badge-warning',red:'badge-danger',purple:'badge-purple',slate:'badge-default'};bloco.innerHTML='<div class="flex items-center justify-between pb-3 mb-3 border-b flex-wrap gap-2 '+(cor==='orange'?'border-orange-500/30':cor==='yellow'?'border-yellow-500/30':cor==='red'?'border-red-500/30':cor==='purple'?'border-purple-500/30':'border-slate-700/30')+'"><h2 class="text-sm font-bold flex items-center gap-2 '+(iconMap[cor]||'text-slate-400')+'">'+icon+' '+titulo+' <span class="text-[10px] font-normal opacity-70">'+(subtitulo||'')+'</span></h2><span class="badge '+(badgeMap[cor]||'badge-default')+'">'+bt+'</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">'+itens.map(function(c){return cardColaborador(c,cor)}).join('')+'</div>';return bloco}
+
+function criarBlocoDiaristas(){const d=getDiaristasDia();const total=d.presentes+d.faltantes;const pd=d.pedidos>0;const dif=d.presentes-d.pedidos;const exc=d.presentes>=d.pedidos&&d.pedidos>0;let status='';let cs='';if(d.pedidos===0){status='Defina o pedido';cs='text-slate-400'}else if(dif===0){status='Meta atendida';cs='text-emerald-400'}else if(dif>0){status=dif+' alem';cs='text-cyan-400'}else{status='Faltam '+Math.abs(dif)+' do pedido';cs='text-yellow-400'}const bloco=document.createElement('div');bloco.className='bg-cyan-950/20 border border-cyan-500/40 rounded-2xl p-4 shadow-xl';const clP=pd&&!exc?'bg-slate-900 border border-emerald-500/40 cursor-pointer active:scale-[0.98]':'bg-slate-900 border border-slate-800 opacity-60 cursor-not-allowed';const clF=pd?'bg-slate-900 border border-red-500/40 cursor-pointer active:scale-[0.98]':'bg-slate-900 border border-slate-800 opacity-60 cursor-not-allowed';bloco.innerHTML='<div class="flex items-center justify-between pb-3 mb-3 border-b border-cyan-500/30 flex-wrap gap-2"><h2 class="text-sm font-bold text-cyan-400">Diaristas Hoje <span class="text-[10px] font-normal opacity-70">- quantidades por dia</span></h2><span class="badge badge-info">'+total+' registrado(s)</span></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl"><button onclick="abrirModalDiaristasPedidos()" class="text-left bg-slate-900 border border-cyan-500/40 rounded-xl p-3.5 cursor-pointer active:scale-[0.98]"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-cyan-400 font-bold">Pedidos</span><i data-lucide="edit-3" class="w-4 h-4 text-cyan-400"></i></div><div class="text-3xl font-extrabold text-cyan-300">'+d.pedidos+'</div><div class="text-[10px] '+cs+' font-semibold mt-1">'+status+'</div></button><button onclick="'+(pd&&!exc?"abrirModalAddDiarista('presente')":'')+'" '+(pd&&!exc?'':'disabled')+' class="text-left rounded-xl p-3.5 transition '+clP+'"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-emerald-400 font-bold">Presentes</span><i data-lucide="edit-3" class="w-4 h-4 text-emerald-400"></i></div><div class="text-3xl font-extrabold text-emerald-300">'+d.presentes+'</div><div class="text-[10px] text-slate-500 mt-1">'+(pd?'de '+d.pedidos+' pedido(s)':'sem pedido')+' · somam em <span class="text-emerald-400 font-bold">Operação</span></div></button><button onclick="'+(pd?"abrirModalAddDiarista('faltou')":'')+'" '+(pd?'':'disabled')+' class="text-left rounded-xl p-3.5 transition '+clF+'"><div class="flex items-center justify-between mb-2"><span class="text-[10px] uppercase text-red-400 font-bold">Faltaram</span><i data-lucide="edit-3" class="w-4 h-4 text-red-400"></i></div><div class="text-3xl font-extrabold text-red-300">'+d.faltantes+'</div><div class="text-[10px] text-slate-500 mt-1">Total: '+total+' · somam em <span class="text-yellow-400 font-bold">Faltas</span></div></button></div>'+(pd?'':'<div class="mt-3 pt-3 border-t border-cyan-500/20 text-[11px] text-yellow-400">Defina primeiro a quantidade de diaristas pedidos.</div>');return bloco}
+
+// ============================================================
+// ABA PRESENTES COM SELECT INTERATIVO DE STATUS (Legenda Oficial)
+// ============================================================
+function criarListaPresentes(colsOperacao) {
+  const d = getDiaristasDia();
+  const bloco = document.createElement('div');
+  bloco.className = 'bg-emerald-950/20 border border-emerald-500/40 rounded-2xl p-4 shadow-xl';
+  
+  const totalPres = colsOperacao.length + d.presentes;
+  let h = '<div class="flex items-center justify-between pb-3 mb-3 border-b border-emerald-500/30 flex-wrap gap-2"><h2 class="text-sm font-bold text-emerald-400 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Presentes Hoje <span class="text-[10px] font-normal opacity-70">- alteração rápida de presença</span></h2><span class="badge badge-success">' + totalPres + ' presente(s)</span></div>';
+  
+  h += '<div class="grid grid-cols-2 gap-2 mb-3">';
+  h += '<div class="bg-slate-900 border border-emerald-500/30 rounded-lg p-2"><div class="text-[10px] uppercase text-emerald-400 font-bold">Escalados</div><div class="text-xl font-extrabold text-emerald-300">' + colsOperacao.length + '</div></div>';
+  h += '<div class="bg-slate-900 border border-cyan-500/30 rounded-lg p-2"><div class="text-[10px] uppercase text-cyan-400 font-bold">Diaristas</div><div class="text-xl font-extrabold text-cyan-300">' + d.presentes + '</div></div>';
+  h += '</div>';
+  
+  if (totalPres === 0) {
+    h += '<p class="text-xs text-slate-500 italic py-4 text-center">Nenhum presente hoje.</p>';
+    bloco.innerHTML = h;
+    return bloco;
+  }
+  
+  h += '<div class="space-y-2">';
+  
+  colsOperacao.forEach(function(c) {
+    const statusAtual = (c.presencaDias && c.presencaDias[diaHoje - 1]) || 'P';
+    const funcaoStatus = contarDiasNaFuncaoAtual(c.historicoDias);
+    const funcao = funcaoStatus.funcao || '-';
+    const alocadoSetor = isFuncaoAlocada(funcao);
+    
+    let optionsHtml = '';
+    STATUS_ESPECIAIS.forEach(function(s) {
+      optionsHtml += '<option value="' + s.valor + '" ' + (s.valor === statusAtual ? 'selected' : '') + '>' + s.label + '</option>';
+    });
+    
+    h += '<div class="bg-slate-900 border border-emerald-500/30 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">';
+    h += '<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-100 truncate">' + c.nome + '</div>';
+    h += '<div class="text-[10px] text-slate-400 truncate">' + c.escala + ' · DSR: ' + c.dsr + '</div>';
+    h += '<div class="text-[10px] ' + (alocadoSetor ? 'text-amber-400' : 'text-slate-500') + ' font-semibold mt-0.5">Função: <strong>' + (alocadoSetor ? funcao : 'Sem setor') + '</strong></div></div>';
+    
+    h += '<div class="flex items-center gap-2 w-full sm:w-auto justify-end">';
+    h += '<select onchange="alterarPresencaRapida(\'' + c.id + '\', this.value)" class="select text-xs bg-slate-950 border-slate-700 text-slate-200 py-1 px-2 rounded-lg">' + optionsHtml + '</select>';
+    h += '</div>';
+    
+    h += '</div>';
+  });
+  
+  for (let i = 1; i <= d.presentes; i++) {
+    h += '<div class="bg-slate-900 border border-cyan-500/30 rounded-xl p-3 flex items-center justify-between gap-2">';
+    h += '<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-100">Diarista ' + i + '</div>';
+    h += '<div class="text-[10px] text-slate-400">Sem cadastro · alocado por quantidade</div>';
+    h += '<div class="text-[10px] text-amber-400 font-semibold mt-0.5">Função: <strong>Diarista</strong></div></div>';
+    h += '<span class="badge badge-info shrink-0">Diarista</span>';
+    h += '</div>';
+  }
+  
+  h += '</div>';
+  bloco.innerHTML = h;
+  return bloco;
+}
+
+// Função para gravar a alteração rápida de presença no banco Neon
+async function alterarPresencaRapida(colabId, novoStatus) {
+  try {
+    const dataStr = anoAtual + '-' + String(mesAtualIndex + 1).padStart(2, '0') + '-' + String(diaHoje).padStart(2, '0');
+    
+    const r = await supabaseClient.from('presenca_diaria').upsert({
+      colaborador_id: colabId,
+      data: dataStr,
+      status: novoStatus
+    }, { onConflict: 'colaborador_id,data' });
+
+    if (r.error) throw r.error;
+
+    const colab = colaboradores.find(function(c) { return String(c.id) === String(colabId); });
+    if (colab) {
+      if (!colab.presencaDias) colab.presencaDias = new Array(totalDiasDoMes).fill('-');
+      colab.presencaDias[diaHoje - 1] = novoStatus;
+    }
+
+    toast('Status de presença alterado para ' + novoStatus, 'ok');
+    renderizar();
+  } catch (e) {
+    console.error(e);
+    toast('Erro ao alterar presença: ' + (e.message || e), 'erro');
+    renderizar();
+  }
+}
+
+function criarListaGeral(cols) {
+  const bloco = document.createElement('div');
+  bloco.className = 'bg-amber-950/10 border-2 border-amber-500/40 rounded-2xl p-4 shadow-2xl';
+  
+  let h = '<div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-500/30 flex-wrap gap-2"><h2 class="text-sm font-bold text-amber-400 flex items-center gap-2"><i data-lucide="layout-grid" class="w-4 h-4"></i> Lista Geral <span class="text-[10px] font-normal opacity-70">- todos os logistas</span></h2><span class="badge badge-warning">' + cols.length + ' colaborador(es)</span></div>';
+  
+  if (cols.length === 0) {
+    h += '<p class="text-xs text-slate-500 italic py-4 text-center">Nenhum colaborador cadastrado.</p>';
+    bloco.innerHTML = h;
+    return bloco;
+  }
+  
+  const contagem = {operacao:0, dsr:0, falta:0, atestado:0, ferias:0, afastamento:0, banco_horas:0, outro_status:0, sem_escala:0};
+  cols.forEach(function(c){ const st = obterStatusHoje(c); if (contagem[st] !== undefined) contagem[st]++; });
+  
+  h += '<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 mb-3">';
+  h += '<div class="bg-slate-900 border border-emerald-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-emerald-400 font-bold">Operação</div><div class="text-lg font-extrabold text-emerald-300">' + contagem.operacao + '</div></div>';
+  h += '<div class="bg-slate-900 border border-orange-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-orange-400 font-bold">DSR</div><div class="text-lg font-extrabold text-orange-300">' + contagem.dsr + '</div></div>';
+  h += '<div class="bg-slate-900 border border-yellow-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-yellow-400 font-bold">Faltas</div><div class="text-lg font-extrabold text-yellow-300">' + contagem.falta + '</div></div>';
+  h += '<div class="bg-slate-900 border border-red-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-red-400 font-bold">Atestados</div><div class="text-lg font-extrabold text-red-300">' + contagem.atestado + '</div></div>';
+  h += '<div class="bg-slate-900 border border-purple-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-purple-400 font-bold">Férias</div><div class="text-lg font-extrabold text-purple-300">' + contagem.ferias + '</div></div>';
+  h += '<div class="bg-slate-900 border border-slate-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-slate-400 font-bold">Afast.</div><div class="text-lg font-extrabold text-slate-300">' + contagem.afastamento + '</div></div>';
+  h += '<div class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-slate-400 font-bold">Outros status</div><div class="text-lg font-extrabold text-slate-300">' + (contagem.outro_status + contagem.sem_escala + contagem.banco_horas) + '</div></div>';
+  h += '</div>';
+  
+  h += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">';
+  cols.forEach(function(c){
+    const st = obterStatusHoje(c);
+    const statusInfo = {
+      operacao: {tipo:'operacao', label:'Em Operação', badge:'badge-success'},
+      presente: {tipo:'presente', label:'PRESENTE', badge:'badge-success'},
+      dsr: {tipo:'dsr', label:'DSR', badge:'badge-orange'},
+      falta: {tipo:'falta', label:'FALTA', badge:'badge-warning'},
+      atestado: {tipo:'atestado', label:'ATESTADO', badge:'badge-danger'},
+      ferias: {tipo:'ferias', label:'Férias', badge:'badge-purple'},
+      afastamento: {tipo:'afastamento', label:'Afastamento', badge:'badge-default'},
+      banco_horas: {tipo:'banco_horas', label:'Banco de Horas', badge:'badge-purple'},
+      outro_status: {tipo:'outro_status', label:'Outro status', badge:'badge-default'},
+      sem_escala: {tipo:'sem_escala', label:'Sem informação no Excel', badge:'badge-default'}
+    }[st] || {tipo:'sem_escala', label:'-', badge:'badge-default'};
+    
+    const rawPresenca = String((c.presencaDias&&c.presencaDias[diaHoje-1]) || '-').toUpperCase();
+    const labelsPresenca = {
+      'P':'Presente (P)', 'AF':'Afastamento (AF)', 'AL':'Afastamento longo (AL)', 'AM':'Atestado médico (AM)',
+      'BH':'Banco de Horas (BH)', 'DF':'Desligamento forçado (DF)', 'DP':'Desligamento Programado (DP)',
+      'DSR':'Descanso Semanal Remunerado (DSR)', 'DV':'Desligamento voluntário (DV)',
+      'F':'Falta Injustificada (F)', 'FE':'Férias (FE)', 'FJ':'Falta Justificada (FJ)', 'FO':'Folga (FO)',
+      'NC':'Não Contratado (NC)', 'NS':'No-Show (NS)', 'PR':'Promoção (PR)', 'S1':'Sinergia Enviada (S1)',
+      'S2':'Sinergia Recebida (S2)', 'TR':'Transferência (TR)', 'TD':'Treinamento e desenvolvimento (TD)',
+      'SU':'Suspensão (SU)', 'FC':'Folga compensatória (FC)', 'IN':'Internalização (IN)', '-':'Sem informação de presença'
+    };
+    const statusLabel = labelsPresenca[rawPresenca] || rawPresenca;
+    
+    h += '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-start justify-between gap-2">';
+    h += '<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-100 truncate">' + c.nome + '</div>';
+    h += '<div class="text-[10px] text-slate-400 truncate">' + c.escala + ' · DSR: ' + c.dsr + '</div>';
+    h += '<div class="text-[10px] text-slate-500 mt-0.5 truncate">' + c.horario + '</div>';
+    h += '<div class="text-[10px] text-amber-400 font-semibold mt-1">' + statusLabel + '</div></div>';
+    h += '<span class="badge ' + statusInfo.badge + ' shrink-0">' + statusLabel + '</span>';
+    h += '</div>';
+  });
+  h += '</div>';
+  
+  bloco.innerHTML = h;
+  return bloco;
+}
+
+function renderizar(){
+const termo=normalizarTexto(document.getElementById('input-busca').value);
+const cont=document.getElementById('container-setores');
+cont.innerHTML="";
+const g={presente:[],operacao:[],dsr:[],banco_horas:[],falta:[],atestado:[],ferias:[],afastamento:[],outro_status:[],sem_escala:[]};
+const quadroHoje=colaboradoresOperacionaisHoje();
+const totalEquipeAtual=colaboradoresOperacionaisMes().length;
+quadroHoje.forEach(function(c){const t=obterStatusHoje(c);if(g[t])g[t].push(c);if(estaEmOperacaoHoje(c))g.operacao.push(c)});
+const fl=function(l){return l.filter(function(c){return matchBuscaAvancada(termo,c.nome,c.escala,c.dsr,c.horario)})};
+const pF=fl(g.presente);const oF=fl(g.operacao);const dF=fl(g.dsr);const bhF=fl(g.banco_horas);const fF=fl(g.falta);const aF=fl(g.atestado);const feF=fl(g.ferias);const afF=fl(g.afastamento);const otF=fl(g.outro_status);const seF=fl(g.sem_escala);
+const dd=getDiaristasDia();
+const td=dd.presentes;
+const totalPresentes=g.presente.length+dd.presentes;
+document.getElementById('kpi-total').innerText=totalEquipeAtual;
+document.getElementById('kpi-presentes').innerText=totalPresentes;
+document.getElementById('kpi-operacao').innerText=totalPresentes;
+document.getElementById('kpi-dsr').innerText=g.dsr.length;
+document.getElementById('kpi-banco-horas').innerText=g.banco_horas.length;
+document.getElementById('kpi-faltas').innerText=g.falta.length+dd.faltantes;
+document.getElementById('kpi-atestados').innerText=g.atestado.length;
+document.getElementById('kpi-diaristas').innerText=td;
+const detP=document.getElementById('kpi-presentes-detalhe');
+if(detP)detP.innerText=g.presente.length+' PHD + '+dd.presentes+' diar.';
+const det=document.getElementById('kpi-operacao-detalhe');
+if(det)det.innerText='Total de presentes hoje';
+const bg={'badge-todos':totalEquipeAtual,'badge-presentes':totalPresentes,'badge-operacao':totalPresentes,'badge-dsr':g.dsr.length,'badge-faltas':g.falta.length+dd.faltantes,'badge-atestados':g.atestado.length,'badge-diaristas':td};
+Object.keys(bg).forEach(function(id){const el=document.getElementById(id);if(el)el.innerText=bg[id];const elM=document.getElementById(id+'-m');if(elM)elM.innerText=bg[id]});
+
+if(termo){
+  const m=[].concat(
+    pF.map(function(c){return{c:c,tipo:'presente'}}),
+    oF.map(function(c){return{c:c,tipo:'operacao'}}),
+    dF.map(function(c){return{c:c,tipo:'dsr'}}),
+    bhF.map(function(c){return{c:c,tipo:'banco_horas'}}),
+    fF.map(function(c){return{c:c,tipo:'falta'}}),
+    aF.map(function(c){return{c:c,tipo:'atestado'}}),
+    feF.map(function(c){return{c:c,tipo:'ferias'}}),
+    afF.map(function(c){return{c:c,tipo:'afastamento'}}),
+    otF.map(function(c){return{c:c,tipo:'outro_status'}}),
+    seF.map(function(c){return{c:c,tipo:'sem_escala'}})
+  );
+  const fM={'todos':null,'presentes':'presente','operacao':'operacao','diaristas':null,'dsr':'dsr','banco_horas':'banco_horas','faltas':'falta','atestados':'atestado'};
+  const tp=fM[filtroAtivo];
+  const filt=tp?m.filter(function(x){return x.tipo===tp}):m;
+  if(filt.length===0){cont.innerHTML='<p class="text-center text-slate-500 italic py-8">Nenhum resultado.</p>';lucide.createIcons();return}
+  const b=document.createElement('div');b.className='bg-amber-950/10 border-2 border-amber-500/40 rounded-2xl p-4 shadow-2xl';
+  b.innerHTML='<div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-500/30"><h2 class="text-sm font-bold text-amber-400">Resultados</h2><span class="badge badge-warning">'+filt.length+'</span></div><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">'+filt.map(function(x){return cardColaborador(x.c,x.tipo)}).join('')+'</div>';
+  cont.appendChild(b);lucide.createIcons();return;
+}
+
+if(filtroAtivo==='todos'){
+  const todosVisiveis = [].concat(pF, oF, dF, bhF, fF, aF, feF, afF, otF, seF);
+  cont.appendChild(criarListaGeral(todosVisiveis));
+  return;
+}
+
+if(filtroAtivo==='presentes'){
+  cont.appendChild(criarListaPresentes([].concat(pF,oF)));
+  return;
+}
+
+if(filtroAtivo==='operacao'){
+  renderizarSetores(oF,cont,true);
+  return;
+}
+
+if(filtroAtivo==='diaristas'){
+  cont.appendChild(criarBlocoDiaristas());
+  return;
+}
+
+if(filtroAtivo==='dsr'){
+  if(dF.length>0){const b=criarBloco('Em DSR Hoje','nao podem ser escalados',dF,'orange','',dF.length);if(b)cont.appendChild(b);}
+  else cont.innerHTML='<p class="text-center text-slate-500 italic py-8">Nenhum em DSR hoje.</p>';
+  return;
+}
+if(filtroAtivo==='banco_horas'){
+  if(bhF.length>0){const b=criarBloco('Banco de Horas Hoje','status BH',bhF,'purple','<i data-lucide="clock-3" class="w-4 h-4"></i>',bhF.length);if(b)cont.appendChild(b);}
+  else cont.innerHTML='<div class="text-center text-slate-500 py-10">Nenhum colaborador em Banco de Horas (BH) hoje.</div>';
+  lucide.createIcons();return;
+}
+if(filtroAtivo==='faltas'){
+  if(fF.length>0){const b=criarBloco('Faltas Hoje','Falta Injustificada (F) e Falta Justificada (FJ)',fF,'yellow','',fF.length);if(b)cont.appendChild(b);}
+  else cont.innerHTML='<p class="text-center text-slate-500 italic py-8">Nenhuma falta.</p>';
+  return;
+}
+if(filtroAtivo==='atestados'){
+  if(aF.length>0){const b=criarBloco('Atestados Hoje','ausencias justificadas',aF,'red','',aF.length);if(b)cont.appendChild(b);}
+  else cont.innerHTML='<p class="text-center text-slate-500 italic py-8">Nenhum atestado.</p>';
+  return;
+}
+lucide.createIcons();
+}
+
+function renderizarSetores(cols,cont,forcarTodos){
+  const setoresComColabs={};
+  for(const setor of Object.keys(SETORES_E_FUNCOES)){
+    const funcs=SETORES_E_FUNCOES[setor];
+    const cs=cols.filter(function(c){const f=c.historicoDias[diaHoje-1]||"-";return funcs.includes(f)});
+    if(cs.length>0||forcarTodos)setoresComColabs[setor]=cs;
+  }
+
+  for(const setor of Object.keys(setoresComColabs)){
+    const cs=setoresComColabs[setor];
+    const b=document.createElement('div');
+    b.className='bg-slate-900/60 border border-slate-800 rounded-2xl p-4 shadow-xl';
+    const esc=setor.replace(/'/g,"\\'");
+    b.innerHTML='<div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 flex-wrap gap-2"><h2 class="text-sm font-bold text-amber-400">'+setor+'</h2><div class="flex items-center gap-2"><span class="badge '+(cs.length>0?'badge-success':'badge-default')+'">'+cs.length+' operador(es)</span><button onclick="abrirModalAlocar(\''+esc+'\')" class="btn btn-primary btn-sm"><i data-lucide="user-plus" class="w-3 h-3"></i> Adicionar</button></div></div>'+(cs.length===0?'<p class="text-xs text-slate-500 italic py-2">Nenhum operador alocado. Clique em <strong>Adicionar</strong> para alocar.</p>':'<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">'+cs.map(function(c){return cardColaborador(c,'operacao')}).join('')+'</div>');
+    cont.appendChild(b);
+  }
+}
+function abrirModalAdd(){document.getElementById('edit-id').value='';document.getElementById('modal-titulo').innerHTML='Adicionar Auxiliar';document.getElementById('input-nome-colab').value='';document.getElementById('select-escala').value='6x1';document.getElementById('select-dsr').value='Domingo';document.getElementById('input-horario').value='00:00 - 07:54';document.getElementById('campos-add-extras').classList.remove('hidden');popularSelectFuncoesPorSetor();document.getElementById('modal-add').classList.remove('hidden');lucide.createIcons()}
+function abrirModalEditar(id){const c=colaboradores.find(function(x){return x.id===id});if(!c)return;document.getElementById('edit-id').value=c.id;document.getElementById('modal-titulo').innerHTML='Alterar Auxiliar';document.getElementById('input-nome-colab').value=c.nome;document.getElementById('campos-add-extras').classList.add('hidden');const f=c.historicoDias[diaHoje-1]||"-";popularSelectFuncoesPorSetor(f);document.getElementById('modal-add').classList.remove('hidden');lucide.createIcons()}
+function fecharModalAdd(){document.getElementById('modal-add').classList.add('hidden')}
+function abrirModalAlocar(setor){document.getElementById('alocar-setor').value=setor;document.getElementById('alocar-titulo').innerHTML='Alocar em '+setor;document.getElementById('alocar-busca').value='';alocarColabSelecionadoId=null;const sel=document.getElementById('alocar-funcao');sel.innerHTML='';(SETORES_E_FUNCOES[setor]||[]).forEach(function(f){const o=document.createElement('option');o.value=f;o.textContent=f;sel.appendChild(o)});filtrarColabsAlocar();document.getElementById('modal-alocar').classList.remove('hidden');lucide.createIcons();setTimeout(function(){document.getElementById('alocar-busca').focus()},100)}
+
+async function registrarMovimentacaoSetorHoje(colabId,funcao){
+  if(String(colabId||'').startsWith('excel-'))throw new Error('Colaborador sem vínculo com o cadastro do banco.');
+  if(isStatusEspecial(funcao))throw new Error('A presença não pode ser alterada pela movimentação de setor.');
+  const dataStr=String(anoAtual)+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(diaHoje).padStart(2,'0');
+  const agora=opAgora();
+  const q=await supabaseClient.from('historico_escala').select('*').eq('colaborador_id',colabId).eq('data_inicio',dataStr).not('hora_inicio','is',null).is('hora_fim',null).order('hora_inicio',{ascending:false}).limit(1);
+  if(q.error)throw q.error;
+  const aberto=(q.data||[])[0];
+  if(aberto&&String(aberto.funcao||'')===String(funcao))return agora;
+  if(aberto){const fecha=await supabaseClient.from('historico_escala').update({hora_fim:agora,data_fim:dataStr}).eq('id',aberto.id);if(fecha.error)throw fecha.error;}
+  const novo=await supabaseClient.from('historico_escala').insert([{colaborador_id:colabId,data_inicio:dataStr,data_fim:dataStr,setor:setorDaFuncao(funcao),funcao:funcao,hora_inicio:agora,hora_fim:null}]);
+  if(novo.error)throw novo.error;
+  return agora;
+}
+async function recarregarMovimentosCard(c){
+  const dataStr=String(anoAtual)+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(diaHoje).padStart(2,'0');
+  const r=await supabaseClient.from('historico_escala').select('*').eq('colaborador_id',c.id).eq('data_inicio',dataStr).not('hora_inicio','is',null).order('hora_inicio',{ascending:true});
+  if(r.error)throw r.error;c.movimentosDia=r.data||[];
+}
+
+function abrirModalAlterarSetor(id){
+  const c=colaboradores.find(function(x){return x.id===id});
+  if(!c)return;
+  const atual=c.historicoDias[diaHoje-1]||'';
+  document.getElementById('alterar-setor-id').value=id;
+  document.getElementById('alterar-setor-titulo').innerHTML='Alterar setor — '+c.nome;
+  const sel=document.getElementById('alterar-setor-funcao');
+  sel.innerHTML='';
+  for(const setor of Object.keys(SETORES_E_FUNCOES)){
+    const g=document.createElement('optgroup');
+    g.label=setor;
+    SETORES_E_FUNCOES[setor].forEach(function(f){
+      const o=document.createElement('option');o.value=f;o.textContent=f;if(f===atual)o.selected=true;g.appendChild(o);
+    });
+    sel.appendChild(g);
+  }
+  document.getElementById('alterar-setor-atual').textContent=atual||'Sem setor';
+  document.getElementById('modal-alterar-setor').classList.remove('hidden');
+  lucide.createIcons();
+}
+function fecharModalAlterarSetor(){document.getElementById('modal-alterar-setor').classList.add('hidden')}
+async function confirmarAlteracaoSetor(){
+  const id=document.getElementById('alterar-setor-id').value;
+  const nova=document.getElementById('alterar-setor-funcao').value;
+  const c=colaboradores.find(function(x){return x.id===id});
+  if(!c||!nova)return;
+  const atual=c.historicoDias[diaHoje-1]||'';
+  if(atual===nova){toast('O LOGI já está nessa função.','warn');return}
+  const btn=document.querySelector('#modal-alterar-setor button[onclick="confirmarAlteracaoSetor()"]');
+  if(btn)btn.disabled=true;
+  try{
+    const st=obterStatusHoje(c);
+    if(st!=='presente'){toast(c.nome+' não pode ser alterado neste status.','warn');return}
+    const hora=await registrarMovimentacaoSetorHoje(id,nova);
+    await recarregarMovimentosCard(c);
+    c.historicoDias[diaHoje-1]=nova;
+    toast(c.nome+' alterado para '+nova+' às '+hora.slice(0,5)+'.','ok');
+    fecharModalAlterarSetor();
+    renderizar();
+  }catch(e){console.error(e);toast('Erro: '+(e.message||e),'erro')}
+  finally{if(btn)btn.disabled=false}
+}
+function fecharModalAlocar(){document.getElementById('modal-alocar').classList.add('hidden');alocarColabSelecionadoId=null}
+function filtrarColabsAlocar(){
+  const t=normalizarTexto(document.getElementById('alocar-busca').value);
+  const cont=document.getElementById('alocar-lista');
+  const lista=colaboradores
+    .filter(function(c){return obterStatusHoje(c)==='presente' && matchBuscaAvancada(t,c.nome)})
+    .sort(function(a,b){return a.nome.localeCompare(b.nome)});
+  if(lista.length===0){
+    cont.innerHTML='<p class="text-xs text-slate-500 italic p-3">Nenhum colaborador presente disponível para adicionar.</p>';
+    return;
+  }
+  cont.innerHTML=lista.map(function(c){
+    const sel=c.id===alocarColabSelecionadoId;
+    const f=c.historicoDias[diaHoje-1]||'-';
+    const ft=(f!=='-'&&!isStatusEspecial(f))?f:'';
+    return '<button type="button" onclick="selecionarColabAlocar(\''+c.id+'\')" class="w-full text-left px-3 py-2.5 border-b border-slate-800/60 last:border-0 flex items-center justify-between gap-2 '+(sel?'bg-amber-500/15 border-l-2 border-l-amber-500':'hover:bg-slate-900/60')+'"><div class="min-w-0"><div class="text-xs font-bold text-slate-200 truncate">'+c.nome+'</div><div class="text-[10px] text-slate-400 truncate">'+c.escala+' · DSR: '+c.dsr+(ft?' · Hoje: '+ft:'')+'</div></div>'+(sel?'<i data-lucide="check-circle-2" class="w-4 h-4 text-amber-400"></i>':'<span class="badge badge-success">Presente</span>')+'</button>';
+  }).join('');
+  lucide.createIcons();
+}
+function selecionarColabAlocar(id){alocarColabSelecionadoId=id;filtrarColabsAlocar()}
+async function confirmarAlocacao(){const funcao=document.getElementById('alocar-funcao').value;if(!alocarColabSelecionadoId){toast("Selecione um.",'warn');return}const colab=colaboradores.find(function(c){return c.id===alocarColabSelecionadoId});if(!colab)return;const btn=document.querySelector('#modal-alocar button[onclick="confirmarAlocacao()"]');if(btn&&btn.disabled)return;if(btn)btn.disabled=true;try{const st=obterStatusHoje(colab);if(st!=='presente'){toast(colab.nome+' nao pode ser alocado neste status.','warn');return}const hora=await registrarMovimentacaoSetorHoje(colab.id,funcao);await recarregarMovimentosCard(colab);colab.historicoDias[diaHoje-1]=funcao;toast(colab.nome+' alocado em '+funcao+' às '+hora.slice(0,5)+'.','ok');fecharModalAlocar();renderizar()}catch(e){console.error(e);toast("Erro: "+(e.message||e),'erro')}finally{if(btn)btn.disabled=false}}
+
+async function salvarColaborador(){const btn=document.querySelector('#modal-add button[onclick="salvarColaborador()"]');if(btn&&btn.disabled)return;if(btn)btn.disabled=true;try{const idEdit=document.getElementById('edit-id').value;const nome=document.getElementById('input-nome-colab').value.trim();const func=document.getElementById('novo-funcao').value;if(!nome){toast("Insira o nome.",'warn');return}if(nome.length<3){toast("Nome curto.",'warn');return}const nn=normalizarTexto(nome);const dup=colaboradores.some(function(c){return normalizarTexto(c.nome)===nn&&c.id!==idEdit});if(dup){toast('Ja existe: '+nome,'warn');return}if(idEdit){const ru=await supabaseClient.from('colaboradores').update({nome:nome}).eq('id',idEdit);if(ru.error){toast("Erro: "+ru.error.message,'erro');return}const c=colaboradores.find(function(x){return x.id===idEdit});if(c&&!isColabEmDSRHoje(c))await atualizarDiaSupabase(idEdit,diaHoje,func);else if(c&&isColabEmDSRHoje(c)&&isStatusEspecial(func))await atualizarDiaSupabase(idEdit,diaHoje,func);toast(nome+' atualizado.','ok')}else{const esc=document.getElementById('select-escala').value;const dsr=document.getElementById('select-dsr').value;const hor=document.getElementById('input-horario').value;const ri=await supabaseClient.from('colaboradores').insert([{nome:nome,escala:esc,dsr:dsr,horario:'00:00 - 07:54'}]).select();if(ri.error){toast("Erro: "+ri.error.message,'erro');return}if(ri.data&&ri.data.length>0){const dh=new Date(anoAtual,mesAtualIndex,diaHoje);const hd=isDiaDSR(dsr,dh);if(!hd||isStatusEspecial(func))await atualizarDiaSupabase(ri.data[0].id,diaHoje,func);toast(nome+' adicionado.','ok')}}fecharModalAdd();await carregarDadosSupabase();renderizar()}catch(e){console.error(e);toast("Erro: "+(e.message||e),'erro')}finally{if(btn)btn.disabled=false}}
+
+function abrirHistorico(id){const c=colaboradores.find(function(x){return x.id===id});if(!c)return;document.getElementById('titulo-modal-hist').innerText='Editar: '+c.nome;const cont=document.getElementById('conteudo-historico-dias');cont.innerHTML='';let idxs=Array.from({length:totalDiasDoMes},function(_,i){return i});idxs.sort(function(a,b){return((a+1)===diaHoje?-1:(b+1)===diaHoje?1:0)});idxs.forEach(function(i){const f=c.historicoDias[i]||"-";const nd=i+1;const eH=nd===diaHoje;const eP=nd<diaHoje;const dD=new Date(anoAtual,mesAtualIndex,nd);const eD=isDiaDSR(c.dsr,dD);const bl=eP&&!modoAdmin;let op='';STATUS_ESPECIAIS.forEach(function(s){op+='<option value="'+s.valor+'" '+(s.valor===f?'selected':'')+'>'+s.label+'</option>'});for(const setor of Object.keys(SETORES_E_FUNCOES)){op+='<optgroup label="'+setor+'">';SETORES_E_FUNCOES[setor].forEach(function(x){op+='<option value="'+x+'" '+(x===f?'selected':'')+'>'+x+'</option>'});op+='</optgroup>'}cont.innerHTML+='<div class="flex items-center justify-between p-2.5 rounded-xl border '+(eH?'border-amber-500 bg-amber-500/10':eD?'border-orange-500/40 bg-orange-950/10':'border-slate-800 bg-slate-950')+' gap-2"><span class="text-[11px] font-bold '+(eH?'text-amber-300':eD?'text-orange-400':'text-slate-300')+' w-32">Dia '+nd+' '+(eH?'HOJE':eD?'DSR':eP?'trancado':'')+'</span><select disabled onchange="tentarAlterarDia(\''+id+'\', '+i+', this)" class="select flex-grow '+(bl?'opacity-50':'')+'">'+op+'</select></div>'});document.getElementById('modal-historico').classList.remove('hidden')}
+function fecharModalHistorico(){document.getElementById('modal-historico').classList.add('hidden')}
+
+function fecharRelatorioAcumulado(){
+  document.getElementById('modal-relatorio-acumulado').classList.add('hidden');
+}
+
+function resumoMensalColaborador(c){
+  const r={operacao:0,P:0,S2:0,F:0,FJ:0,AM:0,BH:0,DSR:0,FO:0,FE:0,AF:0,AL:0,TD:0,SU:0,outros:0};
+  (c.presencaDias||[]).forEach(function(v){
+    const x=String(v||'-').trim();
+    if(!x || x==='-') return;
+    if(Object.prototype.hasOwnProperty.call(r,x)) r[x]++;
+    else r.outros++;
+  });
+  (c.historicoDias||[]).forEach(function(v){if(isFuncaoAlocada(v))r.operacao++});
+  return r;
+}
+
+function abrirRelatorioAcumulado(){
+  const modal=document.getElementById('modal-relatorio-acumulado');
+  const cont=document.getElementById('relatorio-conteudo');
+  const sub=document.getElementById('relatorio-subtitulo');
+
+  const linhas=colaboradores.map(function(c){
+    return {c:c,r:resumoMensalColaborador(c)};
+  });
+
+  const tot={operacao:0,P:0,S2:0,F:0,FJ:0,AM:0,BH:0,DSR:0,FO:0,FE:0,AF:0};
+  linhas.forEach(function(x){
+    Object.keys(tot).forEach(function(k){tot[k]+=x.r[k]||0});
+  });
+
+  sub.innerText=nomeMesAtual+' / '+anoAtual+' · '+colaboradoresOperacionaisHoje().length+' no quadro de hoje · '+totalCadastroBanco+' no cadastro';
+
+  let h='<div id="area-impressao-relatorio">';
+  h+='<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 mb-4">';
+  [
+    ['Dias em Operação',tot.operacao],
+    ['Presenças P/S2',tot.P+tot.S2],
+    ['Faltas F/FJ',tot.F+tot.FJ],
+    ['Atestados AM',tot.AM],
+    ['Banco de Horas BH',tot.BH],
+    ['DSR',tot.DSR]
+  ].forEach(function(k){
+    h+='<div class="bg-slate-950 border border-slate-800 rounded-xl p-3"><div class="text-[9px] uppercase text-slate-400">'+k[0]+'</div><div class="text-xl font-extrabold text-emerald-400">'+k[1]+'</div></div>';
+  });
+  h+='</div>';
+
+  h+='<div class="overflow-auto rounded-xl border border-slate-800"><table class="w-full text-xs text-left"><thead class="bg-slate-900 text-amber-400"><tr>'+
+     '<th class="p-2">Colaborador</th><th class="p-2 text-center">Operação</th><th class="p-2 text-center">P/S2</th>'+
+     '<th class="p-2 text-center">F/FJ</th><th class="p-2 text-center">AM</th><th class="p-2 text-center">BH</th>'+
+     '<th class="p-2 text-center">DSR</th><th class="p-2 text-center">FE</th><th class="p-2 text-center">AF/AL</th></tr></thead><tbody>';
+  linhas.forEach(function(x){
+    h+='<tr class="border-t border-slate-800"><td class="p-2 font-semibold text-slate-200">'+x.c.nome+'</td>'+
+        '<td class="p-2 text-center">'+x.r.operacao+'</td>'+
+        '<td class="p-2 text-center">'+(x.r.P+x.r.S2)+'</td>'+
+        '<td class="p-2 text-center">'+(x.r.F+x.r.FJ)+'</td>'+
+        '<td class="p-2 text-center">'+x.r.AM+'</td>'+
+        '<td class="p-2 text-center">'+x.r.BH+'</td>'+
+        '<td class="p-2 text-center">'+x.r.DSR+'</td>'+
+        '<td class="p-2 text-center">'+x.r.FE+'</td>'+
+        '<td class="p-2 text-center">'+(x.r.AF+x.r.AL)+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+  cont.innerHTML=h;
+  modal.classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function imprimirRelatorio(){
+  const area=document.getElementById('area-impressao-relatorio');
+  if(!area){toast('Abra o relatório primeiro.','warn');return;}
+  const w=window.open('','_blank','width=1100,height=800');
+  if(!w){toast('O navegador bloqueou a janela de impressão.','warn');return;}
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Relatório LogiRotator</title>'+
+    '<style>body{font-family:Arial,sans-serif;padding:24px;color:#111}table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:6px;font-size:11px}th{background:#eee}div{box-sizing:border-box}</style></head><body>'+
+    '<div id="neon-api-notice" style="position:fixed;bottom:8px;right:8px;z-index:9999;background:#172554;color:#bfdbfe;border:1px solid #1d4ed8;border-radius:8px;padding:7px 10px;font:11px sans-serif;max-width:310px">Banco: Neon DB • API segura necessária em /.netlify/functions/api</div>'+
+    '<h2>LogiRotator — Relatório '+nomeMesAtual+' / '+anoAtual+'</h2>'+area.innerHTML+'</body></html>');
+  w.document.close();
+  w.focus();
+  setTimeout(function(){w.print();},250);
+}
+
+function abrirModalMatriz(){document.getElementById('titulo-matriz-mes').innerHTML='Matriz: '+nomeMesAtual+' / '+anoAtual;document.getElementById('matriz-busca').value='';atualizarBotaoModoAdmin();renderizarMatriz();document.getElementById('modal-matriz').classList.remove('hidden');lucide.createIcons();setTimeout(function(){const th=document.querySelector('#tabela-matriz-unica thead th.bg-amber-500\\/30');if(th)th.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})},150)}
+function renderizarMatriz(){const t=normalizarTexto(document.getElementById('matriz-busca').value||'');const tab=document.getElementById('tabela-matriz-unica');const cont=document.getElementById('matriz-busca-contador');tab.innerHTML='';const cf=colaboradores.filter(function(c){return matchBuscaAvancada(t,c.nome,c.escala,c.dsr)});if(cont)cont.innerText=t?cf.length+' de '+colaboradores.length:colaboradores.length+' cols';const dP=[];const dF=[];for(let d=1;d<=totalDiasDoMes;d++){if(d<diaHoje)dP.push(d);else if(d>diaHoje)dF.push(d)}const dO=[].concat(dP,[diaHoje],dF);let th='<thead><tr class="bg-slate-900 text-amber-400 border-b border-slate-800 sticky top-0 z-30"><th class="p-2.5 font-bold sticky left-0 bg-slate-900 z-40 min-w-[220px] border-r border-slate-800">Colaborador</th>';dO.forEach(function(d){const eH=d===diaHoje;const eP=d<diaHoje;let c='p-2 text-center font-semibold min-w-[120px] text-[10px] ';if(eH)c+='text-amber-400 bg-amber-500/30 font-extrabold border-l-2 border-r-2 border-amber-500';else if(eP)c+='text-slate-400 border-l border-slate-800/50 bg-slate-950/40';else c+='text-slate-200 border-l border-slate-800/50';th+='<th class="'+c+'">'+(eH?'HOJE - ':'')+'Dia '+d+'</th>'});th+='</tr></thead>';if(cf.length===0){tab.innerHTML=th+'<tbody><tr><td colspan="'+(dO.length+1)+'" class="text-center text-slate-500 italic py-8">Nenhum.</td></tr></tbody>';return}let tb='<tbody>';cf.forEach(function(c){tb+='<tr class="border-b border-slate-800/60"><td class="p-2 sticky left-0 bg-slate-900 z-20 border-r border-slate-800 min-w-[220px]"><div class="text-xs font-bold text-slate-200">'+c.nome+'</div><div class="text-[10px] text-amber-400 font-semibold mt-0.5">Escala: '+c.escala+' · DSR: '+c.dsr+'</div></td>';dO.forEach(function(d){const iD=d-1;const fD=(c.presencaDias&&c.presencaDias[iD])||"-";const eH=d===diaHoje;const eP=d<diaHoje;const dD=new Date(anoAtual,mesAtualIndex,d);const eD=isDiaDSR(c.dsr,dD);const bl=eP;let op='';STATUS_ESPECIAIS.forEach(function(s){op+='<option value="'+s.valor+'" '+(s.valor===fD?'selected':'')+'>'+s.label+'</option>'});for(const setor of Object.keys(SETORES_E_FUNCOES)){op+='<optgroup label="'+setor+'">';SETORES_E_FUNCOES[setor].forEach(function(x){op+='<option value="'+x+'" '+(x===fD?'selected':'')+'>'+x+'</option>'});op+='</optgroup>'}let tc='p-1 text-center ';if(eH)tc+='bg-amber-500/10 border-l-2 border-r-2 border-amber-500/40';else if(eD)tc+='bg-orange-950/20';else if(eP)tc+='bg-slate-950/60';tb+='<td class="'+tc+'"><select onchange="tentarAlterarDia(\''+c.id+'\', '+iD+', this)" title="'+(eP&&!modoAdmin?'Dia anterior bloqueado para usuário. Somente administrador pode alterar.':'Clique para alterar.')+'" '+(bl?'disabled':'')+' class="w-full text-[10px] rounded p-1 '+(bl?'bg-slate-950 border-slate-800 text-slate-500 cursor-not-allowed':'bg-slate-950 border-slate-700 text-slate-200')+' border">'+op+'</select></td>'});tb+='</tr>'});tb+='</tbody>';tab.innerHTML=th+tb}
+function fecharModalMatriz(){modoAdmin=false;atualizarBotaoModoAdmin();document.getElementById('modal-matriz').classList.add('hidden');renderizar()}
+
+function extrairCodigoSPX(valor){
+  const s = String(valor||'').toUpperCase().trim();
+  const m = s.match(/\b([A-Z]{2,8})\s*-?\s*(\d{3,})\b(?=\s*$|\b)/);
+  return m ? (m[1] + m[2]).replace(/[\s-]+/g,'') : '';
+}
+
+function mostrarLogin(msg){
+ document.body.classList.remove('role-user','role-admin');
+ const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='none';
+ const overlay=document.getElementById('logi-auth');if(overlay)overlay.classList.remove('hidden');
+ const uv=document.getElementById('logi-user-view');if(uv)uv.classList.add('hidden');
+ const err=document.getElementById('logi-login-error');if(err)err.textContent=msg||'';
+ if(window.lucide)lucide.createIcons();
+}
+async function entrarLogi(ev){
+ ev.preventDefault();const btn=document.getElementById('logi-login-submit');const err=document.getElementById('logi-login-error');btn.disabled=true;btn.textContent='Validando...';err.textContent='';
+ try{const email=document.getElementById('logi-email').value.trim();const password=document.getElementById('logi-password').value;const r=await supabaseClient.auth.signInWithPassword({email,password});if(r.error)throw r.error;await validarSessaoLogi(r.data.session);}
+ catch(e){err.textContent=e.message||'Falha no login.';}
+ finally{btn.disabled=false;btn.textContent='Entrar';}
+}
+async function sairLogi(){await supabaseClient.auth.signOut();}
+function montarBarraContaAdmin(){
+ const el=document.getElementById('logi-admin-account');if(el)el.classList.remove('hidden');
+ const n=document.getElementById('logi-admin-name');if(n)n.textContent=(perfilLogi?.nome||perfilLogi?.email||'Administrador')+' • Administrador';
+ const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='';
+}
+function montarPainelUsuario(){
+ const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='none';
+ document.getElementById('logi-user-view').classList.remove('hidden');
+ document.getElementById('user-view-name').textContent=perfilLogi?.nome||perfilLogi?.email||'Usuário';
+ document.getElementById('user-view-subtitle').textContent='HUB-LCE-04 • '+nomeMesAtual+' / '+anoAtual+' • '+String(diaHoje).padStart(2,'0')+'/'+String(mesAtualIndex+1).padStart(2,'0');
+ renderPainelUsuario('operacao');
+}
+function renderPainelUsuario(filtro){
+ const hoje=colaboradoresOperacionaisHoje();
+ const grupos={operacao:[],diarista:[],dsr:[],banco_horas:[],faltas:[],atestados:[]};
+ hoje.forEach(function(c){const st=obterStatusHoje(c);if(st==='presente')grupos.operacao.push(c);else if(st==='dsr')grupos.dsr.push(c);else if(st==='banco_horas')grupos.banco_horas.push(c);else if(st==='falta')grupos.faltas.push(c);else if(st==='atestado')grupos.atestados.push(c);});
+ const d=getDiaristasDia();
+ const cards=[['operacao','Em Operação',grupos.operacao.length,'users'],['diarista','Diarista',d.presentes,'hard-hat'],['dsr','Em DSR',grupos.dsr.length,'palmtree'],['banco_horas','Banco de Horas',grupos.banco_horas.length,'clock-3'],['faltas','Faltas',grupos.faltas.length,'alert-triangle'],['atestados','Atestados',grupos.atestados.length,'stethoscope']];
+ document.getElementById('user-kpis').innerHTML=cards.map(function(c){return '<button onclick="renderPainelUsuario(\''+c[0]+'\')" class="text-left bg-slate-900 border '+(filtro===c[0]?'border-amber-500':'border-slate-800')+' rounded-xl p-4 hover:border-amber-500"><div class="flex items-center justify-between text-slate-400 text-xs"><span>'+c[1]+'</span><i data-lucide="'+c[3]+'" class="w-4 h-4"></i></div><div class="text-2xl font-extrabold mt-2 text-slate-100">'+c[2]+'</div></button>';}).join('');
+ const titles={operacao:'Em Operação',diarista:'Diaristas',dsr:'Em DSR',banco_horas:'Banco de Horas',faltas:'Faltas',atestados:'Atestados'};
+ document.getElementById('user-list-title').textContent=titles[filtro]||'Em Operação';
+ let lista=grupos[filtro]||[];
+ if(filtro==='diarista'){
+  document.getElementById('user-list-count').textContent=String(d.presentes);
+  document.getElementById('user-list').innerHTML='<div class="sm:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-4"><div class="text-sm font-semibold">Diaristas do dia</div><div class="grid grid-cols-3 gap-2 mt-3 text-center"><div><div class="text-xl font-bold text-emerald-400">'+d.presentes+'</div><div class="text-[10px] text-slate-400">Presentes</div></div><div><div class="text-xl font-bold text-red-400">'+d.faltantes+'</div><div class="text-[10px] text-slate-400">Faltantes</div></div><div><div class="text-xl font-bold">'+d.pedidos+'</div><div class="text-[10px] text-slate-400">Pedido</div></div></div></div>';
+ }else{
+  document.getElementById('user-list-count').textContent=String(lista.length);
+  document.getElementById('user-list').innerHTML=lista.length?lista.map(function(c){return '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3"><div class="font-semibold text-sm">'+escaparHtml(c.nome||'Colaborador')+'</div><div class="text-xs text-slate-400 mt-1">'+escaparHtml(c.codigo||c.matricula||'')+'</div></div>';}).join(''):'<div class="sm:col-span-2 text-sm text-slate-500 bg-slate-900 border border-slate-800 rounded-xl p-5 text-center">Nenhum registro nesta categoria para o dia selecionado.</div>';
+ }
+ if(window.lucide)lucide.createIcons();
+}
+function escaparHtml(v){return String(v??'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function abrirGestaoUsuarios(){if(papelLogi!=='admin')return;document.getElementById('logi-users-modal').classList.remove('hidden');carregarListaUsuarios();}
+function fecharGestaoUsuarios(){document.getElementById('logi-users-modal').classList.add('hidden');}
+async function carregarListaUsuarios(){
+ const box=document.getElementById('logi-users-list');box.innerHTML='<p class="text-xs text-slate-400">Carregando...</p>';
+ const r=await supabaseClient.from('logirotator_perfis').select('user_id,nome,email,papel,ativo').order('nome');
+ if(r.error){box.textContent=r.error.message;return;}
+ box.innerHTML=(r.data||[]).map(function(u){return '<div class="flex items-center justify-between gap-3 bg-slate-950 border border-slate-800 rounded-lg p-3"><div><div class="text-sm font-semibold">'+escaparHtml(u.nome||'')+'</div><div class="text-xs text-slate-400">'+escaparHtml(u.email||'')+' • '+escaparHtml(u.papel)+'</div></div><span class="badge '+(u.ativo?'badge-success':'badge-default')+'">'+(u.ativo?'Ativo':'Inativo')+'</span></div>';}).join('')||'<p class="text-xs text-slate-400">Nenhum usuário cadastrado.</p>';
+}
+async function criarUsuarioLogi(ev){
+ ev.preventDefault();if(papelLogi!=='admin')return;
+ const btn=document.getElementById('new-user-submit'),msg=document.getElementById('logi-users-message');btn.disabled=true;msg.textContent='Criando conta...';
+ try{
+  const payload={nome:document.getElementById('new-user-name').value.trim(),email:document.getElementById('new-user-email').value.trim(),password:document.getElementById('new-user-password').value,papel:document.getElementById('new-user-role').value};
+  const response=await fetch(LOGI_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'create_user',payload:payload})});
+  const data=await response.json();if(!response.ok)throw new Error(data.error||'Não foi possível criar usuário.');
+  msg.textContent='Usuário criado com sucesso.';document.getElementById('logi-create-user-form').reset();await carregarListaUsuarios();
+ }catch(e){msg.textContent=e.message||String(e);}
+ finally{btn.disabled=false;}
+}
+
+const _appInicial=document.querySelector("body > .flex.min-h-screen");if(_appInicial)_appInicial.style.display="none";
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
+
+function opHojeISO(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function opAgora(){const d=new Date();return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0")}
+function opMin(h){if(!h)return null;const p=String(h).slice(0,5).split(":");return Number(p[0])*60+Number(p[1])}
+function setorDaFuncao(f){for(const s of Object.keys(SETORES_E_FUNCOES)){if(SETORES_E_FUNCOES[s].includes(f))return s}return"Recebimento"}
+function preencherFuncoesOperacao(){const s=document.getElementById("op-funcao");s.innerHTML="";for(const setor of Object.keys(SETORES_E_FUNCOES)){const g=document.createElement("optgroup");g.label=setor;SETORES_E_FUNCOES[setor].forEach(f=>{const o=document.createElement("option");o.value=f;o.textContent=f;g.appendChild(o)});s.appendChild(g)}}
+function opColabSelecionado(){return colaboradores.find(c=>c.id===document.getElementById("op-colaborador").value)}
+async function buscarMovimentosOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value,b=document.getElementById("op-historico");if(!c||!d)return;b.innerHTML="Carregando...";const r=await supabaseClient.from("historico_escala").select("*").eq("colaborador_id",c.id).eq("data_inicio",d).order("hora_inicio",{ascending:true});if(r.error){b.innerHTML=r.error.message;return}const rows=r.data||[];b.innerHTML=rows.length?rows.map(x=>'<div class="rounded-lg border border-slate-800 bg-slate-900 p-2"><b>'+String(x.funcao||"-")+'</b> <span class="text-cyan-300">'+String(x.hora_inicio||"--:--").slice(0,5)+" → "+(x.hora_fim?String(x.hora_fim).slice(0,5):"Em aberto")+"</span></div>").join(""):'<span class="text-slate-600">Nenhuma movimentação.</span>';const aberto=rows.find(x=>!x.hora_fim);document.getElementById("op-btn-entrada").disabled=!!aberto;document.getElementById("op-btn-troca").disabled=!aberto;document.getElementById("op-btn-saida").disabled=!aberto}
+function opAtualizar(){const c=opColabSelecionado();document.getElementById("op-status").textContent=c?c.nome:"Selecione um colaborador.";buscarMovimentosOperacao()}
+async function registrarEntradaOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value,f=document.getElementById("op-funcao").value;if(!c||!f)return toast("Selecione colaborador e função.","warn");if(d!==opHojeISO())return toast("A entrada deve ser registrada no dia atual.","warn");const agora=opAgora();if(opMin(agora)>474)return toast("Entrada permitida somente até 07:54.","warn");const q=await supabaseClient.from("historico_escala").select("id").eq("colaborador_id",c.id).eq("data_inicio",d).is("hora_fim",null).limit(1);if(q.error)return toast(q.error.message,"erro");if(q.data?.length)return toast("Já existe uma operação em aberto.","warn");const r=await supabaseClient.from("historico_escala").insert([{colaborador_id:c.id,data_inicio:d,data_fim:d,setor:setorDaFuncao(f),funcao:f,hora_inicio:agora,hora_fim:null}]);if(r.error)return toast(r.error.message,"erro");toast("Entrada registrada às "+agora.slice(0,5)+".","ok");buscarMovimentosOperacao()}
+async function trocarFuncaoOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value,f=document.getElementById("op-funcao").value;if(!c||!f)return;const q=await supabaseClient.from("historico_escala").select("*").eq("colaborador_id",c.id).eq("data_inicio",d).is("hora_fim",null).order("hora_inicio",{ascending:false}).limit(1);if(q.error||!q.data?.length)return toast(q.error?.message||"Não há operação aberta.","warn");const atual=q.data[0],agora=opAgora();if(String(atual.funcao)===f)return toast("A função já é a atual.","warn");let r=await supabaseClient.from("historico_escala").update({hora_fim:agora,data_fim:d}).eq("id",atual.id);if(r.error)return toast(r.error.message,"erro");r=await supabaseClient.from("historico_escala").insert([{colaborador_id:c.id,data_inicio:d,data_fim:d,setor:setorDaFuncao(f),funcao:f,hora_inicio:agora,hora_fim:null}]);if(r.error)return toast(r.error.message,"erro");toast("Função alterada às "+agora.slice(0,5)+".","ok");buscarMovimentosOperacao()}
+async function registrarSaidaOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value;if(!c)return;const q=await supabaseClient.from("historico_escala").select("id").eq("colaborador_id",c.id).eq("data_inicio",d).is("hora_fim",null).order("hora_inicio",{ascending:false}).limit(1);if(q.error||!q.data?.length)return toast(q.error?.message||"Não há operação aberta.","warn");const agora=opAgora(),r=await supabaseClient.from("historico_escala").update({hora_fim:agora,data_fim:d}).eq("id",q.data[0].id);if(r.error)return toast(r.error.message,"erro");toast("Saída registrada às "+agora.slice(0,5)+".","ok");buscarMovimentosOperacao()}
+function abrirPainelOperacao(){const m=document.getElementById("modal-operacao"),s=document.getElementById("op-colaborador");s.innerHTML='<option value="">Selecione...</option>'+colaboradores.map(c=>'<option value="'+c.id+'">'+c.nome+"</option>").join("");document.getElementById("op-data").value=opHojeISO();preencherFuncoesOperacao();m.classList.remove("hidden");m.classList.add("flex");s.onchange=opAtualizar;document.getElementById("op-data").onchange=buscarMovimentosOperacao;opAtualizar()}
+function fecharPainelOperacao(){const m=document.getElementById("modal-operacao");m.classList.add("hidden");m.classList.remove("flex")}
+
+function minutosHoraRastreio(h){if(!h)return null;const m=String(h).match(/(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null;}
+function formatarMinutosRastreio(m){if(!Number.isFinite(m)||m<=0)return '0h00';return Math.floor(m/60)+'h'+String(Math.round(m%60)).padStart(2,'0');}
+function abrirRastreioMensal(){if(papelLogi!=='admin'){toast('Rastreio mensal disponível somente para administrador.','erro');return;}const el=document.getElementById('rastreio-mes');if(el&&!el.value)el.value=String(anoAtual)+'-'+String(mesAtualIndex+1).padStart(2,'0');const m=document.getElementById('modal-rastreio-mensal');m.classList.remove('hidden');m.classList.add('flex');renderizarRastreioMensal();}
+function fecharRastreioMensal(){const m=document.getElementById('modal-rastreio-mensal');m.classList.add('hidden');m.classList.remove('flex');}
+function obterDadosRastreioMensal(){const mes=document.getElementById('rastreio-mes')?.value;if(!mes)return {mes:'',rows:[],porColab:[],setores:{},minutos:0,semHora:0};const [aa,mm]=mes.split('-').map(Number);const inicio=mes+'-01';const fim=mes+'-'+String(new Date(aa,mm,0).getDate()).padStart(2,'0');const hoje=opHojeISO();const agora=opAgora();const rows=historicoMovimentosGlobal.filter(r=>{const d=String(r.data_inicio||r.data||'').slice(0,10);return d>=inicio&&d<=fim&&!!r.hora_inicio;});const porId={};const setores={};let minutosTotal=0,semHora=0;rows.forEach(r=>{const c=colaboradores.find(x=>String(x.id)===String(r.colaborador_id));const nome=c?.nome||'Colaborador não localizado';const setor=r.setor||setorDaFuncao(r.funcao||'')||'Setor não informado';const funcao=r.funcao||setor;let ini=minutosHoraRastreio(r.hora_inicio),f=minutosHoraRastreio(r.hora_fim);if(ini===null){semHora++;return;}if(f===null){if(String(r.data_inicio||'').slice(0,10)===hoje)f=minutosHoraRastreio(agora);else{semHora++;return;}}if(f!==null&&f<ini)f+=1440;const dur=Math.max(0,(f??ini)-ini);minutosTotal+=dur;if(!porId[r.colaborador_id])porId[r.colaborador_id]={id:r.colaborador_id,nome:nome,total:0,setores:{},dias:{},movimentos:0};const x=porId[r.colaborador_id];x.total+=dur;x.setores[setor]=(x.setores[setor]||0)+dur;x.movimentos++;const dia=String(r.data_inicio||r.data||'').slice(0,10);if(!x.dias[dia])x.dias[dia]=[];x.dias[dia].push({setor,funcao,inicio:r.hora_inicio,fim:r.hora_fim||((dia===hoje)?agora:null),minutos:dur});if(!setores[setor])setores[setor]={minutos:0,pessoas:{}};setores[setor].minutos+=dur;setores[setor].pessoas[r.colaborador_id]=true;});return {mes,rows,porColab:Object.values(porId).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')),setores,minutos:minutosTotal,semHora};}
+function renderizarRastreioMensal(){const d=obterDadosRastreioMensal();const resumo=document.getElementById('rastreio-resumo'),cont=document.getElementById('rastreio-conteudo');if(!resumo||!cont)return;const pessoas=d.porColab.length,reg=d.rows.length,qtSetores=Object.keys(d.setores).length;resumo.innerHTML=[['LOGIs rastreados',pessoas],['Movimentações',reg],['Setores utilizados',qtSetores],['Tempo rastreado',formatarMinutosRastreio(d.minutos)]].map(x=>'<div class="bg-slate-950 border border-slate-800 rounded-xl p-3"><div class="text-[9px] uppercase text-slate-400">'+x[0]+'</div><div class="text-xl font-extrabold text-cyan-300 mt-1">'+x[1]+'</div></div>').join('');const termo=normalizarTexto(document.getElementById('rastreio-busca')?.value||'');const setores=Object.entries(d.setores).sort((a,b)=>b[1].minutos-a[1].minutos);let h='<section class="bg-slate-950 border border-slate-800 rounded-xl p-3"><h4 class="text-xs font-bold text-cyan-300 mb-3">Permanência por setor / função</h4>';if(!setores.length)h+='<p class="text-xs text-slate-500">Nenhuma movimentação com horário foi registrada neste mês.</p>';else{const max=Math.max(1,...setores.map(x=>x[1].minutos));setores.forEach(([nome,x])=>{h+='<div class="mb-3"><div class="flex justify-between gap-2 text-xs"><b>'+escaparHtmlLogi(nome)+'</b><span class="text-cyan-300">'+formatarMinutosRastreio(x.minutos)+' · '+Object.keys(x.pessoas).length+' LOGIs</span></div><div class="h-2 bg-slate-800 rounded-full mt-1 overflow-hidden"><div class="h-full bg-cyan-500 rounded-full" style="width:'+Math.round(x.minutos/max*100)+'%"></div></div></div>';});}h+='</section><section><h4 class="text-xs font-bold text-slate-200 mb-2">Rastreio individual</h4>';const lista=d.porColab.filter(x=>!termo||matchBuscaAvancada(termo,x.nome,Object.keys(x.setores).join(' ')));if(!lista.length)h+='<p class="text-xs text-slate-500">Nenhum colaborador encontrado.</p>';lista.forEach(x=>{const ss=Object.entries(x.setores).sort((a,b)=>b[1]-a[1]);h+='<details class="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-2"><summary class="cursor-pointer flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-100">'+escaparHtmlLogi(x.nome)+'</span><span class="text-[10px] text-cyan-300">'+formatarMinutosRastreio(x.total)+' · '+x.movimentos+' movimentações</span></summary><div class="mt-3 grid md:grid-cols-2 gap-3"><div><div class="text-[10px] uppercase text-slate-500 mb-2">Tempo por setor</div>'+ss.map(z=>'<div class="flex justify-between text-[10px] border-b border-slate-800 py-1"><span>'+escaparHtmlLogi(z[0])+'</span><b class="text-cyan-300">'+formatarMinutosRastreio(z[1])+'</b></div>').join('')+'</div><div><div class="text-[10px] uppercase text-slate-500 mb-2">Linha do tempo diária</div>';Object.keys(x.dias).sort().forEach(
+</script>
 </body>
 </html>
