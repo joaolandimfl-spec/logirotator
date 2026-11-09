@@ -148,9 +148,11 @@ async function processarRequisicao(request, env) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (url.pathname === "/api" || url.pathname === "/.netlify/functions/api" || url.pathname === "/") {
+    // Intercepta apenas as rotas da API
+    if (url.pathname === "/api" || url.pathname === "/.netlify/functions/api") {
       return processarRequisicao(request, env);
     }
-    return new Response("Not Found", { status: 404 });
+    // Entrega os arquivos estáticos (index.html) para o resto
+    return env.ASSETS.fetch(request);
   }
 };
