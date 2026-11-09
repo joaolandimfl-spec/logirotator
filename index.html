@@ -184,6 +184,7 @@ body.role-admin #logi-admin-account{display:flex!important}
 <button onclick="abrirRelatorioAcumulado();toggleSidebarMobile()" class="sidebar-item"><span class="flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-4 h-4 text-emerald-400"></i> Relatório</span></button><button onclick="abrirRastreioMensal();toggleSidebarMobile()" class="sidebar-item text-cyan-300"><span class="flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4"></i> Rastreio Mensal</span></button><button onclick="abrirPainelOperacao();toggleSidebarMobile()" class="sidebar-item text-amber-400"><span class="flex items-center gap-2"><i data-lucide="timer" class="w-4 h-4"></i> Operação / Movimentação</span></button>
 </nav>
 </aside>
+
 <!-- MODAIS -->
 <div id="modal-add" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
 <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 shadow-2xl">
@@ -282,7 +283,7 @@ body.role-admin #logi-admin-account{display:flex!important}
 </div>
 
 <script>
-const LOGI_API_URL = '/.netlify/functions/api';
+const LOGI_API_URL = '/api';
 
 function criarErroApi(mensagem, status) {
   const e = new Error(mensagem || 'Falha na comunicação com a API Neon.');
@@ -418,50 +419,10 @@ function normalizarTexto(t){if(t===null||t===undefined)return"";return String(t)
 function matchBuscaAvancada(termo){if(!termo)return true;const palavras=termo.split(" ").filter(function(p){return p.length>0});const campos=Array.prototype.slice.call(arguments,1);const alvo=normalizarTexto(campos.filter(function(c){return c}).join(" "));return palavras.every(function(p){return alvo.includes(p)})}
 
 const DIAS_SEMANA_MAP={"dom":0,"domingo":0,"seg":1,"segunda":1,"ter":2,"terca":2,"terca feira":2,"qua":3,"quarta":3,"quarta feira":3,"qui":4,"quinta":4,"quinta feira":4,"sex":5,"sexta":5,"sexta feira":5,"sab":6,"sabado":6,"sabado feira":6};
+function isDiaDSR(dsrTexto,dataObj){if(!dsrTexto)return false;const d=dataObj.getDay();const dn=normalizarTexto(dsrTexto).replace(/feira/g,"").replace(/-/g," ");const dn2=dn.replace(/\s+/g," ").trim();const p=dn2.split(/,|\se\s/).map(function(x){return x.trim().replace(/\s+/g," ")}).filter(function(x){return x});for(let i=0;i<p.length;i++){const parte=p[i];if(DIAS_SEMANA_MAP[parte]===d)return true;const prim=parte.split(" ")[0];if(DIAS_SEMANA_MAP[prim]===d)return true;if(DIAS_SEMANA_MAP[prim.slice(0,3)]===d)return true}return false}
+function isColabEmDSRHoje(c){const dataHoje=new Date(anoAtual,mesAtualIndex,diaHoje);return isDiaDSR(c.dsr,dataHoje)}
 
-// ============================================================
-// FUNÇÃO DSR CORRIGIDA — reconhece "2° Domingo/Mês" + formatos antigos
-// ============================================================
-function isDiaDSR(dsrTexto, dataObj) {
-    if (!dsrTexto) return false;
-    const d = dataObj.getDay();
-
-    // 1) Padrão "2° Domingo/Mês" no próprio campo dsr
-    const matchDom = String(dsrTexto).match(/(\d)\s*°?\s*Domingo\s*\/?\s*M[êe]s/i);
-    if (matchDom && d === 0) {
-        const nDomingoHoje = Math.ceil(dataObj.getDate() / 7);
-        if (Number(matchDom[1]) === nDomingoHoje) return true;
-    }
-
-    // 2) Folga semanal normal (código original)
-    const dn = normalizarTexto(dsrTexto).replace(/feira/g, '').replace(/-/g, ' ');
-    const dn2 = dn.replace(/\s+/g, ' ').trim();
-    const p = dn2.split(/,|\se\s/).map(function(x){ return x.trim().replace(/\s+/g, ' '); }).filter(function(x){ return x; });
-    for (let i = 0; i < p.length; i++) {
-        const parte = p[i];
-        if (DIAS_SEMANA_MAP[parte] === d) return true;
-        const prim = parte.split(' ')[0];
-        if (DIAS_SEMANA_MAP[prim] === d) return true;
-        if (DIAS_SEMANA_MAP[prim.slice(0, 3)] === d) return true;
-    }
-    return false;
-}
-
-// ============================================================
-// FUNÇÃO DSR HOJE — usa dsr + domingoFixo
-// ============================================================
-function isColabEmDSRHoje(c) {
-    const dataHoje = new Date(anoAtual, mesAtualIndex, diaHoje);
-    // 1) Folga semanal normal OU padrão "N° Domingo/Mês" no campo dsr
-    if (isDiaDSR(c.dsr, dataHoje)) return true;
-    // 2) Domingo fixo do mês (coluna domingo_fixo do banco)
-    if (dataHoje.getDay() === 0 && Number(c.domingoFixo) > 0) {
-        const nDomingoHoje = Math.ceil(dataHoje.getDate() / 7);
-        if (Number(c.domingoFixo) === nDomingoHoje) return true;
-    }
-    return false;
-}
- function obterStatusHoje(c){
+function obterStatusHoje(c){
   const pres=(c.presencaDias&&c.presencaDias[diaHoje-1])||"-";
   if(pres==="DSR"||pres==="FO")return'dsr';
   if(["F","FJ"].includes(pres))return'falta';
@@ -480,6 +441,7 @@ function colaboradoresOperacionaisHoje(){
     return st && st!=='-' && !foraDoQuadro.has(st);
   });
 }
+
 function colaboradoresOperacionaisMes(){
   const foraDoQuadro=new Set(['DF','DP','DV','NC','NS']);
   return colaboradores.filter(function(c){
@@ -491,11 +453,13 @@ function colaboradoresOperacionaisMes(){
     });
   });
 }
+
 function estaEmOperacaoHoje(c){
   const f=(c.historicoDias&&c.historicoDias[diaHoje-1])||'-';
   const p=(c.presencaDias&&c.presencaDias[diaHoje-1])||'-';
   return ["P","S2"].includes(p) && isFuncaoAlocada(f);
 }
+
 function contarDiasNaFuncaoAtual(h){const f=h[diaHoje-1];if(!f||isStatusEspecial(f))return{funcao:"Nenhuma",dias:0,dataInicio:null,dataFim:null};let c=0;let idx=diaHoje-1;for(let i=diaHoje-1;i>=0;i--){if(h[i]===f&&!isStatusEspecial(h[i])){c++;idx=i}else{break}}return{funcao:f,dias:c,dataInicio:new Date(anoAtual,mesAtualIndex,idx+1),dataFim:new Date(anoAtual,mesAtualIndex,diaHoje)}}
 
 function obterChaveDiaristasDia(){return'diaristas_'+anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(diaHoje).padStart(2,'0')}
@@ -593,7 +557,7 @@ async function init(){
     lucide.createIcons();
   }catch(e){
     console.error('Falha ao iniciar modo de teste:',e);
-    toast('Não foi possível carregar os dados. Verifique a API do Netlify e a conexão com o Neon DB.','erro');
+    toast('Não foi possível carregar os dados. Verifique a API do Cloudflare Worker e a conexão com o Neon DB.','erro');
     const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='';
   }
 }
@@ -699,7 +663,6 @@ async function carregarDadosSupabase(){
         escala:c.escala||'6x1',
         horario:'Horário operacional: 00:00 - 07:54',
         dsr:c.dsr||'Domingo',
-        domingoFixo:Number(c.domingo_fixo||0),
         codigoSPX:String(c.codigo_spx||c.codigo||c.spx||c.matricula||'').trim().toUpperCase(),
         email:c.email||'',
         opsId:c.ops_id||'',
@@ -812,14 +775,17 @@ async function atualizarDiaSupabase(colabId,dia,funcao){
   if(String(colabId||'').startsWith('excel-')){
     throw new Error('Este colaborador existe somente no Excel e ainda não possui vínculo com o cadastro do banco.');
   }
+
   if(isStatusEspecial(funcao)){
     throw new Error('A presença é somente leitura nesta grade. Use a aba Presentes para alterar o status.');
   }
+
   const dataStr=anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(dia).padStart(2,'0');
   let setor='Recebimento';
   for(const s of Object.keys(SETORES_E_FUNCOES)){
     if(SETORES_E_FUNCOES[s].includes(funcao)){setor=s;break}
   }
+
   const existente=await supabaseClient
     .from('historico_escala')
     .select('id')
@@ -827,7 +793,9 @@ async function atualizarDiaSupabase(colabId,dia,funcao){
     .eq('data_inicio',dataStr)
     .is('hora_inicio',null)
     .limit(1);
+
   if(existente.error) throw existente.error;
+
   let r;
   if(existente.data && existente.data.length){
     r=await supabaseClient.from('historico_escala')
@@ -1255,44 +1223,15 @@ function imprimirRelatorio(){
   w.focus();
   setTimeout(function(){w.print();},250);
 }
-
 function abrirModalMatriz(){document.getElementById('titulo-matriz-mes').innerHTML='Matriz: '+nomeMesAtual+' / '+anoAtual;document.getElementById('matriz-busca').value='';atualizarBotaoModoAdmin();renderizarMatriz();document.getElementById('modal-matriz').classList.remove('hidden');lucide.createIcons();setTimeout(function(){const th=document.querySelector('#tabela-matriz-unica thead th.bg-amber-500\\/30');if(th)th.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})},150)}
 function renderizarMatriz(){const t=normalizarTexto(document.getElementById('matriz-busca').value||'');const tab=document.getElementById('tabela-matriz-unica');const cont=document.getElementById('matriz-busca-contador');tab.innerHTML='';const cf=colaboradores.filter(function(c){return matchBuscaAvancada(t,c.nome,c.escala,c.dsr)});if(cont)cont.innerText=t?cf.length+' de '+colaboradores.length:colaboradores.length+' cols';const dP=[];const dF=[];for(let d=1;d<=totalDiasDoMes;d++){if(d<diaHoje)dP.push(d);else if(d>diaHoje)dF.push(d)}const dO=[].concat(dP,[diaHoje],dF);let th='<thead><tr class="bg-slate-900 text-amber-400 border-b border-slate-800 sticky top-0 z-30"><th class="p-2.5 font-bold sticky left-0 bg-slate-900 z-40 min-w-[220px] border-r border-slate-800">Colaborador</th>';dO.forEach(function(d){const eH=d===diaHoje;const eP=d<diaHoje;let c='p-2 text-center font-semibold min-w-[120px] text-[10px] ';if(eH)c+='text-amber-400 bg-amber-500/30 font-extrabold border-l-2 border-r-2 border-amber-500';else if(eP)c+='text-slate-400 border-l border-slate-800/50 bg-slate-950/40';else c+='text-slate-200 border-l border-slate-800/50';th+='<th class="'+c+'">'+(eH?'HOJE - ':'')+'Dia '+d+'</th>'});th+='</tr></thead>';if(cf.length===0){tab.innerHTML=th+'<tbody><tr><td colspan="'+(dO.length+1)+'" class="text-center text-slate-500 italic py-8">Nenhum.</td></tr></tbody>';return}let tb='<tbody>';cf.forEach(function(c){tb+='<tr class="border-b border-slate-800/60"><td class="p-2 sticky left-0 bg-slate-900 z-20 border-r border-slate-800 min-w-[220px]"><div class="text-xs font-bold text-slate-200">'+c.nome+'</div><div class="text-[10px] text-amber-400 font-semibold mt-0.5">Escala: '+c.escala+' · DSR: '+c.dsr+'</div></td>';dO.forEach(function(d){const iD=d-1;const fD=(c.presencaDias&&c.presencaDias[iD])||"-";const eH=d===diaHoje;const eP=d<diaHoje;const dD=new Date(anoAtual,mesAtualIndex,d);const eD=isDiaDSR(c.dsr,dD);const bl=eP;let op='';STATUS_ESPECIAIS.forEach(function(s){op+='<option value="'+s.valor+'" '+(s.valor===fD?'selected':'')+'>'+s.label+'</option>'});for(const setor of Object.keys(SETORES_E_FUNCOES)){op+='<optgroup label="'+setor+'">';SETORES_E_FUNCOES[setor].forEach(function(x){op+='<option value="'+x+'" '+(x===fD?'selected':'')+'>'+x+'</option>'});op+='</optgroup>'}let tc='p-1 text-center ';if(eH)tc+='bg-amber-500/10 border-l-2 border-r-2 border-amber-500/40';else if(eD)tc+='bg-orange-950/20';else if(eP)tc+='bg-slate-950/60';tb+='<td class="'+tc+'"><select onchange="tentarAlterarDia(\''+c.id+'\', '+iD+', this)" title="'+(eP&&!modoAdmin?'Dia anterior bloqueado para usuário. Somente administrador pode alterar.':'Clique para alterar.')+'" '+(bl?'disabled':'')+' class="w-full text-[10px] rounded p-1 '+(bl?'bg-slate-950 border-slate-800 text-slate-500 cursor-not-allowed':'bg-slate-950 border-slate-700 text-slate-200')+' border">'+op+'</select></td>'});tb+='</tr>'});tb+='</tbody>';tab.innerHTML=th+tb}
 function fecharModalMatriz(){modoAdmin=false;atualizarBotaoModoAdmin();document.getElementById('modal-matriz').classList.add('hidden');renderizar()}
-
-function extrairCodigoSPX(valor){
-  const s = String(valor||'').toUpperCase().trim();
-  const m = s.match(/\b([A-Z]{2,8})\s*-?\s*(\d{3,})\b(?=\s*$|\b)/);
-  return m ? (m[1] + m[2]).replace(/[\s-]+/g,'') : '';
-}
-
-function mostrarLogin(msg){
- document.body.classList.remove('role-user','role-admin');
- const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='none';
- const overlay=document.getElementById('logi-auth');if(overlay)overlay.classList.remove('hidden');
- const uv=document.getElementById('logi-user-view');if(uv)uv.classList.add('hidden');
- const err=document.getElementById('logi-login-error');if(err)err.textContent=msg||'';
- if(window.lucide)lucide.createIcons();
-}
-async function entrarLogi(ev){
- ev.preventDefault();const btn=document.getElementById('logi-login-submit');const err=document.getElementById('logi-login-error');btn.disabled=true;btn.textContent='Validando...';err.textContent='';
- try{const email=document.getElementById('logi-email').value.trim();const password=document.getElementById('logi-password').value;const r=await supabaseClient.auth.signInWithPassword({email,password});if(r.error)throw r.error;await validarSessaoLogi(r.data.session);}
- catch(e){err.textContent=e.message||'Falha no login.';}
- finally{btn.disabled=false;btn.textContent='Entrar';}
-}
+function extrairCodigoSPX(valor){const s = String(valor||'').toUpperCase().trim();const m = s.match(/\b([A-Z]{2,8})\s*-?\s*(\d{3,})\b(?=\s*$|\b)/);return m ? (m[1] + m[2]).replace(/[\s-]+/g,'') : '';}
+function mostrarLogin(msg){document.body.classList.remove('role-user','role-admin');const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='none';const overlay=document.getElementById('logi-auth');if(overlay)overlay.classList.remove('hidden');const uv=document.getElementById('logi-user-view');if(uv)uv.classList.add('hidden');const err=document.getElementById('logi-login-error');if(err)err.textContent=msg||'';if(window.lucide)lucide.createIcons();}
+async function entrarLogi(ev){ev.preventDefault();const btn=document.getElementById('logi-login-submit');const err=document.getElementById('logi-login-error');btn.disabled=true;btn.textContent='Validando...';err.textContent='';try{const email=document.getElementById('logi-email').value.trim();const password=document.getElementById('logi-password').value;const r=await supabaseClient.auth.signInWithPassword({email,password});if(r.error)throw r.error;await validarSessaoLogi(r.data.session);}catch(e){err.textContent=e.message||'Falha no login.';}finally{btn.disabled=false;btn.textContent='Entrar';}}
 async function sairLogi(){await supabaseClient.auth.signOut();}
-function montarBarraContaAdmin(){
- const el=document.getElementById('logi-admin-account');if(el)el.classList.remove('hidden');
- const n=document.getElementById('logi-admin-name');if(n)n.textContent=(perfilLogi?.nome||perfilLogi?.email||'Administrador')+' • Administrador';
- const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='';
-}
-function montarPainelUsuario(){
- const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='none';
- document.getElementById('logi-user-view').classList.remove('hidden');
- document.getElementById('user-view-name').textContent=perfilLogi?.nome||perfilLogi?.email||'Usuário';
- document.getElementById('user-view-subtitle').textContent='HUB-LCE-04 • '+nomeMesAtual+' / '+anoAtual+' • '+String(diaHoje).padStart(2,'0')+'/'+String(mesAtualIndex+1).padStart(2,'0');
- renderPainelUsuario('operacao');
-}
+function montarBarraContaAdmin(){const el=document.getElementById('logi-admin-account');if(el)el.classList.remove('hidden');const n=document.getElementById('logi-admin-name');if(n)n.textContent=(perfilLogi?.nome||perfilLogi?.email||'Administrador')+' • Administrador';const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='';}
+function montarPainelUsuario(){const app=document.querySelector('body > .flex.min-h-screen');if(app)app.style.display='none';document.getElementById('logi-user-view').classList.remove('hidden');document.getElementById('user-view-name').textContent=perfilLogi?.nome||perfilLogi?.email||'Usuário';document.getElementById('user-view-subtitle').textContent='HUB-LCE-04 • '+nomeMesAtual+' / '+anoAtual+' • '+String(diaHoje).padStart(2,'0')+'/'+String(mesAtualIndex+1).padStart(2,'0');renderPainelUsuario('operacao');}
 function renderPainelUsuario(filtro){
  const hoje=colaboradoresOperacionaisHoje();
  const grupos={operacao:[],diarista:[],dsr:[],banco_horas:[],faltas:[],atestados:[]};
@@ -1339,83 +1278,26 @@ if (document.readyState === "loading") {
 } else {
   init();
 }
-
 function opHojeISO(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function opAgora(){const d=new Date();return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0")}
 function opMin(h){if(!h)return null;const p=String(h).slice(0,5).split(":");return Number(p[0])*60+Number(p[1])}
 function setorDaFuncao(f){for(const s of Object.keys(SETORES_E_FUNCOES)){if(SETORES_E_FUNCOES[s].includes(f))return s}return"Recebimento"}
-function preencherFuncoesOperacao(){const s=document.getElementById("op-funcao");s.innerHTML="";for(const setor of Object.keys(SETORES_E_FUNCOES)){const g=document.createElement("optgroup");g.label=setor;SETORES_E_FUNCOES[setor].forEach(f=>{const o=document.createElement("option");o.value=f;o.textContent=f;g.appendChild(o)});s.appendChild(g)}}
+function preencherFuncoesOperacao(){const s=document.getElementById("op-funcao");if(!s)return;s.innerHTML="";for(const setor of Object.keys(SETORES_E_FUNCOES)){const g=document.createElement("optgroup");g.label=setor;SETORES_E_FUNCOES[setor].forEach(f=>{const o=document.createElement("option");o.value=f;o.textContent=f;g.appendChild(o)});s.appendChild(g)}}
 function opColabSelecionado(){return colaboradores.find(c=>c.id===document.getElementById("op-colaborador").value)}
-async function buscarMovimentosOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value,b=document.getElementById("op-historico");if(!c||!d)return;b.innerHTML="Carregando...";const r=await supabaseClient.from("historico_escala").select("*").eq("colaborador_id",c.id).eq("data_inicio",d).order("hora_inicio",{ascending:true});if(r.error){b.innerHTML=r.error.message;return}const rows=r.data||[];b.innerHTML=rows.length?rows.map(x=>'<div class="rounded-lg border border-slate-800 bg-slate-900 p-2"><b>'+String(x.funcao||"-")+'</b> <span class="text-cyan-300">'+String(x.hora_inicio||"--:--").slice(0,5)+" → "+(x.hora_fim?String(x.hora_fim).slice(0,5):"Em aberto")+"</span></div>").join(""):'<span class="text-slate-600">Nenhuma movimentação.</span>';const aberto=rows.find(x=>!x.hora_fim);document.getElementById("op-btn-entrada").disabled=!!aberto;document.getElementById("op-btn-troca").disabled=!aberto;document.getElementById("op-btn-saida").disabled=!aberto}
-function opAtualizar(){const c=opColabSelecionado();document.getElementById("op-status").textContent=c?c.nome:"Selecione um colaborador.";buscarMovimentosOperacao()}
+async function buscarMovimentosOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value,b=document.getElementById("op-historico");if(!c||!d||!b)return;b.innerHTML="Carregando...";const r=await supabaseClient.from("historico_escala").select("*").eq("colaborador_id",c.id).eq("data_inicio",d).order("hora_inicio",{ascending:true});if(r.error){b.innerHTML=r.error.message;return}const rows=r.data||[];b.innerHTML=rows.length?rows.map(x=>'<div class="rounded-lg border border-slate-800 bg-slate-900 p-2"><b>'+String(x.funcao||"-")+'</b> <span class="text-cyan-300">'+String(x.hora_inicio||"--:--").slice(0,5)+" → "+(x.hora_fim?String(x.hora_fim).slice(0,5):"Em aberto")+"</span></div>").join(""):'<span class="text-slate-600">Nenhuma movimentação.</span>';const aberto=rows.find(x=>!x.hora_fim);const e=document.getElementById("op-btn-entrada"),t=document.getElementById("op-btn-troca"),s=document.getElementById("op-btn-saida");if(e)e.disabled=!!aberto;if(t)t.disabled=!aberto;if(s)s.disabled=!aberto}
+function opAtualizar(){const c=opColabSelecionado();const el=document.getElementById("op-status");if(el)el.textContent=c?c.nome:"Selecione um colaborador.";buscarMovimentosOperacao()}
 async function registrarEntradaOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value,f=document.getElementById("op-funcao").value;if(!c||!f)return toast("Selecione colaborador e função.","warn");if(d!==opHojeISO())return toast("A entrada deve ser registrada no dia atual.","warn");const agora=opAgora();if(opMin(agora)>474)return toast("Entrada permitida somente até 07:54.","warn");const q=await supabaseClient.from("historico_escala").select("id").eq("colaborador_id",c.id).eq("data_inicio",d).is("hora_fim",null).limit(1);if(q.error)return toast(q.error.message,"erro");if(q.data?.length)return toast("Já existe uma operação em aberto.","warn");const r=await supabaseClient.from("historico_escala").insert([{colaborador_id:c.id,data_inicio:d,data_fim:d,setor:setorDaFuncao(f),funcao:f,hora_inicio:agora,hora_fim:null}]);if(r.error)return toast(r.error.message,"erro");toast("Entrada registrada às "+agora.slice(0,5)+".","ok");buscarMovimentosOperacao()}
 async function trocarFuncaoOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value,f=document.getElementById("op-funcao").value;if(!c||!f)return;const q=await supabaseClient.from("historico_escala").select("*").eq("colaborador_id",c.id).eq("data_inicio",d).is("hora_fim",null).order("hora_inicio",{ascending:false}).limit(1);if(q.error||!q.data?.length)return toast(q.error?.message||"Não há operação aberta.","warn");const atual=q.data[0],agora=opAgora();if(String(atual.funcao)===f)return toast("A função já é a atual.","warn");let r=await supabaseClient.from("historico_escala").update({hora_fim:agora,data_fim:d}).eq("id",atual.id);if(r.error)return toast(r.error.message,"erro");r=await supabaseClient.from("historico_escala").insert([{colaborador_id:c.id,data_inicio:d,data_fim:d,setor:setorDaFuncao(f),funcao:f,hora_inicio:agora,hora_fim:null}]);if(r.error)return toast(r.error.message,"erro");toast("Função alterada às "+agora.slice(0,5)+".","ok");buscarMovimentosOperacao()}
 async function registrarSaidaOperacao(){const c=opColabSelecionado(),d=document.getElementById("op-data").value;if(!c)return;const q=await supabaseClient.from("historico_escala").select("id").eq("colaborador_id",c.id).eq("data_inicio",d).is("hora_fim",null).order("hora_inicio",{ascending:false}).limit(1);if(q.error||!q.data?.length)return toast(q.error?.message||"Não há operação aberta.","warn");const agora=opAgora(),r=await supabaseClient.from("historico_escala").update({hora_fim:agora,data_fim:d}).eq("id",q.data[0].id);if(r.error)return toast(r.error.message,"erro");toast("Saída registrada às "+agora.slice(0,5)+".","ok");buscarMovimentosOperacao()}
-
-function abrirPainelOperacao(){
-  const m=document.getElementById("modal-operacao");
-  const s=document.getElementById("op-colaborador");
-  if(!m||!s)return;
-  s.innerHTML='<option value="">Selecione...</option>'+colaboradores.map(c=>'<option value="'+c.id+'">'+c.nome+"</option>").join("");
-  document.getElementById("op-data").value=opHojeISO();
-  preencherFuncoesOperacao();
-  m.classList.remove("hidden");
-  m.classList.add("flex");
-  s.onchange=opAtualizar;
-  document.getElementById("op-data").onchange=buscarMovimentosOperacao;
-  opAtualizar();
-}
-function fecharPainelOperacao(){
-  const m=document.getElementById("modal-operacao");
-  if(!m)return;
-  m.classList.add("hidden");
-  m.classList.remove("flex");
-}
-
+function abrirPainelOperacao(){const m=document.getElementById("modal-operacao"),s=document.getElementById("op-colaborador");if(!m||!s)return;s.innerHTML='<option value="">Selecione...</option>'+colaboradores.map(c=>'<option value="'+c.id+'">'+c.nome+"</option>").join("");document.getElementById("op-data").value=opHojeISO();preencherFuncoesOperacao();m.classList.remove("hidden");m.classList.add("flex");s.onchange=opAtualizar;document.getElementById("op-data").onchange=buscarMovimentosOperacao;opAtualizar()}
+function fecharPainelOperacao(){const m=document.getElementById("modal-operacao");if(!m)return;m.classList.add("hidden");m.classList.remove("flex")}
 function minutosHoraRastreio(h){if(!h)return null;const m=String(h).match(/(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null;}
 function formatarMinutosRastreio(m){if(!Number.isFinite(m)||m<=0)return '0h00';return Math.floor(m/60)+'h'+String(Math.round(m%60)).padStart(2,'0');}
 function abrirRastreioMensal(){if(papelLogi!=='admin'){toast('Rastreio mensal disponível somente para administrador.','erro');return;}const el=document.getElementById('rastreio-mes');if(el&&!el.value)el.value=String(anoAtual)+'-'+String(mesAtualIndex+1).padStart(2,'0');const m=document.getElementById('modal-rastreio-mensal');m.classList.remove('hidden');m.classList.add('flex');renderizarRastreioMensal();}
 function fecharRastreioMensal(){const m=document.getElementById('modal-rastreio-mensal');m.classList.add('hidden');m.classList.remove('flex');}
 function obterDadosRastreioMensal(){const mes=document.getElementById('rastreio-mes')?.value;if(!mes)return {mes:'',rows:[],porColab:[],setores:{},minutos:0,semHora:0};const [aa,mm]=mes.split('-').map(Number);const inicio=mes+'-01';const fim=mes+'-'+String(new Date(aa,mm,0).getDate()).padStart(2,'0');const hoje=opHojeISO();const agora=opAgora();const rows=historicoMovimentosGlobal.filter(r=>{const d=String(r.data_inicio||r.data||'').slice(0,10);return d>=inicio&&d<=fim&&!!r.hora_inicio;});const porId={};const setores={};let minutosTotal=0,semHora=0;rows.forEach(r=>{const c=colaboradores.find(x=>String(x.id)===String(r.colaborador_id));const nome=c?.nome||'Colaborador não localizado';const setor=r.setor||setorDaFuncao(r.funcao||'')||'Setor não informado';const funcao=r.funcao||setor;let ini=minutosHoraRastreio(r.hora_inicio),f=minutosHoraRastreio(r.hora_fim);if(ini===null){semHora++;return;}if(f===null){if(String(r.data_inicio||'').slice(0,10)===hoje)f=minutosHoraRastreio(agora);else{semHora++;return;}}if(f!==null&&f<ini)f+=1440;const dur=Math.max(0,(f??ini)-ini);minutosTotal+=dur;if(!porId[r.colaborador_id])porId[r.colaborador_id]={id:r.colaborador_id,nome:nome,total:0,setores:{},dias:{},movimentos:0};const x=porId[r.colaborador_id];x.total+=dur;x.setores[setor]=(x.setores[setor]||0)+dur;x.movimentos++;const dia=String(r.data_inicio||r.data||'').slice(0,10);if(!x.dias[dia])x.dias[dia]=[];x.dias[dia].push({setor,funcao,inicio:r.hora_inicio,fim:r.hora_fim||((dia===hoje)?agora:null),minutos:dur});if(!setores[setor])setores[setor]={minutos:0,pessoas:{}};setores[setor].minutos+=dur;setores[setor].pessoas[r.colaborador_id]=true;});return {mes,rows,porColab:Object.values(porId).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR')),setores,minutos:minutosTotal,semHora};}
-function renderizarRastreioMensal(){
-  const d=obterDadosRastreioMensal();
-  const resumo=document.getElementById('rastreio-resumo');
-  const cont=document.getElementById('rastreio-conteudo');
-  if(!resumo||!cont)return;
-  const pessoas=d.porColab.length;
-  const reg=d.rows.length;
-  const qtSetores=Object.keys(d.setores).length;
-  resumo.innerHTML=[['LOGIs rastreados',pessoas],['Movimentações',reg],['Setores utilizados',qtSetores],['Tempo rastreado',formatarMinutosRastreio(d.minutos)]].map(x=>'<div class="bg-slate-950 border border-slate-800 rounded-xl p-3"><div class="text-[9px] uppercase text-slate-400">'+x[0]+'</div><div class="text-xl font-extrabold text-cyan-300 mt-1">'+x[1]+'</div></div>').join('');
-  const termo=normalizarTexto(document.getElementById('rastreio-busca')?.value||'');
-  const setores=Object.entries(d.setores).sort((a,b)=>b[1].minutos-a[1].minutos);
-  let h='<section class="bg-slate-950 border border-slate-800 rounded-xl p-3"><h4 class="text-xs font-bold text-cyan-300 mb-3">Permanência por setor / função</h4>';
-  if(!setores.length)h+='<p class="text-xs text-slate-500">Nenhuma movimentação com horário foi registrada neste mês.</p>';
-  else{
-    const max=Math.max(1,...setores.map(x=>x[1].minutos));
-    setores.forEach(([nome,x])=>{h+='<div class="mb-3"><div class="flex justify-between gap-2 text-xs"><b>'+escaparHtmlLogi(nome)+'</b><span class="text-cyan-300">'+formatarMinutosRastreio(x.minutos)+' · '+Object.keys(x.pessoas).length+' LOGIs</span></div><div class="h-2 bg-slate-800 rounded-full mt-1 overflow-hidden"><div class="h-full bg-cyan-500 rounded-full" style="width:'+Math.round(x.minutos/max*100)+'%"></div></div></div>';});
-  }
-  h+='</section><section><h4 class="text-xs font-bold text-slate-200 mb-2">Rastreio individual</h4>';
-  const lista=d.porColab.filter(x=>!termo||matchBuscaAvancada(termo,x.nome,Object.keys(x.setores).join(' ')));
-  if(!lista.length)h+='<p class="text-xs text-slate-500">Nenhum colaborador encontrado.</p>';
-  lista.forEach(x=>{
-    const ss=Object.entries(x.setores).sort((a,b)=>b[1]-a[1]);
-    h+='<details class="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-2"><summary class="cursor-pointer flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-100">'+escaparHtmlLogi(x.nome)+'</span><span class="text-[10px] text-cyan-300">'+formatarMinutosRastreio(x.total)+' · '+x.movimentos+' movimentações</span></summary><div class="mt-3 grid md:grid-cols-2 gap-3"><div><div class="text-[10px] uppercase text-slate-500 mb-2">Tempo por setor</div>'+ss.map(z=>'<div class="flex justify-between text-[10px] border-b border-slate-800 py-1"><span>'+escaparHtmlLogi(z[0])+'</span><b class="text-cyan-300">'+formatarMinutosRastreio(z[1])+'</b></div>').join('')+'</div><div><div class="text-[10px] uppercase text-slate-500 mb-2">Linha do tempo diária</div>';
-    Object.keys(x.dias).sort().forEach(dia=>{
-      h+='<div class="mb-2"><div class="text-[10px] font-bold text-slate-400">'+dia+'</div>';
-      x.dias[dia].forEach(y=>{
-        h+='<div class="text-[10px] text-slate-300 border-b border-slate-800 py-0.5">'+escaparHtmlLogi(y.setor)+' · '+escaparHtmlLogi(y.funcao)+' · '+String(y.inicio||'').slice(0,5)+' → '+String(y.fim||'em aberto').slice(0,5)+' <b class="text-cyan-300">('+formatarMinutosRastreio(y.minutos)+')</b></div>';
-      });
-      h+='</div>';
-    });
-    h+='</div></div></details>';
-  });
-  h+='</section>';
-  cont.innerHTML=h;
-}
-
-window.addEventListener('error', function(e){
-  console.error('Erro JS:', e.message, 'em', e.filename, 'linha', e.lineno);
-});
+function renderizarRastreioMensal(){const d=obterDadosRastreioMensal();const resumo=document.getElementById('rastreio-resumo'),cont=document.getElementById('rastreio-conteudo');if(!resumo||!cont)return;const pessoas=d.porColab.length,reg=d.rows.length,qtSetores=Object.keys(d.setores).length;resumo.innerHTML=[['LOGIs rastreados',pessoas],['Movimentações',reg],['Setores utilizados',qtSetores],['Tempo rastreado',formatarMinutosRastreio(d.minutos)]].map(x=>'<div class="bg-slate-950 border border-slate-800 rounded-xl p-3"><div class="text-[9px] uppercase text-slate-400">'+x[0]+'</div><div class="text-xl font-extrabold text-cyan-300 mt-1">'+x[1]+'</div></div>').join('');const termo=normalizarTexto(document.getElementById('rastreio-busca')?.value||'');const setores=Object.entries(d.setores).sort((a,b)=>b[1].minutos-a[1].minutos);let h='<section class="bg-slate-950 border border-slate-800 rounded-xl p-3"><h4 class="text-xs font-bold text-cyan-300 mb-3">Permanência por setor / função</h4>';if(!setores.length)h+='<p class="text-xs text-slate-500">Nenhuma movimentação com horário foi registrada neste mês.</p>';else{const max=Math.max(1,...setores.map(x=>x[1].minutos));setores.forEach(([nome,x])=>{h+='<div class="mb-3"><div class="flex justify-between gap-2 text-xs"><b>'+escaparHtmlLogi(nome)+'</b><span class="text-cyan-300">'+formatarMinutosRastreio(x.minutos)+' · '+Object.keys(x.pessoas).length+' LOGIs</span></div><div class="h-2 bg-slate-800 rounded-full mt-1 overflow-hidden"><div class="h-full bg-cyan-500 rounded-full" style="width:'+Math.round(x.minutos/max*100)+'%"></div></div></div>';});}h+='</section><section><h4 class="text-xs font-bold text-slate-200 mb-2">Rastreio individual</h4>';const lista=d.porColab.filter(x=>!termo||matchBuscaAvancada(termo,x.nome,Object.keys(x.setores).join(' ')));if(!lista.length)h+='<p class="text-xs text-slate-500">Nenhum colaborador encontrado.</p>';lista.forEach(x=>{const ss=Object.entries(x.setores).sort((a,b)=>b[1]-a[1]);h+='<details class="bg-slate-950 border border-slate-800 rounded-xl p-3 mb-2"><summary class="cursor-pointer flex flex-wrap items-center justify-between gap-2"><span class="text-xs font-bold text-slate-100">'+escaparHtmlLogi(x.nome)+'</span><span class="text-[10px] text-cyan-300">'+formatarMinutosRastreio(x.total)+' · '+x.movimentos+' movimentações</span></summary><div class="mt-3 grid md:grid-cols-2 gap-3"><div><div class="text-[10px] uppercase text-slate-500 mb-2">Tempo por setor</div>'+ss.map(z=>'<div class="flex justify-between text-[10px] border-b border-slate-800 py-1"><span>'+escaparHtmlLogi(z[0])+'</span><b class="text-cyan-300">'+formatarMinutosRastreio(z[1])+'</b></div>').join('')+'</div><div><div class="text-[10px] uppercase text-slate-500 mb-2">Linha do tempo diária</div>'+Object.keys(x.dias).sort().map(dia=>'<div class="mb-2"><div class="text-[10px] font-bold text-slate-400">'+dia+'</div>'+x.dias[dia].map(y=>'<div class="text-[10px] text-slate-300 border-b border-slate-800 py-0.5">'+escaparHtmlLogi(y.setor)+' · '+escaparHtmlLogi(y.funcao)+' · '+String(y.inicio||'').slice(0,5)+' → '+String(y.fim||'em aberto').slice(0,5)+' <b class="text-cyan-300">('+formatarMinutosRastreio(y.minutos)+')</b></div>').join('')+'</div>').join('')+'</div></div></details>';});h+='</section>';cont.innerHTML=h;}
+window.addEventListener('error', function(e){console.error('Erro JS:', e.message, 'em', e.filename, 'linha', e.lineno);});
 </script>
 </body>
 </html>
