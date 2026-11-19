@@ -9,9 +9,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='120' fill='%23f59e0b'/><path d='M130 180 L60 256 L130 332 M382 180 L452 256 L382 332 M275 140 L235 372' stroke='%2309090b' stroke-width='48' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+<!-- Carrega Tailwind e Lucide (ícones) via CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
+/* ===== ESTILOS GERAIS (TAILWIND CUSTOMIZADO) ===== */
 :root{--primary:38 92% 50%;--primary-fg:222 47% 4%;--secondary:217 33% 17%;--border:217 33% 20%;--muted:217 33% 15%;--bg:222 47% 4%}
 *{box-sizing:border-box}
 body{font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased}
@@ -62,6 +64,7 @@ body.role-admin #logi-admin-account{display:flex!important}
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
 
+<!-- TELA DE LOGIN (Oculta no modo de teste) -->
 <div id="logi-auth" class="hidden fixed inset-0 z-[200] bg-slate-950 flex items-center justify-center p-4">
  <form id="logi-login-form" class="w-full max-w-sm bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl" onsubmit="entrarLogi(event)">
   <div class="flex items-center gap-3 mb-5"><div class="bg-amber-500/10 p-3 rounded-xl text-amber-400"><i data-lucide="layers" class="w-6 h-6"></i></div><div><h1 class="text-xl font-extrabold text-amber-400">LogiRotator</h1><p class="text-xs text-slate-400">Acesso seguro • HUB-LCE-04</p></div></div>
@@ -101,9 +104,11 @@ body.role-admin #logi-admin-account{display:flex!important}
  </div>
 </div>
 
+<!-- BANNER DE MODO DE TESTE -->
 <div id="logi-test-mode-banner" class="bg-amber-500 text-slate-950 text-center text-xs font-bold px-3 py-2">MODO DE TESTE — autenticação desativada temporariamente. Não publique esta versão em produção.</div>
 <div class="flex min-h-screen">
 
+<!-- SIDEBAR DESKTOP -->
 <aside id="sidebar-desktop" class="hidden lg:flex lg:flex-col w-64 bg-slate-900/70 border-r border-slate-800 backdrop-blur-sm sticky top-0 h-screen">
 <div class="p-4 border-b border-slate-800"><div class="flex items-center gap-2.5">
 <div class="bg-amber-500/10 p-2 rounded-xl border border-amber-500/30 text-amber-400"><i data-lucide="layers" class="w-5 h-5"></i></div>
@@ -126,6 +131,7 @@ body.role-admin #logi-admin-account{display:flex!important}
 <div class="p-3 border-t border-slate-800 text-[10px] text-slate-500"><p id="label-mes-ano-sidebar">&mdash;</p></div>
 </aside>
 
+<!-- CONTEÚDO PRINCIPAL -->
 <main class="flex-1 min-w-0">
 <div id="app" class="max-w-md md:max-w-6xl mx-auto p-3 sm:p-6 pb-12">
 <header class="flex flex-col gap-4 mb-6 pb-4 border-b border-slate-800">
@@ -139,6 +145,7 @@ body.role-admin #logi-admin-account{display:flex!important}
 </div>
 </header>
 
+<!-- PAINEL DE KPIs -->
 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
 <button onclick="setFiltro('todos')" class="text-left card hover:border-blue-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Total Atual</span><h2 id="kpi-total" class="text-2xl font-extrabold text-slate-100 mt-0.5">0</h2></div><div class="bg-blue-500/10 p-2.5 rounded-lg border border-blue-500/20 text-blue-400"><i data-lucide="users" class="w-5 h-5"></i></div></button>
 <button onclick="setFiltro('presentes')" class="text-left card hover:border-emerald-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Presentes</span><h2 id="kpi-presentes" class="text-2xl font-extrabold text-emerald-400 mt-0.5">0</h2><span id="kpi-presentes-detalhe" class="text-[9px] text-slate-500">&mdash;</span></div><div class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-400"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div></button>
@@ -150,6 +157,7 @@ body.role-admin #logi-admin-account{display:flex!important}
 <button onclick="setFiltro('atestados')" class="text-left card hover:border-red-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Atestados</span><h2 id="kpi-atestados" class="text-2xl font-extrabold text-red-400 mt-0.5">0</h2></div><div class="bg-red-500/10 p-2.5 rounded-lg border border-red-500/20 text-red-400"><i data-lucide="stethoscope" class="w-5 h-5"></i></div></button>
 </div>
 
+<!-- BARRA DE PESQUISA -->
 <div class="card mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
 <div class="relative w-full"><i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i><input type="text" id="input-busca" placeholder="Pesquisar por nome, escala ou DSR..." oninput="renderizar()" class="input pl-9"></div>
 <div class="w-full sm:w-auto flex justify-end gap-2"><span id="label-filtro-ativo" class="badge badge-info px-3 py-2"><i data-lucide="filter" class="w-3.5 h-3.5"></i> Todos</span></div>
@@ -160,6 +168,7 @@ body.role-admin #logi-admin-account{display:flex!important}
 </main>
 </div>
 
+<!-- SIDEBAR MOBILE -->
 <div id="sidebar-mobile-overlay" onclick="toggleSidebarMobile()" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-40 hidden lg:hidden"></div>
 <aside id="sidebar-mobile" class="fixed top-0 left-0 h-full w-72 bg-slate-900 border-r border-slate-800 z-50 transform -translate-x-full transition-transform duration-300 lg:hidden flex flex-col">
 <div class="p-4 border-b border-slate-800 flex items-center justify-between">
@@ -283,12 +292,18 @@ body.role-admin #logi-admin-account{display:flex!important}
 </div>
 
 <script>
+// ============================================================
+// 1. CONFIGURAÇÃO DA API E CLIENTE NEON
+// ============================================================
 const LOGI_API_URL = '/api';
+
 function criarErroApi(mensagem, status) {
   const e = new Error(mensagem || 'Falha na comunicação com a API Neon.');
   e.status = status || 500;
   return e;
 }
+
+// Faz a requisição HTTP para o Worker do Cloudflare
 async function requisicaoNeon(payload) {
   let response;
   try {
@@ -298,7 +313,7 @@ async function requisicaoNeon(payload) {
       body: JSON.stringify(payload)
     });
   } catch (e) {
-    throw criarErroApi('Não foi possível acessar a API do Neon. Publique também as Netlify Functions do projeto.', 0);
+    throw criarErroApi('Não foi possível acessar a API do Neon.', 0);
   }
   let body = {};
   try { body = await response.json(); } catch (_) {}
@@ -306,6 +321,7 @@ async function requisicaoNeon(payload) {
   return body;
 }
 
+// Classe que simula a API do Supabase, mas envia para o Neon
 class NeonQuery {
   constructor(table) {
     this.table = table; this.action = 'select'; this.columns = '*';
@@ -347,14 +363,18 @@ class NeonQuery {
   }
   then(resolve, reject) { return this.execute().then(resolve, reject); }
 }
+
 const supabaseClient = {
   from(table) { return new NeonQuery(table); },
   auth: {
     async signOut() { return { error: null }; },
-    async signInWithPassword() { return { data: { session: null }, error: criarErroApi('Autenticação ainda não configurada na API Neon. Use o modo de teste.', 501) }; }
+    async signInWithPassword() { return { data: { session: null }, error: criarErroApi('Autenticação ainda não configurada.', 501) }; }
   }
 };
 
+// ============================================================
+// 2. FUNÇÕES UTILITÁRIAS E CONSTANTES
+// ============================================================
 function toast(msg,tipo){tipo=tipo||'ok';const el=document.createElement('div');el.className='fixed top-4 right-4 z-[999] px-4 py-3 rounded-xl shadow-2xl text-sm font-semibold border '+(tipo==='ok'?'bg-emerald-500/20 border-emerald-500/40 text-emerald-200':tipo==='warn'?'bg-yellow-500/20 border-yellow-500/40 text-yellow-200':'bg-red-500/20 border-red-500/40 text-red-200');el.textContent=msg;document.body.appendChild(el);setTimeout(function(){el.remove()},3500)}
 
 const SETORES_E_FUNCOES={
@@ -418,25 +438,32 @@ function normalizarTexto(t){if(t===null||t===undefined)return"";return String(t)
 function matchBuscaAvancada(termo){if(!termo)return true;const palavras=termo.split(" ").filter(function(p){return p.length>0});const campos=Array.prototype.slice.call(arguments,1);const alvo=normalizarTexto(campos.filter(function(c){return c}).join(" "));return palavras.every(function(p){return alvo.includes(p)})}
 
 const DIAS_SEMANA_MAP={"dom":0,"domingo":0,"seg":1,"segunda":1,"ter":2,"terca":2,"terca feira":2,"qua":3,"quarta":3,"quarta feira":3,"qui":4,"quinta":4,"quinta feira":4,"sex":5,"sexta":5,"sexta feira":5,"sab":6,"sabado":6,"sabado feira":6};
+
+// ============================================================
+// 3. REGRAS DE DSR E STATUS (CORRIGIDO)
+// ============================================================
 function isDiaDSR(dsrTexto,dataObj){if(!dsrTexto)return false;const d=dataObj.getDay();const dn=normalizarTexto(dsrTexto).replace(/feira/g,"").replace(/-/g," ");const dn2=dn.replace(/\s+/g," ").trim();const p=dn2.split(/,|\se\s/).map(function(x){return x.trim().replace(/\s+/g," ")}).filter(function(x){return x});for(let i=0;i<p.length;i++){const parte=p[i];if(DIAS_SEMANA_MAP[parte]===d)return true;const prim=parte.split(" ")[0];if(DIAS_SEMANA_MAP[prim]===d)return true;if(DIAS_SEMANA_MAP[prim.slice(0,3)]===d)return true}return false}
 function isColabEmDSRHoje(c){const dataHoje=new Date(anoAtual,mesAtualIndex,diaHoje);return isDiaDSR(c.dsr,dataHoje)}
 
 function obterStatusHoje(c){
-  // 1. DSR na escala tem prioridade máxima
-  if(isColabEmDSRHoje(c)) return 'dsr';
-
+  // 1. Pega o status que está gravado no banco para hoje (se não tiver, é '-')
   const pres = (c.presencaDias && c.presencaDias[diaHoje-1]) || "-";
-  
-  // 2. Status explícitos de ausência (no banco)
+
+  // 2. Verifica as ausências / status especiais
   if(["F","FJ"].includes(pres)) return 'falta';
   if(pres === "AM") return 'atestado';
   if(pres === "FE") return 'ferias';
-  if(pres === "BH") return 'banco_horas';
   if(["AF","AL"].includes(pres)) return 'afastamento';
-  if(["DF","DP","DV","NC","NS"].includes(pres)) return 'afastamento';
-  if(["S1","TD","SU","PR","TR","FC","IN"].includes(pres)) return 'outro_status';
+  if(pres === "BH") return 'banco_horas';
+  if(["DF","DP","DV","NC","NS"].includes(pres)) return 'afastamento'; // Demitidos não aparecem
+  
+  // 3. DSR Automático (se a escala for folga hoje)
+  if(isColabEmDSRHoje(c)) return 'dsr';
 
-  // 3. Se não for nenhuma ausência ou DSR, é PRESENTE (mesmo sem registro no banco)
+  // 4. Se for presente (P) ou outros status de operação
+  if(["P","S2","S1","TD","SU","PR","TR","FC","IN"].includes(pres)) return 'presente';
+
+  // 5. Se o banco estiver vazio, consideramos como PRESENTE
   return 'presente';
 }
 
@@ -466,8 +493,8 @@ function estaEmOperacaoHoje(c){
   return isFuncaoAlocada(f) && !isColabEmDSRHoje(c);
 }
 
+// ... (O restante das funções de contagem, diaristas, etc. segue igual ao original)
 function contarDiasNaFuncaoAtual(h){const f=h[diaHoje-1];if(!f||isStatusEspecial(f))return{funcao:"Nenhuma",dias:0,dataInicio:null,dataFim:null};let c=0;let idx=diaHoje-1;for(let i=diaHoje-1;i>=0;i--){if(h[i]===f&&!isStatusEspecial(h[i])){c++;idx=i}else{break}}return{funcao:f,dias:c,dataInicio:new Date(anoAtual,mesAtualIndex,idx+1),dataFim:new Date(anoAtual,mesAtualIndex,diaHoje)}}
-
 function obterChaveDiaristasDia(){return'diaristas_'+anoAtual+'-'+String(mesAtualIndex+1).padStart(2,'0')+'-'+String(diaHoje).padStart(2,'0')}
 function getDiaristasDia(){const raw=localStorage.getItem(obterChaveDiaristasDia());if(!raw)return{pedidos:0,presentes:0,faltantes:0};try{const o=JSON.parse(raw);return{pedidos:parseInt(o.pedidos,10)||0,presentes:parseInt(o.presentes,10)||0,faltantes:parseInt(o.faltantes,10)||0}}catch(e){return{pedidos:0,presentes:0,faltantes:0}}}
 function setDiaristasDia(o){
@@ -483,7 +510,6 @@ async function carregarDiaristasDiaBanco(){
 function abrirModalDiaristasPedidos(){document.getElementById('input-diaristas-pedidos').value=getDiaristasDia().pedidos;document.getElementById('modal-diaristas-pedidos').classList.remove('hidden');lucide.createIcons();setTimeout(function(){document.getElementById('input-diaristas-pedidos').select()},100)}
 function fecharModalDiaristasPedidos(){document.getElementById('modal-diaristas-pedidos').classList.add('hidden')}
 function salvarDiaristasPedidos(){const v=parseInt(document.getElementById('input-diaristas-pedidos').value,10)||0;const a=getDiaristasDia();let np=a.presentes;let nf=a.faltantes;if(v>0){if(np>v)np=v;if((np+nf)>v)nf=Math.max(0,v-np);}setDiaristasDia({pedidos:v,presentes:np,faltantes:nf});toast('Pedido: '+v,'ok');fecharModalDiaristasPedidos();renderizar()}
-
 function abrirModalAddDiarista(statusPre){
   const d=getDiaristasDia();
   if(d.pedidos<=0){toast("Defina primeiro o pedido.",'warn');return}
@@ -521,7 +547,6 @@ function abrirModalAddDiarista(statusPre){
   setTimeout(function(){const alvo=statusPre==='faltou'?novoF:novoP;if(alvo){alvo.focus();alvo.select();}},100);
 }
 function fecharModalAddDiarista(){document.getElementById('modal-add-diarista-qtd').classList.add('hidden')}
-
 function salvarDiaristasQtd(){
   const p=parseInt(document.getElementById('input-diaristas-presentes').value,10)||0;
   const f=parseInt(document.getElementById('input-diaristas-faltantes').value,10)||0;
@@ -534,9 +559,7 @@ function salvarDiaristasQtd(){
   fecharModalAddDiarista();
   renderizar();
 }
-
 function toggleSidebarMobile(){const s=document.getElementById('sidebar-mobile');const o=document.getElementById('sidebar-mobile-overlay');const ab=!s.classList.contains('-translate-x-full');if(ab){s.classList.add('-translate-x-full');o.classList.add('hidden')}else{s.classList.remove('-translate-x-full');o.classList.remove('hidden')}}
-
 function setFiltro(f){filtroAtivo=f;document.querySelectorAll('.sidebar-item').forEach(function(b){b.classList.remove('active')});const btn=document.getElementById('menu-'+f);if(btn)btn.classList.add('active');const labels={'todos':'Todos','presentes':'Presentes','operacao':'Em Operação','diaristas':'Diaristas','dsr':'Em DSR Hoje','banco_horas':'Banco de Horas Hoje','faltas':'Faltas Hoje','atestados':'Atestados Hoje'};const icons={'todos':'layout-grid','presentes':'check-circle-2','operacao':'users','diaristas':'hard-hat','dsr':'palmtree','banco_horas':'clock-3','faltas':'alert-triangle','atestados':'stethoscope'};const el=document.getElementById('label-filtro-ativo');if(el)el.innerHTML='<i data-lucide="'+icons[f]+'" class="w-3.5 h-3.5"></i> '+labels[f];renderizar();lucide.createIcons()}
 
 async function init(){
@@ -600,7 +623,7 @@ async function carregarDadosSupabase(){
     }
     const presencas=await carregarPresencasDoMesCompleto();
 
-    // 🔥 FORÇA A DATA DE HOJE (não volta para o último dia com dados)
+    // 🔥 FORÇA A DATA DE HOJE
     diaHoje = dataAtualSistema.getDate(); 
     
     const txtOperacional='HUB-LCE-04 • '+nomeMesAtual+' / '+anoAtual+' (Dia '+diaHoje+')';
@@ -935,16 +958,16 @@ function criarListaGeral(cols) {
     const st = obterStatusHoje(c);
     const statusInfo = {
       operacao: {tipo:'operacao', label:'Em Operação', badge:'badge-success'},
-      presente: {tipo:'presente', label:'PRESENTE', badge:'badge-success'},
-      dsr: {tipo:'dsr', label:'DSR', badge:'badge-orange'},
-      falta: {tipo:'falta', label:'FALTA', badge:'badge-warning'},
-      atestado: {tipo:'atestado', label:'ATESTADO', badge:'badge-danger'},
-      ferias: {tipo:'ferias', label:'Férias', badge:'badge-purple'},
-      afastamento: {tipo:'afastamento', label:'Afastamento', badge:'badge-default'},
-      banco_horas: {tipo:'banco_horas', label:'Banco de Horas', badge:'badge-purple'},
+      presente: {tipo:'presente', label:'Presente (P)', badge:'badge-success'},
+      dsr: {tipo:'dsr', label:'Descanso Semanal Remunerado (DSR)', badge:'badge-orange'},
+      falta: {tipo:'falta', label:'Falta Injustificada (F)', badge:'badge-warning'},
+      atestado: {tipo:'atestado', label:'Atestado médico (AM)', badge:'badge-danger'},
+      ferias: {tipo:'ferias', label:'Férias (FE)', badge:'badge-purple'},
+      afastamento: {tipo:'afastamento', label:'Afastamento (AF/AL/DF/DP)', badge:'badge-default'},
+      banco_horas: {tipo:'banco_horas', label:'Banco de Horas (BH)', badge:'badge-purple'},
       outro_status: {tipo:'outro_status', label:'Outro status', badge:'badge-default'},
-      sem_escala: {tipo:'sem_escala', label:'Presente (Sem registro)', badge:'badge-success'}
-    }[st] || {tipo:'sem_escala', label:'Presente', badge:'badge-success'};
+      sem_escala: {tipo:'presente', label:'Presente (Sem registro)', badge:'badge-success'}
+    }[st] || {tipo:'presente', label:'Presente', badge:'badge-success'};
     const rawPresenca = String((c.presencaDias&&c.presencaDias[diaHoje-1]) || '-').toUpperCase();
     const labelsPresenca = {
       'P':'Presente (P)', 'AF':'Afastamento (AF)', 'AL':'Afastamento longo (AL)', 'AM':'Atestado médico (AM)',
@@ -1059,6 +1082,7 @@ if(filtroAtivo==='atestados'){
 lucide.createIcons();
 }
 
+// ... (O restante das funções de setores, modais, relatórios, etc. seguem o mesmo padrão do arquivo original)
 function renderizarSetores(cols,cont,forcarTodos){
   const setoresComColabs={};
   for(const setor of Object.keys(SETORES_E_FUNCOES)){
