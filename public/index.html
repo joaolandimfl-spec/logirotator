@@ -142,7 +142,7 @@ body.role-admin #logi-admin-account{display:flex!important}
 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 mb-6">
 <button onclick="setFiltro('todos')" class="text-left card hover:border-blue-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Total Atual</span><h2 id="kpi-total" class="text-2xl font-extrabold text-slate-100 mt-0.5">0</h2></div><div class="bg-blue-500/10 p-2.5 rounded-lg border border-blue-500/20 text-blue-400"><i data-lucide="users" class="w-5 h-5"></i></div></button>
 <button onclick="setFiltro('presentes')" class="text-left card hover:border-emerald-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Presentes</span><h2 id="kpi-presentes" class="text-2xl font-extrabold text-emerald-400 mt-0.5">0</h2><span id="kpi-presentes-detalhe" class="text-[9px] text-slate-500">&mdash;</span></div><div class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-400"><i data-lucide="check-circle-2" class="w-5 h-5"></i></div></button>
-<button onclick="setFiltro('operacao')" class="text-left card hover:border-emerald-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Em Operação</span><h2 id="kpi-operacao" class="text-2xl font-extrabold text-emerald-400 mt-0.5">0</h2><span id="kpi-operacao-detalhe" class="text-[9px] text-slate-500">Total de presentes hoje</span></div><div class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-400"><i data-lucide="activity" class="w-5 h-5"></i></div></button>
+<button onclick="setFiltro('operacao')" class="text-left card hover:border-emerald-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Em Operação</span><h2 id="kpi-operacao" class="text-2xl font-extrabold text-emerald-400 mt-0.5">0</h2><span id="kpi-operacao-detalhe" class="text-[9px] text-slate-500">Alocados</span></div><div class="bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 text-emerald-400"><i data-lucide="activity" class="w-5 h-5"></i></div></button>
 <button onclick="setFiltro('diaristas')" class="text-left card hover:border-cyan-400 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-cyan-400">Diaristas</span><h2 id="kpi-diaristas" class="text-2xl font-extrabold text-cyan-400 mt-0.5">0</h2></div><div class="bg-cyan-500/10 p-2.5 rounded-lg border border-cyan-500/20 text-cyan-400"><i data-lucide="hard-hat" class="w-5 h-5"></i></div></button>
 <button onclick="setFiltro('dsr')" class="text-left card hover:border-orange-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Em DSR</span><h2 id="kpi-dsr" class="text-2xl font-extrabold text-orange-400 mt-0.5">0</h2></div><div class="bg-orange-500/10 p-2.5 rounded-lg border border-orange-500/20 text-orange-400"><i data-lucide="palmtree" class="w-5 h-5"></i></div></button>
 <button onclick="setFiltro('banco_horas')" class="text-left card hover:border-violet-500/50 active:scale-[0.98]"><div><span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Banco de Horas</span><h2 id="kpi-banco-horas" class="text-2xl font-extrabold text-violet-400 mt-0.5">0</h2><span class="text-[9px] text-slate-500">Status BH hoje</span></div><div class="bg-violet-500/10 p-2.5 rounded-lg border border-violet-500/20 text-violet-400"><i data-lucide="clock-3" class="w-5 h-5"></i></div></button>
@@ -422,22 +422,30 @@ function isDiaDSR(dsrTexto,dataObj){if(!dsrTexto)return false;const d=dataObj.ge
 function isColabEmDSRHoje(c){const dataHoje=new Date(anoAtual,mesAtualIndex,diaHoje);return isDiaDSR(c.dsr,dataHoje)}
 
 function obterStatusHoje(c){
-  const pres=(c.presencaDias&&c.presencaDias[diaHoje-1])||"-";
-  if(pres==="DSR"||pres==="FO")return'dsr';
-  if(["F","FJ"].includes(pres))return'falta';
-  if(pres==="AM")return'atestado';
-  if(pres==="FE")return'ferias';
-  if(pres==="BH")return'banco_horas';
-  if(["AF","AL"].includes(pres))return'afastamento';
-  if(["P","S2"].includes(pres))return'presente';
-  if(["S1","TD","SU","PR","TR","FC","IN"].includes(pres))return'outro_status';
-  return'sem_escala';
+  // 1. DSR na escala tem prioridade máxima
+  if(isColabEmDSRHoje(c)) return 'dsr';
+
+  const pres = (c.presencaDias && c.presencaDias[diaHoje-1]) || "-";
+  
+  // 2. Status explícitos de ausência (no banco)
+  if(["F","FJ"].includes(pres)) return 'falta';
+  if(pres === "AM") return 'atestado';
+  if(pres === "FE") return 'ferias';
+  if(pres === "BH") return 'banco_horas';
+  if(["AF","AL"].includes(pres)) return 'afastamento';
+  if(["DF","DP","DV","NC","NS"].includes(pres)) return 'afastamento';
+  if(["S1","TD","SU","PR","TR","FC","IN"].includes(pres)) return 'outro_status';
+
+  // 3. Se não for nenhuma ausência ou DSR, é PRESENTE (mesmo sem registro no banco)
+  return 'presente';
 }
+
 function colaboradoresOperacionaisHoje(){
-  const foraDoQuadro=new Set(['DF','DP','DV','NC','NS']);
   return colaboradores.filter(function(c){
-    const st=String((c.presencaDias&&c.presencaDias[diaHoje-1])||'-').toUpperCase();
-    return st && st!=='-' && !foraDoQuadro.has(st);
+    if (c.ativo === false) return false;
+    // Remove quem está de férias ou afastado no cadastro
+    if (c.situacao === 'Férias' || c.situacao === 'Afastamento') return false;
+    return true; // Aceita todos os outros
   });
 }
 
@@ -454,9 +462,8 @@ function colaboradoresOperacionaisMes(){
 }
 
 function estaEmOperacaoHoje(c){
-  const f=(c.historicoDias&&c.historicoDias[diaHoje-1])||'-';
-  const p=(c.presencaDias&&c.presencaDias[diaHoje-1])||'-';
-  return ["P","S2"].includes(p) && isFuncaoAlocada(f);
+  const f = (c.historicoDias && c.historicoDias[diaHoje-1]) || '-';
+  return isFuncaoAlocada(f) && !isColabEmDSRHoje(c);
 }
 
 function contarDiasNaFuncaoAtual(h){const f=h[diaHoje-1];if(!f||isStatusEspecial(f))return{funcao:"Nenhuma",dias:0,dataInicio:null,dataFim:null};let c=0;let idx=diaHoje-1;for(let i=diaHoje-1;i>=0;i--){if(h[i]===f&&!isStatusEspecial(h[i])){c++;idx=i}else{break}}return{funcao:f,dias:c,dataInicio:new Date(anoAtual,mesAtualIndex,idx+1),dataFim:new Date(anoAtual,mesAtualIndex,diaHoje)}}
@@ -593,23 +600,9 @@ async function carregarDadosSupabase(){
     }
     const presencas=await carregarPresencasDoMesCompleto();
 
-    const contagemPorDia={};
-    presencas.forEach(function(r){
-      const ds=String(r.data||'').slice(0,10);
-      if(!ds)return;
-      const d=Number(ds.slice(8,10));
-      if(d>=1&&d<=totalDiasDoMes&&d<=dataAtualSistema.getDate()){
-        contagemPorDia[d]=(contagemPorDia[d]||0)+1;
-      }
-    });
-    const diasComDados=Object.keys(contagemPorDia).map(Number).sort(function(a,b){return a-b});
-    if(diasComDados.length){
-      const maiorCarga=Math.max.apply(null,diasComDados.map(function(d){return contagemPorDia[d]}));
-      const minimoCarga=Math.max(1,Math.floor(maiorCarga*0.80));
-      const diasCompletos=diasComDados.filter(function(d){return contagemPorDia[d]>=minimoCarga});
-      if(diasCompletos.length)diaHoje=diasCompletos[diasCompletos.length-1];
-      else diaHoje=diasComDados[diasComDados.length-1];
-    }
+    // 🔥 FORÇA A DATA DE HOJE (não volta para o último dia com dados)
+    diaHoje = dataAtualSistema.getDate(); 
+    
     const txtOperacional='HUB-LCE-04 • '+nomeMesAtual+' / '+anoAtual+' (Dia '+diaHoje+')';
     const lm=document.getElementById('label-mes-ano'); if(lm)lm.innerText=txtOperacional;
     const lms=document.getElementById('label-mes-ano-sidebar'); if(lms)lms.innerText=txtOperacional;
@@ -672,6 +665,7 @@ async function carregarDadosSupabase(){
         hub:c.hub||'',
         subRegional:c.sub_regional||'',
         ativo:c.ativo!==false,
+        situacao:c.situacao||'Ativo',
         historicoDias:hd,
         presencaDias:pd,
         movimentosDia:historico.filter(function(r){
@@ -697,7 +691,7 @@ function atualizarKPIs(){
   const diaristas=hoje.filter(function(x){return x.status==='diarista'}).length;
   const diaristasDia=getDiaristasDia();
   const totalPresentes=presentes+diaristasDia.presentes;
-  const operacao=totalPresentes;
+  const operacao=hoje.filter(function(x){ return estaEmOperacaoHoje(x.c); }).length;
   const dsr=hoje.filter(function(x){return x.status==='dsr'}).length;
   const bh=hoje.filter(function(x){return x.status==='banco_horas'}).length;
   const faltas=hoje.filter(function(x){return x.status==='falta'}).length;
@@ -705,33 +699,33 @@ function atualizarKPIs(){
 
   const vals={
     'kpi-total':total,
-    'kpi-presentes':presentes,
+    'kpi-presentes':totalPresentes,
     'kpi-operacao':operacao,
     'kpi-diaristas':diaristas,
     'kpi-dsr':dsr,
     'kpi-banco-horas':bh,
-    'kpi-faltas':faltas,
+    'kpi-faltas':faltas+diaristasDia.faltantes,
     'kpi-atestados':atestados,
     'badge-todos':total,
     'badge-presentes':totalPresentes,
     'badge-operacao':operacao,
     'badge-diaristas':diaristas,
     'badge-dsr':dsr,
-    'badge-faltas':faltas,
+    'badge-faltas':faltas+diaristasDia.faltantes,
     'badge-atestados':atestados,
     'badge-todos-m':total,
     'badge-presentes-m':presentes,
     'badge-operacao-m':operacao,
     'badge-diaristas-m':diaristas,
     'badge-dsr-m':dsr,
-    'badge-faltas-m':faltas,
+    'badge-faltas-m':faltas+diaristasDia.faltantes,
     'badge-atestados-m':atestados
   };
   Object.keys(vals).forEach(function(id){
     const el=document.getElementById(id); if(el)el.textContent=vals[id];
   });
-  const pd=document.getElementById('kpi-presentes-detalhe'); if(pd)pd.textContent=totalPresentes+' de '+total;
-  const od=document.getElementById('kpi-operacao-detalhe'); if(od)od.textContent='Total de presentes hoje';
+  const pd=document.getElementById('kpi-presentes-detalhe'); if(pd)pd.textContent=presentes+' PHD + '+diaristasDia.presentes+' diar.';
+  const od=document.getElementById('kpi-operacao-detalhe'); if(od)od.textContent='Alocados em setores';
 }
 
 function popularSelectFuncoesPorSetor(def){const sel=document.getElementById('novo-funcao');sel.innerHTML="";let og=document.createElement('optgroup');og.label="Status Especiais";STATUS_ESPECIAIS.forEach(function(s){const o=document.createElement('option');o.value=s.valor;o.textContent=s.label;if(s.valor===def)o.selected=true;og.appendChild(o)});sel.appendChild(og);for(const setor of Object.keys(SETORES_E_FUNCOES)){const ogr=document.createElement('optgroup');ogr.label=setor;SETORES_E_FUNCOES[setor].forEach(function(f){const o=document.createElement('option');o.value=f;o.textContent=f;if(f===def)o.selected=true;ogr.appendChild(o)});sel.appendChild(ogr)}}
@@ -949,8 +943,8 @@ function criarListaGeral(cols) {
       afastamento: {tipo:'afastamento', label:'Afastamento', badge:'badge-default'},
       banco_horas: {tipo:'banco_horas', label:'Banco de Horas', badge:'badge-purple'},
       outro_status: {tipo:'outro_status', label:'Outro status', badge:'badge-default'},
-      sem_escala: {tipo:'sem_escala', label:'Sem informação no Excel', badge:'badge-default'}
-    }[st] || {tipo:'sem_escala', label:'-', badge:'badge-default'};
+      sem_escala: {tipo:'sem_escala', label:'Presente (Sem registro)', badge:'badge-success'}
+    }[st] || {tipo:'sem_escala', label:'Presente', badge:'badge-success'};
     const rawPresenca = String((c.presencaDias&&c.presencaDias[diaHoje-1]) || '-').toUpperCase();
     const labelsPresenca = {
       'P':'Presente (P)', 'AF':'Afastamento (AF)', 'AL':'Afastamento longo (AL)', 'AM':'Atestado médico (AM)',
@@ -990,7 +984,7 @@ const td=dd.presentes;
 const totalPresentes=g.presente.length+dd.presentes;
 document.getElementById('kpi-total').innerText=totalEquipeAtual;
 document.getElementById('kpi-presentes').innerText=totalPresentes;
-document.getElementById('kpi-operacao').innerText=totalPresentes;
+document.getElementById('kpi-operacao').innerText=g.operacao.length;
 document.getElementById('kpi-dsr').innerText=g.dsr.length;
 document.getElementById('kpi-banco-horas').innerText=g.banco_horas.length;
 document.getElementById('kpi-faltas').innerText=g.falta.length+dd.faltantes;
@@ -999,8 +993,8 @@ document.getElementById('kpi-diaristas').innerText=td;
 const detP=document.getElementById('kpi-presentes-detalhe');
 if(detP)detP.innerText=g.presente.length+' PHD + '+dd.presentes+' diar.';
 const det=document.getElementById('kpi-operacao-detalhe');
-if(det)det.innerText='Total de presentes hoje';
-const bg={'badge-todos':totalEquipeAtual,'badge-presentes':totalPresentes,'badge-operacao':totalPresentes,'badge-dsr':g.dsr.length,'badge-faltas':g.falta.length+dd.faltantes,'badge-atestados':g.atestado.length,'badge-diaristas':td};
+if(det)det.innerText='Alocados em setores';
+const bg={'badge-todos':totalEquipeAtual,'badge-presentes':totalPresentes,'badge-operacao':g.operacao.length,'badge-dsr':g.dsr.length,'badge-faltas':g.falta.length+dd.faltantes,'badge-atestados':g.atestado.length,'badge-diaristas':td};
 Object.keys(bg).forEach(function(id){const el=document.getElementById(id);if(el)el.innerText=bg[id];const elM=document.getElementById(id+'-m');if(elM)elM.innerText=bg[id]});
 
 if(termo){
