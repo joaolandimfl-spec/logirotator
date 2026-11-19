@@ -937,13 +937,17 @@ function criarListaGeral(cols) {
   const bloco = document.createElement('div');
   bloco.className = 'bg-amber-950/10 border-2 border-amber-500/40 rounded-2xl p-4 shadow-2xl';
   let h = '<div class="flex items-center justify-between pb-3 mb-3 border-b border-amber-500/30 flex-wrap gap-2"><h2 class="text-sm font-bold text-amber-400 flex items-center gap-2"><i data-lucide="layout-grid" class="w-4 h-4"></i> Lista Geral <span class="text-[10px] font-normal opacity-70">- todos os logistas</span></h2><span class="badge badge-warning">' + cols.length + ' colaborador(es)</span></div>';
+  
   if (cols.length === 0) {
     h += '<p class="text-xs text-slate-500 italic py-4 text-center">Nenhum colaborador cadastrado.</p>';
     bloco.innerHTML = h;
     return bloco;
   }
+  
+  // Contadores do topo
   const contagem = {operacao:0, dsr:0, falta:0, atestado:0, ferias:0, afastamento:0, banco_horas:0, outro_status:0, sem_escala:0};
   cols.forEach(function(c){ const st = obterStatusHoje(c); if (contagem[st] !== undefined) contagem[st]++; });
+  
   h += '<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 mb-3">';
   h += '<div class="bg-slate-900 border border-emerald-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-emerald-400 font-bold">Operação</div><div class="text-lg font-extrabold text-emerald-300">' + contagem.operacao + '</div></div>';
   h += '<div class="bg-slate-900 border border-orange-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-orange-400 font-bold">DSR</div><div class="text-lg font-extrabold text-orange-300">' + contagem.dsr + '</div></div>';
@@ -953,38 +957,36 @@ function criarListaGeral(cols) {
   h += '<div class="bg-slate-900 border border-slate-500/30 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-slate-400 font-bold">Afast.</div><div class="text-lg font-extrabold text-slate-300">' + contagem.afastamento + '</div></div>';
   h += '<div class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-center"><div class="text-[10px] uppercase text-slate-400 font-bold">Outros status</div><div class="text-lg font-extrabold text-slate-300">' + (contagem.outro_status + contagem.sem_escala + contagem.banco_horas) + '</div></div>';
   h += '</div>';
+  
+  // Cards
   h += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">';
   cols.forEach(function(c){
     const st = obterStatusHoje(c);
-    const statusInfo = {
-      operacao: {tipo:'operacao', label:'Em Operação', badge:'badge-success'},
-      presente: {tipo:'presente', label:'Presente (P)', badge:'badge-success'},
-      dsr: {tipo:'dsr', label:'Descanso Semanal Remunerado (DSR)', badge:'badge-orange'},
-      falta: {tipo:'falta', label:'Falta Injustificada (F)', badge:'badge-warning'},
-      atestado: {tipo:'atestado', label:'Atestado médico (AM)', badge:'badge-danger'},
-      ferias: {tipo:'ferias', label:'Férias (FE)', badge:'badge-purple'},
-      afastamento: {tipo:'afastamento', label:'Afastamento (AF/AL/DF/DP)', badge:'badge-default'},
-      banco_horas: {tipo:'banco_horas', label:'Banco de Horas (BH)', badge:'badge-purple'},
-      outro_status: {tipo:'outro_status', label:'Outro status', badge:'badge-default'},
-      sem_escala: {tipo:'presente', label:'Presente (Sem registro)', badge:'badge-success'}
-    }[st] || {tipo:'presente', label:'Presente', badge:'badge-success'};
-    const rawPresenca = String((c.presencaDias&&c.presencaDias[diaHoje-1]) || '-').toUpperCase();
-    const labelsPresenca = {
-      'P':'Presente (P)', 'AF':'Afastamento (AF)', 'AL':'Afastamento longo (AL)', 'AM':'Atestado médico (AM)',
-      'BH':'Banco de Horas (BH)', 'DF':'Desligamento forçado (DF)', 'DP':'Desligamento Programado (DP)',
-      'DSR':'Descanso Semanal Remunerado (DSR)', 'DV':'Desligamento voluntário (DV)',
-      'F':'Falta Injustificada (F)', 'FE':'Férias (FE)', 'FJ':'Falta Justificada (FJ)', 'FO':'Folga (FO)',
-      'NC':'Não Contratado (NC)', 'NS':'No-Show (NS)', 'PR':'Promoção (PR)', 'S1':'Sinergia Enviada (S1)',
-      'S2':'Sinergia Recebida (S2)', 'TR':'Transferência (TR)', 'TD':'Treinamento e desenvolvimento (TD)',
-      'SU':'Suspensão (SU)', 'FC':'Folga compensatória (FC)', 'IN':'Internalização (IN)', '-':'Sem informação de presença'
+    
+    // 🎯 AQUI ESTÁ A CORREÇÃO: Usamos o status real (st) para definir o texto e a cor
+    const mapa = {
+      operacao:    { label: 'Em Operação',       badge: 'badge-success' },
+      presente:    { label: 'Presente',          badge: 'badge-success' },
+      dsr:         { label: 'DSR / Folga',       badge: 'badge-orange' },
+      falta:       { label: 'Falta',             badge: 'badge-warning' },
+      atestado:    { label: 'Atestado',          badge: 'badge-danger' },
+      ferias:      { label: 'Férias',            badge: 'badge-purple' },
+      afastamento: { label: 'Afastamento',       badge: 'badge-default' },
+      banco_horas: { label: 'Banco de Horas',    badge: 'badge-purple' },
+      outro_status:{ label: 'Outro status',      badge: 'badge-default' },
+      sem_escala:  { label: 'Presente',          badge: 'badge-success' }
     };
-    const statusLabel = labelsPresenca[rawPresenca] || rawPresenca;
+    
+    const info = mapa[st] || { label: 'Presente', badge: 'badge-success' };
+
     h += '<div class="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-start justify-between gap-2">';
     h += '<div class="min-w-0 flex-1"><div class="text-xs font-bold text-slate-100 truncate">' + c.nome + '</div>';
     h += '<div class="text-[10px] text-slate-400 truncate">' + c.escala + ' · DSR: ' + c.dsr + '</div>';
     h += '<div class="text-[10px] text-slate-500 mt-0.5 truncate">' + c.horario + '</div>';
-    h += '<div class="text-[10px] text-amber-400 font-semibold mt-1">' + statusLabel + '</div></div>';
-    h += '<span class="badge ' + statusInfo.badge + ' shrink-0">' + statusLabel + '</span>';
+    
+    // Mostra o texto correto baseado no status (st)
+    h += '<div class="text-[10px] font-semibold mt-1 text-slate-300">' + info.label + '</div></div>';
+    h += '<span class="badge ' + info.badge + ' shrink-0">' + info.label + '</span>';
     h += '</div>';
   });
   h += '</div>';
